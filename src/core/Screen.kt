@@ -1,5 +1,6 @@
 package core
 
+import math.vec2
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
@@ -71,6 +72,10 @@ class Screen(Tileset: BufferedImage, Font: BufferedImage) {
 
         fun drawTile(g2d: Graphics2D, TileX: Int, TileY: Int, x: Int, y: Int, width: Int, height: Int) {
             g2d.drawImage(TilesetArray[TileX + TILESET_WIDTH * TileY], x, y, width, height, null)
+        }
+
+        fun drawTile(g2d: Graphics2D, TileX: Int, TileY: Int, p: vec2, width: Int, height: Int) {
+            g2d.drawImage(TilesetArray[TileX + TILESET_WIDTH * TileY], p.x.toInt(), p.y.toInt(), width, height, null)
         }
 
         fun showInfo(g2d: Graphics2D, PositionX: Float, PositionY: Float, Title: String, Text: Array<String>, Numbers: IntArray) {

@@ -5,19 +5,23 @@ import java.awt.geom.Rectangle2D
 
 import core.Screen
 import gametype.Game
+import math.vec2
 
-class Wheat(x: Float, y: Float) : Nature() {
+class Wheat(p: vec2) : Nature() {
     var num = 0
 
+    companion object {
+        val EDGE_SIZE = 16
+    }
+
     init {
-        this.x = x
-        this.y = y
-        field = Rectangle2D.Double(x.toDouble(), y.toDouble(), 1.0, 1.0)
+        super.p = p
+        field = Rectangle2D.Float(p.x, p.y, 1.0f, 1.0f)
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 8, 3, x.toInt() - EDGE_SIZE / 2, y.toInt() - EDGE_SIZE / 2 + 2, EDGE_SIZE, EDGE_SIZE)
-        Screen.drawTile(g2d, 7 + num, 6, x.toInt() - EDGE_SIZE / 2, y.toInt() - EDGE_SIZE / 2, EDGE_SIZE, EDGE_SIZE)
+        Screen.drawTile(g2d, 8, 3, p.x.toInt() - EDGE_SIZE / 2, p.y.toInt() - EDGE_SIZE / 2 + 2, EDGE_SIZE, EDGE_SIZE)
+        Screen.drawTile(g2d, 7 + num, 6, p.x.toInt() - EDGE_SIZE / 2, p.y.toInt() - EDGE_SIZE / 2, EDGE_SIZE, EDGE_SIZE)
     }
 
     override fun update() {
@@ -30,12 +34,8 @@ class Wheat(x: Float, y: Float) : Nature() {
         return num + 1
     }
 
-    override fun gatherResources(n: Int) {
-        num -= n
+    override fun gatherResources(amount: Int) {
+        num -= amount
         if (num < 0) Game.natureList.remove(this)
-    }
-
-    companion object {
-        val EDGE_SIZE = 16
     }
 }

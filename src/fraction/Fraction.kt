@@ -47,10 +47,10 @@ open class Fraction {
     var population = 0
     var maxPopulation = 0
     var isDefeated: Boolean = false
-    internal var teamIndex: Int = 0
+    var teamNumber: Int = 0
     var color: Color = Color(0, 0, 0)
-    internal var statusText = arrayOf("", "")
-    protected var tick = 1
+    var statusText = arrayOf("", "")
+    var tick = 1
 
     open fun render(g2d: Graphics2D) {}
 
@@ -74,7 +74,7 @@ open class Fraction {
 
     fun drawStatus(g2d: Graphics2D) {
         if (isDefeated) return
-        if (teamIndex == 0)
+        if (teamNumber == 0)
             Screen.drawString(g2d, statusText[0], status.x.toInt() - statusText[1].length / 2 * Screen.LETTER_WIDTH * 2, status.y.toInt() - 30, 2.0)
         else
             Screen.drawString(g2d, statusText[1], status.x.toInt() - statusText[1].length / 2 * Screen.LETTER_WIDTH * 2, status.y.toInt() - 30, 2.0)
@@ -83,17 +83,13 @@ open class Fraction {
     open fun update() {}
 
     fun updateCenter() {
-        var centerX = 0.0f
-        var centerY = 0.0f
+        var center = vec2(0.0f, 0.0f)
         for (i in buildingList.indices) {
             val building = buildingList[i]
-            centerX += building.x
-            centerY += building.y
+            center += building.p
         }
-        centerX /= buildingList.size.toFloat()
-        centerY /= buildingList.size.toFloat()
-        this.center.x = centerX
-        this.center.y = centerY
+        center /= buildingList.size.toFloat()
+        this.center = center
     }
 
     fun moveStatus() {
@@ -106,8 +102,7 @@ open class Fraction {
         status.y += dy / 100.0f
     }
 
-    open fun placeBuilding(paramInt: Int, paramDouble1: Int, paramDouble2: Int) {}
-
+    open fun placeBuilding(id: Int, p: vec2) {}
 
     fun isColliding(r: Rectangle2D): Boolean {
         for (i in Game.fractionList.indices) {
@@ -121,7 +116,7 @@ open class Fraction {
                 if (entity.field!!.intersects(r)) return true
             }
         }
-        val it = Game.natureList.iterator();
+        val it = Game.natureList.iterator()
         for (n in it) {
             if (n.field!!.intersects(r)) it.remove()
         }
@@ -138,29 +133,27 @@ open class Fraction {
         return false
     }
 
-    fun inRange(BuildingList: ArrayList<Building>, xpos: Double, ypos: Double): Boolean {
+    fun inRange(BuildingList: ArrayList<Building>, xpos: Float, ypos: Float): Boolean {
         for (i in BuildingList.indices) {
             val b = BuildingList[i]
-            if (b.range!!.contains(xpos, ypos)) {
+            if (b.range!!.contains(xpos.toDouble(), ypos.toDouble())) {
                 return true
             }
         }
         return false
     }
 
-    fun getNearestNature(from: vec2, name: String?): vec2 {
-        var D = Integer.MAX_VALUE.toFloat()
-        val target = vec2(from.x, from.y)
+    private fun getNearestNature(from: vec2, name: String?): vec2 {
+        var max = Float.MAX_VALUE
+        var target = vec2(from.x, from.y)
         for (i in Game.natureList.indices) {
             val nature = Game.natureList[i]
             if (nature::class.simpleName == name) {
-                val dx = nature.x - from.x
-                val dy = nature.y - from.y
-                val d = dx * dx + dy * dy
-                if (D > d) {
-                    D = d
-                    target.x = nature.x
-                    target.y = nature.y
+                val delta = nature.p - from
+                val d = delta.square().sum()
+                if (max > d) {
+                    max = d
+                    target = nature.p
                 }
             }
         }

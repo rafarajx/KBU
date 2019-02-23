@@ -6,12 +6,12 @@ import java.awt.geom.Rectangle2D
 import java.util.Random
 
 import fraction.Fraction
+import math.vec2
 
 open class Building {
     var owner: Fraction? = null
 
-    open var x: Int = 0
-    open var y: Int = 0
+    open var p = vec2(0.0f, 0.0f)
     open var field: Rectangle2D? = null
     open var range: Rectangle2D? = null
     open var teamNumber: Int = -1
@@ -40,6 +40,14 @@ open class Building {
             g2d.fillRect(x - 13, y, (current.toFloat() / max * 26).toInt(), 4)
             g2d.color = Color.BLACK
             g2d.drawRect(x - 13, y, (current.toFloat() / max * 26).toInt(), 4)
+        }
+
+        fun drawBar(g2d: Graphics2D, p: vec2, current: Int, max: Int, c: Color) {
+            drawBar(g2d, p.x.toInt(), p.y.toInt(), current, max, c)
+        }
+
+        fun drawBar(g2d: Graphics2D, x: Float, y: Float, current: Int, max: Int, c: Color) {
+            drawBar(g2d, x.toInt(), y.toInt(), current, max, c)
         }
     }
 }

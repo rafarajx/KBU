@@ -11,73 +11,69 @@ import entity.Worker.Stonemason
 import entity.Worker.Woodcutter
 import fraction.Fraction
 import gametype.Game
+import math.vec2
 import nature.Cloud
 
-class House(x: Int, y: Int, owner: Fraction, teamIndex: Int) : Building() {
+class House(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
     override var range: Rectangle2D? = null
     var health = 200
 
-    private val freeMill: Mill?
-        get() {
-            for (i in owner!!.millList.indices) {
-                val m = owner!!.millList[i]
-                if (m.miller == null)
-                    return m
-            }
-            return null
+    private fun freeMill(): Mill? {
+        for (i in owner!!.millList.indices) {
+            val m = owner!!.millList[i]
+            if (m.miller == null)
+                return m
         }
+        return null
+    }
 
     init {
-        this.x = x
-        this.y = y
+        super.p = p
         this.owner = owner
         this.teamNumber = teamIndex
-        this.field = Rectangle2D.Double((x - EDGE_LENGTH / 2).toDouble(), (y - EDGE_LENGTH / 2).toDouble(), EDGE_LENGTH.toDouble(), EDGE_LENGTH.toDouble())
-        this.range = Rectangle2D.Double((x - RANGE / 2).toDouble(), (y - RANGE / 2).toDouble(), RANGE.toDouble(), RANGE.toDouble())
+        this.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
+        this.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
         owner.maxPopulation += 4
         owner.buildingList.add(this)
         owner.houseList.add(this)
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 0, 0, x - EDGE_LENGTH / 2, y - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
-        Building.drawBar(g2d, x, y - 10, health, 200, Color.RED)
+        Screen.drawTile(g2d, 0, 0, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+        Building.drawBar(g2d, p.x, p.y - 10, health, 200, Color.RED)
         if (owner!!.population < owner!!.maxPopulation)
-            Building.drawBar(g2d, x, y, tick % 1000, 1000, Color.ORANGE)
+            Building.drawBar(g2d, p, tick % 1000, 1000, Color.ORANGE)
     }
 
     override fun update() {
         if (health <= 0) die()
-        if (tick % 100 == 0) {
-            Game.natureList.add(Cloud(x - 3, y - 15))
+        if (tick % 100 == 0 || tick % 173 == 0) {
+            Game.natureList.add(Cloud(p - vec2(3.0f, 5.0f)))
         }
-        if (tick % 173 == 0) {
-            Game.natureList.add(Cloud(x - 3, y - 15))
-        }
-        if (tick % 1000 == 0 && owner!!.population < owner!!.maxPopulation && owner!!.resources!!.enough(0, 0, 0, 5)) {
+        if (tick % 1000 == 0 && owner!!.population < owner!!.maxPopulation && owner!!.resources.enough(0, 0, 0, 5)) {
             val mill: Mill?
-            if (freeMill != null) {
-                mill = freeMill;
-                owner!!.entityList.add(Miller(x, y, owner!!, teamNumber))
-                val miller = Miller(x, y, owner!!, teamNumber)
+            if (freeMill() != null) {
+                mill = freeMill()
+                owner!!.entityList.add(Miller(p, owner!!, teamNumber))
+                val miller = Miller(p, owner!!, teamNumber)
                 miller.mill = mill
-                mill!!.miller = miller
-                owner!!.resources!!.food -= 5
-            } else if (countEntities(Stonemason::class.java!!.getName()) < owner!!.quarryList.size) {
-                owner!!.entityList.add(Stonemason(x, y, owner!!, teamNumber))
-                owner!!.resources!!.food -= 5
-            } else if (countEntities(Woodcutter::class.java!!.getName()) < owner!!.woodCampList.size) {
-                owner!!.entityList.add(Woodcutter(x, y, owner!!, teamNumber))
-                owner!!.resources!!.food -= 5
+                mill!!.miller[0] = miller
+                owner!!.resources.food -= 5
+            } else if (countEntities(Stonemason::class.simpleName) < owner!!.quarryList.size) {
+                owner!!.entityList.add(Stonemason(p, owner!!, teamNumber))
+                owner!!.resources.food -= 5
+            } else if (countEntities(Woodcutter::class.simpleName) < owner!!.woodCampList.size) {
+                owner!!.entityList.add(Woodcutter(p, owner!!, teamNumber))
+                owner!!.resources.food -= 5
             }
         }
         tick++
     }
 
-    private fun countEntities(name: String): Int {
+    private fun countEntities(name: String?): Int {
         var n = 0
         for (i in owner!!.entityList.indices)
-            if (owner!!.entityList[i].javaClass.getName() == name) n++
+            if (owner!!.entityList[i]::class.simpleName == name) n++
         return n
     }
 

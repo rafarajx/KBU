@@ -6,8 +6,9 @@ import java.awt.geom.Rectangle2D
 
 import building.Grave
 import gametype.Game
+import math.vec2
 
-class ZombieAI(StartX: Int, StartY: Int, nation: String, fractionIndex: Int, c: Color, TeamIndex: Int) : Fraction() {
+class ZombieAI(StartX: Int, StartY: Int, c: Color, TeamIndex: Int) : Fraction() {
     var queueNum = 0
     var buildingQueue = IntArray(1)
 
@@ -15,7 +16,7 @@ class ZombieAI(StartX: Int, StartY: Int, nation: String, fractionIndex: Int, c: 
         this.center.x = StartX.toFloat()
         this.center.y = StartY.toFloat()
         this.color = c
-        this.teamIndex = TeamIndex
+        this.teamNumber = TeamIndex
         this.AIBuildingTime = 30
         this.AIRange = 2000
         this.baseAIRange = 2000
@@ -42,23 +43,20 @@ class ZombieAI(StartX: Int, StartY: Int, nation: String, fractionIndex: Int, c: 
         if (tick % AIBuildingTime == 0) {
             val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
             val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
-            placeBuilding(this.buildingQueue[this.queueNum % this.buildingQueue.size], x + Game.cameraX,
-                    y + Game.cameraY)
+            placeBuilding(this.buildingQueue[this.queueNum % this.buildingQueue.size], vec2(x, y) + Game.camera)
         }
         tick++
     }
 
-    override fun placeBuilding(selectedBuilding: Int, positionX: Int, positionY: Int) {
-        val cameraX = Game.cameraX.toDouble()
-        val cameraY = Game.cameraY.toDouble()
-        val r = Rectangle2D.Double(positionX.toDouble() - cameraX - 16.0, positionY.toDouble() - cameraY - 16.0, 32.0, 32.0)
+    override fun placeBuilding(selectedBuilding: Int, p: vec2) {
+        val camera = Game.camera
+        val r = Rectangle2D.Double(p.x - camera.x - 16.0, p.y - camera.y - 16.0, 32.0, 32.0)
         if (isColliding(r)) {
             return
         }
         when (selectedBuilding) {
-            0 -> this.buildingList.add(Grave(positionX, positionY, this, teamIndex))
+            0 -> this.buildingList.add(Grave(p, this, teamNumber))
         }
     }
 
-    fun pay(Cost: IntArray) {}
 }

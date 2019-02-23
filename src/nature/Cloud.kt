@@ -5,34 +5,33 @@ import java.awt.geom.Rectangle2D
 
 import core.Screen
 import gametype.Game
+import math.vec2
 
-class Cloud(x: Int, y: Int) : Nature() {
-    var SpreadLevel = 0
-    var FieldSize = 16
+class Cloud(p: vec2) : Nature() {
+    var spreadLevel = 0
+    var fieldSize = 16
 
     init {
-        this.x = x.toFloat()
-        this.y = y.toFloat()
-        this.field = Rectangle2D.Float(this.x, this.y, 1.0f, 1.0f)
+        super.p = p
+        super.field = Rectangle2D.Float(p.x, p.y, 1.0f, 1.0f)
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 7 + this.SpreadLevel, 1, this.x.toInt(), this.y.toInt(), this.FieldSize, this.FieldSize)
+        Screen.drawTile(g2d, 7 + this.spreadLevel, 1, p, this.fieldSize, this.fieldSize)
     }
 
     override fun update() {
         if (tick % 30 == 0) {
-            SpreadLevel++
+            spreadLevel++
         }
         if (tick % 20 == 0) {
-            x += (Nature.r.nextInt(4) - 1).toFloat()
-            y -= (Nature.r.nextInt(1) + 3).toFloat()
+            p += vec2((Nature.r.nextInt(4) - 1).toFloat(), -(Nature.r.nextInt(1) + 3).toFloat())
         }
-        if (this.SpreadLevel == 5) {
+        if (this.spreadLevel == 5) {
             Game.natureList.remove(this)
         }
         tick++
     }
 
-    override fun gatherResources(num: Int) {}
+    override fun gatherResources(amount: Int) {}
 }

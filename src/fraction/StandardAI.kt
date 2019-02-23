@@ -6,21 +6,21 @@ import java.awt.geom.Rectangle2D
 
 import building.*
 import core.Resources
+import math.vec2
 
-class StandardAI(startX: Int, startY: Int, nation: String, fractionIndex: Int, color: Color, resources: Resources, AIBuildingTime: Int, baseAIRange: Int, TeamIndex: Int) : Fraction() {
+class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, resources: Resources, AIBuildingTime: Int, baseAIRange: Int, TeamNumber: Int) : Fraction() {
 
     init {
-        this.center.x = startX.toFloat()
-        this.center.y = startY.toFloat()
+        this.center = start.copy()
         this.color = color
         this.resources = resources
         this.fractionIndex = fractionIndex
         this.nation = nation
-        this.teamIndex = TeamIndex
+        this.teamNumber = TeamNumber
         this.AIBuildingTime = AIBuildingTime
         this.baseAIRange = baseAIRange
         this.AIRange = baseAIRange
-        this.buildingList.add(Tower(startX, startY, this, TeamIndex))
+        this.buildingList.add(Tower(start, this, TeamNumber))
         status.x = center.x
         status.y = center.y
         statusText[0] = "Friend"
@@ -85,41 +85,41 @@ class StandardAI(startX: Int, startY: Int, nation: String, fractionIndex: Int, c
         when (bnum) {
             Building.HOUSE -> {
                 if (resources.enough(House.COST)) {
-                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
-                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
+                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x
+                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
                     if (isColliding(r)) {
                         this.AIRange += 50
                         return
                     }
                     resources.pay(House.COST)
-                    House(x, y, this, teamIndex)
+                    House(vec2(x, y), this, teamNumber)
                 }
             }
             Building.MILL -> {
                 if (resources.enough(Mill.COST)) {
-                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
-                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
+                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x
+                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
                     if (isColliding(r)) {
                         this.AIRange += 50
                         return
                     }
                     resources.pay(Mill.COST)
-                    Mill(x, y, this, teamIndex)
+                    Mill(vec2(x, y), this, teamNumber)
                 }
             }
             Building.TOWER -> {
                 if (resources.enough(Tower.COST)) {
-                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
-                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
+                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x
+                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
                     if (isColliding(r)) {
                         this.AIRange += 50
                         return
                     }
                     resources.pay(Tower.COST)
-                    Tower(x, y, this, teamIndex)
+                    Tower(vec2(x, y), this, teamNumber)
                 }
             }
             Building.WOODCAMP -> {
@@ -136,7 +136,7 @@ class StandardAI(startX: Int, startY: Int, nation: String, fractionIndex: Int, c
                         return
                     }
                     resources.pay(WoodCamp.COST)
-                    WoodCamp(p.x.toInt(), p.y.toInt(), this, teamIndex)
+                    WoodCamp(p, this, teamNumber)
                 }
             }
             Building.QUARRY -> {
@@ -153,20 +153,20 @@ class StandardAI(startX: Int, startY: Int, nation: String, fractionIndex: Int, c
                         return
                     }
                     resources.pay(Quarry.COST)
-                    Quarry(p.x.toInt(), p.y.toInt(), this, teamIndex)
+                    Quarry(p, this, teamNumber)
                 }
             }
             Building.BARRACK -> {
                 if (resources.enough(Barrack.COST)) {
-                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
-                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
+                    val x = random.nextInt(AIRange) - AIRange / 2 + center.x
+                    val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
                     if (isColliding(r)) {
                         this.AIRange += 50
                         return
                     }
                     resources.pay(Barrack.COST)
-                    Barrack(x, y, this, teamIndex)
+                    Barrack(vec2(x, y), this, teamNumber)
                 }
             }
         }

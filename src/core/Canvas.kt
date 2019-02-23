@@ -18,8 +18,8 @@ class Canvas : java.awt.Canvas() {
         addMouseMotionListener(Frame.input)
         addKeyListener(Frame.input)
         try {
-            Screen(ImageIO.read(Main::class.java!!.getResourceAsStream("/Tileset.png")),
-                    ImageIO.read(Main::class.java!!.getResourceAsStream("/Font.png")))
+            Screen(ImageIO.read(Main::class.java.getResourceAsStream("/Tileset.png")),
+                    ImageIO.read(Main::class.java.getResourceAsStream("/Font.png")))
         } catch (e: IOException) {
             e.printStackTrace()
             System.exit(0)

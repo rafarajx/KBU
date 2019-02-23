@@ -22,6 +22,7 @@ import core.Resources
 import core.Screen
 import fraction.Fraction
 import fraction.Player
+import math.vec2
 import nature.Flowers
 import nature.Grass
 import nature.Nature
@@ -51,10 +52,9 @@ open class Game {
         var mouseY: Int = 0
         val PLAYER_INDEX: Int
         var fractionList: ArrayList<Fraction>
-        var player: Player = Player(1000, 100, "PLAYER", 0, Color.BLUE, Resources(100, 60, 10, 200), 0)
+        var player: Player = Player(vec2(1000.0f, 100.0f), "PLAYER", 0, Color.BLUE, Resources(100, 60, 10, 200), 0)
         var natureList = ArrayList<Nature>()
-        var cameraX: Int = 0
-        var cameraY: Int = 0
+        var camera = vec2(0.0f, 0.0f)
         val MENU_BAR: Array<IntArray>
         var MENU_BAR_SCALE: Int = 0
         var SELECTED_BUILDING: Int = 0
@@ -75,8 +75,6 @@ open class Game {
             PLAYER_INDEX = 0
             fractionList = ArrayList()
             natureList = ArrayList()
-            cameraY = 0
-            cameraX = 0
             MENU_BAR = arrayOf(IntArray(2), intArrayOf(0, 1), intArrayOf(0, 2), intArrayOf(0, 3), intArrayOf(0, 4), intArrayOf(0, 5), intArrayOf(0, 6))
             MENU_BAR_SCALE = 3
             SELECTED_BUILDING = 0
@@ -90,34 +88,34 @@ open class Game {
 
         fun setupNature(fractions: Int) {
             for (i in 0..1000) {
-                val x = random.nextInt(3000) - 500
-                val y = random.nextInt(3000) - 500
-                if (!isColliding(Rectangle2D.Double((x - Tree.EDGE_LENGTH / 2).toDouble(), (y - Tree.EDGE_LENGTH / 2).toDouble(), Tree.EDGE_LENGTH.toDouble(), Tree.EDGE_LENGTH.toDouble()))) {
-                    natureList.add(Tree(x.toFloat(), y.toFloat()))
+                val x = random.nextInt(3000) - 500.toFloat()
+                val y = random.nextInt(3000) - 500.toFloat()
+                if (!isColliding(Rectangle2D.Float(x - Tree.EDGE_LENGTH / 2, y - Tree.EDGE_LENGTH / 2, Tree.EDGE_LENGTH.toFloat(), Tree.EDGE_LENGTH.toFloat()))) {
+                    natureList.add(Tree(vec2(x, y)))
                 }
             }
             for (i in 0..49) {
-                val x = random.nextInt(3000) - 500
-                val y = random.nextInt(3000) - 500
-                if (!isColliding(Rectangle2D.Double((x - 8).toDouble(), (y - 8).toDouble(), 16.0, 16.0))) {
-                    natureList.add(Flowers(x.toFloat(), y.toFloat()))
+                val x = random.nextInt(3000) - 500.toFloat()
+                val y = random.nextInt(3000) - 500.toFloat()
+                if (!isColliding(Rectangle2D.Float(x - 8.0f, y - 8.0f, 16.0f, 16.0f))) {
+                    natureList.add(Flowers(vec2(x, y)))
                 }
             }
             for (i in 0..49) {
-                val x = random.nextInt(3000) - 500
-                val y = random.nextInt(3000) - 500
-                if (!isColliding(Rectangle2D.Double((x - 8).toDouble(), (y - 8).toDouble(), 16.0, 16.0))) {
-                    natureList.add(Grass(x.toFloat(), y.toFloat()))
+                val x = random.nextInt(3000) - 500.toFloat()
+                val y = random.nextInt(3000) - 500.toFloat()
+                if (!isColliding(Rectangle2D.Float(x - 8.0f, y - 8.0f, 16.0f, 16.0f))) {
+                    natureList.add(Grass(vec2(x, y)))
                 }
             }
             for (i1 in 0 until 4 * fractions) {
-                val x1 = random.nextInt(3000) - 500
-                val y1 = random.nextInt(3000) - 500
+                val x1 = random.nextInt(3000) - 500.toFloat()
+                val y1 = random.nextInt(3000) - 500.toFloat()
                 for (i2 in 0..9) {
-                    val x2 = random.nextInt(200)
-                    val y2 = random.nextInt(200)
-                    if (!isColliding(Rectangle2D.Double((x1 + x2 - 8).toDouble(), (y1 + y2 - 8).toDouble(), 16.0, 16.0))) {
-                        natureList.add(Rock((x1 + x2).toFloat(), (y1 + y2).toFloat()))
+                    val x2 = random.nextInt(200).toFloat()
+                    val y2 = random.nextInt(200).toFloat()
+                    if (!isColliding(Rectangle2D.Float(x1 + x2 - 8.0f, y1 + y2 - 8.0f, 16.0f, 16.0f))) {
+                        natureList.add(Rock(vec2(x1 + x2, y1 + y2)))
                     }
                 }
             }
@@ -144,7 +142,7 @@ open class Game {
 
         fun drawObjects(g2d: Graphics2D) {
             AF = g2d.transform
-            g2d.translate(cameraX, cameraY)
+            g2d.translate(camera.x.toInt(), camera.y.toInt())
             for (i in fractionList.indices)
                 fractionList[i].renderBuildings(g2d)
             for (i in fractionList.indices)
@@ -220,13 +218,13 @@ open class Game {
             for (fraction in fractionList) {
                 g2d.color = fraction.color
                 for (building in fraction.buildingList) {
-                    val x = Math.min(Math.max(0, (building.x.toFloat() / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
-                    val y = Math.min(Math.max(0, (building.y.toFloat() / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
+                    val x = Math.min(Math.max(0, (building.p.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
+                    val y = Math.min(Math.max(0, (building.p.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
                     g2d.fillRect(x, y, 2, 2)
                 }
                 for (entity in fraction.entityList) {
-                    val x = Math.min(Math.max(0, (entity.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
-                    val y = Math.min(Math.max(0, (entity.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
+                    val x = Math.min(Math.max(0, (entity.p.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
+                    val y = Math.min(Math.max(0, (entity.p.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
                     g2d.fillRect(x, y, 1, 1)
                 }
             }
@@ -236,10 +234,10 @@ open class Game {
             g2d.drawLine(MINIMAP_SIZE - 1, MINIMAP_SIZE - 1, 0, MINIMAP_SIZE - 1)
             g2d.drawLine(0, MINIMAP_SIZE - 1, 0, 0)
 
-            val cx1 = ((-Game.cameraX).toDouble() / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
-            val cx2 = ((-Game.cameraX + Canvas.WIDTH).toDouble() / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
-            val cy1 = ((-Game.cameraY).toDouble() / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
-            val cy2 = ((-Game.cameraY + Canvas.HEIGHT).toDouble() / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
+            val cx1 = ((-camera.x) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
+            val cx2 = ((-camera.x + Canvas.WIDTH) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
+            val cy1 = ((-camera.y) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
+            val cy2 = ((-camera.y + Canvas.HEIGHT) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
 
             g2d.drawLine(cx1, cy1, cx2, cy1)
             g2d.drawLine(cx2, cy1, cx2, cy2)
@@ -261,7 +259,7 @@ open class Game {
         fun updateInput() {
             if (Input.mousePressed) {
                 if (Input.mouseButton == 1) {
-                    player.placeBuilding(SELECTED_BUILDING, Input.mouseX, Input.mouseY)
+                    player.placeBuilding(SELECTED_BUILDING, vec2(Input.mouseX.toFloat(), Input.mouseY.toFloat()))
                 }
             }
             if (Input.mouseMoved) {
@@ -271,14 +269,14 @@ open class Game {
                 y1 = Input.mouseY.toFloat()
             }
             if (Input.mouseButton == 3 || Input.mouseButton == 2) {
-                val x2 = Input.mouseX.toDouble()
-                val y2 = Input.mouseY.toDouble()
-                val XD = x2 - x1
-                val YD = y2 - y1
+                val x2 = Input.mouseX.toFloat()
+                val y2 = Input.mouseY.toFloat()
+                val xd = x2 - x1
+                val yd = y2 - y1
                 x1 = Input.mouseX.toFloat()
                 y1 = Input.mouseY.toFloat()
-                cameraX += XD.toInt()
-                cameraY += YD.toInt()
+                camera.x += xd
+                camera.y += yd
             }
             if (tick % 5 == 0) {
                 if (Input.isKeyDown(37) && SELECTED_BUILDING > 0) SELECTED_BUILDING--

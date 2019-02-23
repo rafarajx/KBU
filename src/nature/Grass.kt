@@ -4,22 +4,20 @@ import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
 import core.Screen
+import math.vec2
 
-class Grass(x: Float, y: Float) : Nature() {
+class Grass(p: vec2) : Nature() {
     internal var num = 0
     internal var FieldSize = 16
 
     init {
-        this.x = x
-        this.y = y
-        this.field = Rectangle2D.Double(x.toDouble(), y.toDouble(), 1.0, 1.0)
+        super.p = p
+        super.field = Rectangle2D.Float(p.x, p.y, 1.0f, 1.0f)
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 8, 3, this.x.toInt() - this.FieldSize / 2, this.y.toInt() - this.FieldSize / 2 + 2,
-                this.FieldSize, this.FieldSize)
-        Screen.drawTile(g2d, 7 + this.num, 5, this.x.toInt() - this.FieldSize / 2, this.y.toInt() - this.FieldSize / 2,
-                this.FieldSize, this.FieldSize)
+        Screen.drawTile(g2d, 8, 3, p.x.toInt() - FieldSize / 2, p.y.toInt() - FieldSize / 2 + 2, FieldSize, FieldSize)
+        Screen.drawTile(g2d, 7 + num, 5, p.x.toInt() - FieldSize / 2, p.y.toInt() - FieldSize / 2, FieldSize, FieldSize)
     }
 
     override fun update() {
@@ -29,5 +27,5 @@ class Grass(x: Float, y: Float) : Nature() {
         this.tick += 1
     }
 
-    override fun gatherResources(num: Int) {}
+    override fun gatherResources(amount: Int) {}
 }

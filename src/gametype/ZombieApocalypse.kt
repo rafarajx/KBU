@@ -8,6 +8,7 @@ import core.Screen
 import fraction.Player
 import fraction.StandardAI
 import fraction.ZombieAI
+import math.vec2
 import sound.SimpleSound
 
 class ZombieApocalypse(FriendsNumber: Int, difficulty: Int) : Game() {
@@ -20,25 +21,23 @@ class ZombieApocalypse(FriendsNumber: Int, difficulty: Int) : Game() {
         Game.natureList.clear()
         Game.fractionList.clear()
         Game.setupNature(FriendsNumber + 1)
-        var StartX = 1000
-        var StartY = 1000
-        Game.fractionList.add(Player(StartX, StartY, "PLAYER", 0, Color.BLUE, Resources(100, 60, 8, 30), 0))
+        var start = vec2(1000.0f, 1000.0f)
+        Game.fractionList.add(Player(start, Color.BLUE, Resources(100, 60, 8, 30), 0))
         difficulty++
         for (i in 0 until FriendsNumber) {
             val red = Game.random.nextInt(255)
             val green = Game.random.nextInt(255)
             val blue = Game.random.nextInt(255)
             val c = Color(red, green, blue)
-            StartX = Game.random.nextInt(2000)
-            StartY = Game.random.nextInt(2000)
+            start = vec2(Game.random.nextInt(2000), Game.random.nextInt(2000))
             Game.fractionList.add(
                     StandardAI(
-                            StartX, StartY, "AI1", i + 1, c, Resources(
+                            start, "AI1", i + 1, c, Resources(
                             200 / difficulty, 120 / difficulty, 20 / difficulty, 60 / difficulty),
                             60 * difficulty, (5 - difficulty) * 50, 0)
             )
         }
-        Game.fractionList.add(ZombieAI(1000, 1000, "Zombies", FriendsNumber + 1, Color.RED, 1))
+        Game.fractionList.add(ZombieAI(1000, 1000, Color.RED, 1))
     }
 
     override fun render(g2d: Graphics2D) {

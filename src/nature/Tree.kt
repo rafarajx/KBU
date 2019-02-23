@@ -5,26 +5,26 @@ import java.awt.geom.Rectangle2D
 
 import core.Screen
 import gametype.Game
+import math.vec2
 
-class Tree(x: Float, y: Float) : Nature() {
+class Tree(p: vec2) : Nature() {
     var range: Rectangle2D? = null
     var resources = 200
-    var num: Int = 0
+    private var num: Int = 0
 
     init {
-        this.x = x
-        this.y = y
+        super.p = p
         this.num = Nature.r.nextInt(2)
-        this.field = Rectangle2D.Double(x - 16.0, y - 16.0, 32.0, 32.0)
+        this.field = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 8, 3, this.x.toInt() - 16, this.y.toInt() - 16 + 7, 32, 32)
-        Screen.drawTile(g2d, this.resources / 15, 15 - this.num, this.x.toInt() - 16, this.y.toInt() - 16, 32, 32)
+        Screen.drawTile(g2d, 8, 3, p.x.toInt() - 16, p.y.toInt() - 16 + 7, 32, 32)
+        Screen.drawTile(g2d, resources / 15, 15 - num, p.x.toInt() - 16, p.y.toInt() - 16, 32, 32)
     }
 
     override fun update() {
-        if (this.resources <= 0) {
+        if (resources <= 0) {
             die()
         }
     }
@@ -33,8 +33,8 @@ class Tree(x: Float, y: Float) : Nature() {
         Game.natureList.remove(this)
     }
 
-    override fun gatherResources(num: Int) {
-        this.resources -= num
+    override fun gatherResources(amount: Int) {
+        resources -= amount
     }
 
     companion object {

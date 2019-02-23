@@ -11,16 +11,16 @@ import core.Screen
 import entity.Entity
 import fraction.Fraction
 import gametype.Game
+import math.vec2
 import nature.Tree
 
-class Woodcutter(x: Int, y: Int, owner: Fraction, teamIndex: Int) : Entity() {
+class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     private var hasWood: Boolean = false
 
     init {
-        super.x = x.toFloat()
-        super.y = y.toFloat()
+        super.p = p
         super.owner = owner
-        super.teamIndex = teamIndex
+        super.teamNumber = teamIndex
         edgeLength = 16
         health = 50
         damage = 10
@@ -31,23 +31,23 @@ class Woodcutter(x: Int, y: Int, owner: Fraction, teamIndex: Int) : Entity() {
 
     override fun render(g2d: Graphics2D) {
         if (target == null) {
-            Screen.drawTile(g2d, 1, 8, x.toInt() - edgeLength / 2, y.toInt() - edgeLength / 2, edgeLength, edgeLength)
+            Screen.drawTile(g2d, 1, 8, p - edgeLength / 2, edgeLength, edgeLength)
         } else {
             if (hasWood) {
                 drawAnimatedEntity(g2d, 1, 9)
-                Screen.drawTile(g2d, 7, 0, x.toInt() - 8, y.toInt() - 14, edgeLength, edgeLength)
+                Screen.drawTile(g2d, 7, 0, p.x.toInt() - 8, p.y.toInt() - 14, edgeLength, edgeLength)
             } else {
                 drawAnimatedEntity(g2d, 1, 8)
             }
         }
         if (Input.isKeyDown(32)) {
-            Entity.drawBar(g2d, x.toInt(), y.toInt(), health, 50, Color.RED)
+            Entity.drawBar(g2d, p, health, 50, Color.RED)
         }
     }
 
     override fun update() {
         if (health < 0) die()
-        field = Rectangle2D.Double((x - edgeLength / 2).toDouble(), (y - edgeLength / 2).toDouble(), edgeLength.toDouble(), edgeLength.toDouble())
+        field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
         if (hasWood) {
             if (tick % 15 == 0) {
                 target = getNearestBuilding(WoodCamp::class.simpleName)
@@ -64,21 +64,17 @@ class Woodcutter(x: Int, y: Int, owner: Fraction, teamIndex: Int) : Entity() {
             }
         }
         if (target != null) {
-            val dx = (target!!.x - x).toDouble()
-            val dy = (target!!.y - y).toDouble()
-            val d = Math.sqrt(Math.pow(dx, 2.0) + Math.pow(dy, 2.0))
-            if (d == 0.0) {
-                my = 0f
-                mx = my
+            val delta = target!! - p
+            val d = delta.square().sum()
+            if (d == 0.0f) {
+                move = vec2(0.0f, 0.0f)
             } else {
-                mx = (dx / d).toFloat()
-                my = (dy / d).toFloat()
+                move = delta / d
             }
-            x += mx * speed
-            y += my * speed
+            p += move * speed
         }
         if (tick % 1200 == 0) {
-            owner!!.resources!!.pay(Resources(0, 0, 0, 1))
+            owner!!.resources.pay(Resources(0, 0, 0, 1))
         }
         tick++
     }
@@ -97,8 +93,8 @@ class Woodcutter(x: Int, y: Int, owner: Fraction, teamIndex: Int) : Entity() {
     private fun leaveWood() {
         for (j in owner!!.buildingList.indices) {
             val building = owner!!.buildingList[j]
-            if (building.javaClass.getName() == WoodCamp::class.java!!.getName() && building.field!!.intersects(field!!)) {
-                owner!!.resources!!.gain(Resources(1, 0, 0, 0))
+            if (building::class.simpleName == WoodCamp::class.simpleName && building.field!!.intersects(field!!)) {
+                owner!!.resources.gain(Resources(1, 0, 0, 0))
                 hasWood = false
                 return
             }

@@ -8,18 +8,18 @@ import java.awt.geom.Rectangle2D
 import core.Main
 import core.Resources
 import gametype.Game
+import math.vec2
 
-class Uprising(startX: Int, startY: Int, Nation: String, fractionIndex: Int, teamIndex: Int) : Fraction() {
+class Uprising(start: vec2, teamIndex: Int) : Fraction() {
     var queueNum = 0
     var buildingQueue = intArrayOf(2, 2, 2, 5, 6, 6, 6, 6)
 
     init {
-        this.center.x = startX.toFloat()
-        this.center.y = startY.toFloat()
-        this.teamIndex = teamIndex
+        this.center = start.copy()
+        this.teamNumber = teamIndex
         this.AIRange = baseAIRange
         this.baseAIRange = baseAIRange
-        this.buildingList.add(Tower(startX, startY, this, teamIndex))
+        this.buildingList.add(Tower(start, this, teamIndex))
         color = Color.RED
         maxPopulation = Main.BILLION
         resources = Resources(Main.BILLION)
@@ -43,16 +43,14 @@ class Uprising(startX: Int, startY: Int, Nation: String, fractionIndex: Int, tea
         if (tick % 1200 == 0) {
             val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
             val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
-            placeBuilding(buildingQueue[queueNum % buildingQueue.size], x + Game.cameraX, y + Game.cameraY)
+            placeBuilding(buildingQueue[queueNum % buildingQueue.size], vec2(x, y) + Game.camera)
         }
         tick++
     }
 
-    override fun placeBuilding(selectedBuilding: Int, positionX: Int, positionY: Int) {
-
-        val cameraX = Game.cameraX
-        val cameraY = Game.cameraY
-        val r = Rectangle2D.Float(positionX.toFloat() - cameraX.toFloat() - 16.0f, positionY.toFloat() - cameraY.toFloat() - 16.0f, 32.0f, 32.0f)
+    override fun placeBuilding(selectedBuilding: Int, p: vec2) {
+        val camera = Game.camera
+        val r = Rectangle2D.Float(p.x - camera.x - 16.0f, p.y - camera.y - 16.0f, 32.0f, 32.0f)
         if (isColliding(r)) {
             this.AIRange += 100
             return
@@ -60,31 +58,31 @@ class Uprising(startX: Int, startY: Int, Nation: String, fractionIndex: Int, tea
         when (selectedBuilding) {
             Building.HOUSE -> if (resources.enough(House.COST)) {
                 resources.pay(House.COST)
-                buildingList.add(House(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(House(p - camera, this, teamNumber))
             }
             Building.MILL -> if (resources.enough(Mill.COST)) {
                 resources.pay(Mill.COST)
-                buildingList.add(Mill(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(Mill(p - camera, this, teamNumber))
             }
             Building.TOWER -> if (resources.enough(Tower.COST)) {
                 resources.pay(Tower.COST)
-                buildingList.add(Tower(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(Tower(p - camera, this, teamNumber))
             }
             Building.WOODCAMP -> if (resources.enough(WoodCamp.COST)) {
                 resources.pay(WoodCamp.COST)
-                buildingList.add(WoodCamp(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(WoodCamp(p - camera, this, teamNumber))
             }
             Building.QUARRY -> if (resources.enough(Quarry.COST)) {
                 resources.pay(Quarry.COST)
-                buildingList.add(Quarry(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(Quarry(p - camera, this, teamNumber))
             }
             Building.BARRACK -> if (resources.enough(Barrack.COST)) {
                 resources.pay(Barrack.COST)
-                buildingList.add(Barrack(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(Barrack(p - camera, this, teamNumber))
             }
             Building.BARRICADE -> if (resources.enough(Barricade.COST)) {
                 resources.pay(Barricade.COST)
-                buildingList.add(Barricade(positionX - cameraX, positionY - cameraY, this, teamIndex))
+                buildingList.add(Barricade(p - camera, this, teamNumber))
             }
         }
         AIRange = baseAIRange

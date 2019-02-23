@@ -11,16 +11,15 @@ import fraction.Fraction
 import gametype.Game
 import math.vec2
 import sound.SimpleSound
+import kotlin.math.hypot
 
 open class Entity {
-    var x: Float = 0.0f
-    var y: Float = 0.0f
-    protected var mx: Float = 0.0f
-    protected var my: Float = 0.0f
+    var p = vec2(0.0f, 0.0f)
+    protected var move = vec2(0.0f, 0.0f)
     protected var owner: Fraction? = null
     var field: Rectangle2D? = null
     protected var range: Ellipse2D? = null
-    var teamIndex: Int = 0
+    var teamNumber: Int = 0
     protected var health: Int = 0
     protected var damage: Int = 0
     protected var speed: Float = 0.0f
@@ -31,18 +30,18 @@ open class Entity {
     open fun render(g2d: Graphics2D) {}
 
     fun drawAnimatedEntity(g2d: Graphics2D, tileX: Int, tileY: Int) {
-        val sx = x.toInt() - edgeLength / 2
-        val sy = y.toInt() - edgeLength / 2
-        if (mx == 0f && my == 0f) {
+        val sx = p.x.toInt() - edgeLength / 2
+        val sy = p.y.toInt() - edgeLength / 2
+        if (move.x == 0f && move.y == 0f) {
             Screen.drawTile(g2d, tileX, tileY, sx, sy, edgeLength, edgeLength)
             return
         }
         val frame = tick % 48 / 16
         var offset = 0
-        if (my < 0 && my > Math.abs(mx)) offset = 3 //up
-        if (my > 0 && my > Math.abs(mx)) offset = 0 //down
-        if (mx < 0 && mx > Math.abs(my)) offset = 9 //left
-        if (mx > 0 && mx > Math.abs(my)) offset = 6 //right
+        if (move.y < 0 && move.y > Math.abs(move.x)) offset = 3 //up
+        if (move.y > 0 && move.y > Math.abs(move.x)) offset = 0 //down
+        if (move.x < 0 && move.x > Math.abs(move.y)) offset = 9 //left
+        if (move.x > 0 && move.x > Math.abs(move.y)) offset = 6 //right
         Screen.drawTile(g2d, tileX + offset + frame, tileY, sx, sy, edgeLength, edgeLength)
     }
 
@@ -54,33 +53,29 @@ open class Entity {
         health -= dmg
     }
 
-    fun getNearestEnemy(x: Float, y: Float, TeamIndex: Int): vec2 {
-        var D = Integer.MAX_VALUE.toFloat()
-        val targetPosition = vec2(x, y)
+    fun getNearestEnemy(p : vec2, TeamIndex: Int): vec2 {
+        var max = Float.MAX_VALUE
+        var targetPosition = p.copy()
         for (i in Game.fractionList.indices) {
             val fraction = Game.fractionList[i]
             for (j in fraction.entityList.indices) {
                 val entity = fraction.entityList[j]
-                if (entity.teamIndex == TeamIndex) break
-                val dx = entity.x - x
-                val dy = entity.y - y
-                val d = dx * dx + dy * dy
-                if (D > d) {
-                    D = d
-                    targetPosition.x = entity.x
-                    targetPosition.y = entity.y
+                if (entity.teamNumber == TeamIndex) break
+                var delta = entity.p - p
+                val d = hypot(delta.x, delta.y)
+                if (max > d) {
+                    max = d
+                    targetPosition = entity.p.copy()
                 }
             }
             for (j in fraction.buildingList.indices) {
                 val building = fraction.buildingList[j]
                 if (building.teamNumber == TeamIndex) break
-                val dx = building.x - x
-                val dy = building.y - y
-                val d = dx * dx + dy * dy
-                if (D > d) {
-                    D = d
-                    targetPosition.x = building.x.toFloat()
-                    targetPosition.y = building.y.toFloat()
+                val delta = building.p - p
+                val d = hypot(delta.x, delta.y)
+                if (max > d) {
+                    max = d
+                    targetPosition = building.p.copy()
                 }
             }
         }
@@ -88,18 +83,16 @@ open class Entity {
     }
 
     fun getNearestNature(name: String?): vec2 {
-        var D = Integer.MAX_VALUE.toFloat()
-        val target = vec2(x, y)
+        var max = Float.MAX_VALUE
+        var target = p.copy()
         for (i in Game.natureList.indices) {
             val nature = Game.natureList[i]
             if (nature::class.simpleName == name) {
-                val dx = nature.x - x
-                val dy = nature.y - y
-                val d = dx * dx + dy * dy
-                if (D > d) {
-                    D = d
-                    target.x = nature.x
-                    target.y = nature.y
+                val delta = nature.p - p
+                val d = hypot(delta.x, delta.y)
+                if (max > d) {
+                    max = d
+                    target = nature.p.copy()
                 }
             }
         }
@@ -107,18 +100,16 @@ open class Entity {
     }
 
     fun getNearestBuilding(name: String?): vec2 {
-        var D = Integer.MAX_VALUE.toFloat()
-        val target = vec2(x, y)
+        var max = Float.MAX_VALUE
+        var target = p.copy()
         for (i in owner!!.buildingList.indices) {
             val building = owner!!.buildingList[i]
             if (building::class.simpleName == name) {
-                val dx = building.x - x
-                val dy = building.y - y
-                val d = dx * dx + dy * dy
-                if (D > d) {
-                    D = d
-                    target.x = building.x.toFloat()
-                    target.y = building.y.toFloat()
+                val delta = building.p - p
+                val d = hypot(delta.x, delta.y)
+                if (max > d) {
+                    max = d
+                    target = building.p.copy()
                 }
             }
         }
@@ -130,7 +121,7 @@ open class Entity {
             val fraction = Game.fractionList[i]
             for (j in fraction.entityList.indices) {
                 val entity = fraction.entityList[j]
-                if (entity.teamIndex == TeamIndex) break
+                if (entity.teamNumber == TeamIndex) break
                 if (entity.field!!.intersects(field)) {
                     entity.hurt(damage)
                     return
@@ -161,6 +152,14 @@ open class Entity {
             g2d.fillRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
             g2d.color = Color.BLACK
             g2d.drawRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
+        }
+
+        fun drawBar(g2d: Graphics2D, p: vec2, current: Int, max: Int, c: Color) {
+            drawBar(g2d, p.x.toInt(), p.y.toInt(), current, max, c)
+        }
+
+        fun drawBar(g2d: Graphics2D, x: Float, y: Float, current: Int, max: Int, c: Color) {
+            drawBar(g2d, x.toInt(), y.toInt(), current, max, c)
         }
     }
 }

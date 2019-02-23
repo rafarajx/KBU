@@ -7,8 +7,9 @@ import java.awt.geom.Rectangle2D
 import core.Resources
 import core.Screen
 import fraction.Fraction
+import math.vec2
 
-class Barricade(x: Int, y: Int, owner: Fraction, teamNumber: Int) : Building() {
+class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 
     private val EDGE_LENGTH = 16
     private val RANGE = 100
@@ -18,19 +19,18 @@ class Barricade(x: Int, y: Int, owner: Fraction, teamNumber: Int) : Building() {
     internal var health = 250
 
     init {
-        this.x = x
-        this.y = y
+        super.p = p
         this.owner = owner
         this.teamNumber = teamNumber
-        this.field = Rectangle2D.Double((x - EDGE_LENGTH / 2).toDouble(), (y - EDGE_LENGTH / 2).toDouble(), EDGE_LENGTH.toDouble(), EDGE_LENGTH.toDouble())
-        this.range = Rectangle2D.Double((x - RANGE / 2).toDouble(), (y - RANGE / 2).toDouble(), RANGE.toDouble(), RANGE.toDouble())
+        this.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
+        this.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
         owner.buildingList.add(this)
         owner.barricadeList.add(this)
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 0, 6, x - EDGE_LENGTH / 2, y - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
-        Building.drawBar(g2d, x, y, health, 250, Color.RED)
+        Screen.drawTile(g2d, 0, 6, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+        Building.drawBar(g2d, p, health, 250, Color.RED)
     }
 
     override fun update() {
