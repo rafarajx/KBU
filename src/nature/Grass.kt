@@ -7,8 +7,8 @@ import core.Screen
 import math.vec2
 
 class Grass(p: vec2) : Nature() {
-    internal var num = 0
-    internal var FieldSize = 16
+    private var num = 0
+    private var fieldSize = 16
 
     init {
         super.p = p
@@ -16,8 +16,8 @@ class Grass(p: vec2) : Nature() {
     }
 
     override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 8, 3, p.x.toInt() - FieldSize / 2, p.y.toInt() - FieldSize / 2 + 2, FieldSize, FieldSize)
-        Screen.drawTile(g2d, 7 + num, 5, p.x.toInt() - FieldSize / 2, p.y.toInt() - FieldSize / 2, FieldSize, FieldSize)
+        Screen.drawTile(g2d, 8, 3, p.x.toInt() - fieldSize / 2, p.y.toInt() - fieldSize / 2 + 2, fieldSize, fieldSize)
+        Screen.drawTile(g2d, 7 + num, 5, p.x.toInt() - fieldSize / 2, p.y.toInt() - fieldSize / 2, fieldSize, fieldSize)
     }
 
     override fun update() {

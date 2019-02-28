@@ -14,7 +14,7 @@ class Rock(p: vec2) : Nature() {
     private val appearance: Int
 
     companion object {
-        private val EDGE_LENGTH = 16
+        private const val EDGE_LENGTH = 16
     }
 
     init {

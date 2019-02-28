@@ -26,11 +26,8 @@ open class Fraction {
     var random = Random()
     var center = vec2(0.0f)
     var status = vec2(0.0f)
-    var AIBuildingTime : Int = 0
     var AIRange : Int = 0
     var baseAIRange : Int = 0
-    var fractionIndex : Int = 0
-    var nation = ""
 
     var buildingList = ArrayList<Building>()
 
@@ -104,6 +101,21 @@ open class Fraction {
 
     open fun placeBuilding(id: Int, p: vec2) {}
 
+    fun isConstructionColliding(r: Rectangle2D): Boolean {
+        for (i in Game.fractionList.indices) {
+            val fraction = Game.fractionList[i]
+            for (j in fraction.buildingList.indices) {
+                val building = fraction.buildingList[j]
+                if (building.field!!.intersects(r)) return true
+            }
+            for (j in fraction.entityList.indices) {
+                val entity = fraction.entityList[j]
+                if (entity.field!!.intersects(r)) return true
+            }
+        }
+        return false
+    }
+
     fun isColliding(r: Rectangle2D): Boolean {
         for (i in Game.fractionList.indices) {
             val fraction = Game.fractionList[i]
@@ -118,7 +130,7 @@ open class Fraction {
         }
         val it = Game.natureList.iterator()
         for (n in it) {
-            if (n.field!!.intersects(r)) it.remove()
+            if (n.field!!.intersects(r)) return true
         }
         return false
     }
@@ -145,7 +157,7 @@ open class Fraction {
 
     private fun getNearestNature(from: vec2, name: String?): vec2 {
         var max = Float.MAX_VALUE
-        var target = vec2(from.x, from.y)
+        var target = from.copy()
         for (i in Game.natureList.indices) {
             val nature = Game.natureList[i]
             if (nature::class.simpleName == name) {
@@ -153,7 +165,7 @@ open class Fraction {
                 val d = delta.square().sum()
                 if (max > d) {
                     max = d
-                    target = nature.p
+                    target = nature.p.copy()
                 }
             }
         }

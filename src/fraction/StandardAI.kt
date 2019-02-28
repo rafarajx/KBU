@@ -7,24 +7,22 @@ import java.awt.geom.Rectangle2D
 import building.*
 import core.Resources
 import math.vec2
+import java.util.*
 
-class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, resources: Resources, AIBuildingTime: Int, baseAIRange: Int, TeamNumber: Int) : Fraction() {
+class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: Int, teamNumber: Int) : Fraction() {
 
     init {
         this.center = start.copy()
         this.color = color
         this.resources = resources
-        this.fractionIndex = fractionIndex
-        this.nation = nation
-        this.teamNumber = TeamNumber
-        this.AIBuildingTime = AIBuildingTime
+        this.teamNumber = teamNumber
         this.baseAIRange = baseAIRange
         this.AIRange = baseAIRange
-        this.buildingList.add(Tower(start, this, TeamNumber))
         status.x = center.x
         status.y = center.y
         statusText[0] = "Friend"
         statusText[1] = "Enemy"
+        Tower(start, this, teamNumber)
     }
 
     override fun render(g2d: Graphics2D) {}
@@ -32,6 +30,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
     override fun update() {
 
         if (buildingList.size == 0) isDefeated = true
+        
         for (i in entityList.indices) {
             if(entityList.indices.contains(i))
                 entityList[i].update()
@@ -40,10 +39,11 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
             if(buildingList.indices.contains(i))
                 buildingList[i].update()
         }
+        
         if (isDefeated) return
         if (tick % 60 == 0) updateCenter()
         moveStatus()
-        if (tick % AIBuildingTime == 0) build()
+        if (tick % 60 == 0) build()
         tick++
     }
 
@@ -56,9 +56,9 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
             placeBuilding(Building.QUARRY)
         else if (woodCampList.size < 1)
             placeBuilding(Building.WOODCAMP)
-        else if (entityList.size > maxPopulation || maxPopulation < buildingList.size)
+        else if (population >= maxPopulation || entityList.size >= maxPopulation || maxPopulation <= buildingList.size)
             placeBuilding(Building.HOUSE)
-        else if (resources.wood > 40 && resources.stone > 80 && resources.food > 100) {
+        else if (resources.wood > 40 && resources.stone > 80 && resources.iron > 10 && resources.food > 100) {
             if (random.nextBoolean()) {
                 placeBuilding(Building.TOWER)
             } else {
@@ -69,15 +69,13 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
     }
 
     private fun smallest(): Int {
-        val wc = resources.wood * woodCampList.size
-        val sc = resources.stone * quarryList.size
-        val fc = resources.food * millList.size
-        return if (wc < fc && wc < sc)
-            Building.WOODCAMP
-        else if (sc < fc && sc < wc)
-            Building.QUARRY
-        else
-            Building.MILL
+        val map = hashMapOf(
+            Building.WOODCAMP to resources.wood * woodCampList.size,
+            Building.QUARRY to resources.stone * quarryList.size,
+            Building.MILL to resources.food * millList.size,
+            Building.QUARRY to resources.iron * millList.size * 4
+        )
+        return map.minBy { it.value }!!.key
     }
 
     private fun placeBuilding(bnum: Int) {
@@ -88,7 +86,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
                     val x = random.nextInt(AIRange) - AIRange / 2 + center.x
                     val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
-                    if (isColliding(r)) {
+                    if (isConstructionColliding(r)) {
                         this.AIRange += 50
                         return
                     }
@@ -101,7 +99,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
                     val x = random.nextInt(AIRange) - AIRange / 2 + center.x
                     val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
-                    if (isColliding(r)) {
+                    if (isConstructionColliding(r)) {
                         this.AIRange += 50
                         return
                     }
@@ -114,7 +112,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
                     val x = random.nextInt(AIRange) - AIRange / 2 + center.x
                     val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
-                    if (isColliding(r)) {
+                    if (isConstructionColliding(r)) {
                         this.AIRange += 50
                         return
                     }
@@ -131,7 +129,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
                     p.y += (random.nextInt(100) - 50).toFloat()
 
                     val r = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
-                    if (isColliding(r)) {
+                    if (isConstructionColliding(r)) {
                         this.AIRange += 50
                         return
                     }
@@ -148,7 +146,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
                     p.y += (random.nextInt(100) - 50).toFloat()
 
                     val r = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
-                    if (isColliding(r)) {
+                    if (isConstructionColliding(r)) {
                         this.AIRange += 50
                         return
                     }
@@ -161,7 +159,7 @@ class StandardAI(start: vec2, nation: String, fractionIndex: Int, color: Color, 
                     val x = random.nextInt(AIRange) - AIRange / 2 + center.x
                     val y = random.nextInt(AIRange) - AIRange / 2 + center.y
                     val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
-                    if (isColliding(r)) {
+                    if (isConstructionColliding(r)) {
                         this.AIRange += 50
                         return
                     }

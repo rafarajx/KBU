@@ -8,8 +8,11 @@ import core.Screen
 import math.vec2
 
 class Flowers(p: vec2) : Nature() {
-    private val EDGE_LENGTH = 16
     var appearance = 0
+    
+    companion object{
+        private const val EDGE_LENGTH = 16
+    }
 
     init {
         super.p = p

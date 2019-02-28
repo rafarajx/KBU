@@ -11,12 +11,13 @@ import math.vec2
 
 class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 
-    private val EDGE_LENGTH = 16
-    private val RANGE = 100
-    override var teamNumber: Int = 0
-    override var field: Rectangle2D? = null
-    override var range: Rectangle2D? = null
     internal var health = 250
+
+    companion object {
+        val COST = Resources(10, 20, 1, 0)
+        private const val EDGE_LENGTH = 16
+        private const val RANGE = 100
+    }
 
     init {
         super.p = p
@@ -38,15 +39,11 @@ class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
     }
 
     fun die() {
-        owner!!.buildingList.remove(this)
-        owner!!.barricadeList.remove(this)
+        owner.buildingList.remove(this)
+        owner.barricadeList.remove(this)
     }
 
     override fun hurt(dmg: Int) {
         health -= dmg
-    }
-
-    companion object {
-        val COST = Resources(10, 20, 1, 0)
     }
 }

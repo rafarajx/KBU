@@ -10,12 +10,13 @@ import fraction.Fraction
 import math.vec2
 
 class Quarry(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
-    private val EDGE_LENGTH = 32
-    private val RANGE = 150
-    override var teamNumber: Int = 0
-    override var field: Rectangle2D? = null
-    override var range: Rectangle2D? = null
     internal var health = 200
+
+    companion object {
+        val COST = Resources(15, 20, 0, 0)
+        private const val EDGE_LENGTH = 32
+        private const val RANGE = 150
+    }
 
     init {
         super.p = p
@@ -37,15 +38,11 @@ class Quarry(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
     }
 
     fun die() {
-        owner!!.buildingList.remove(this)
-        owner!!.quarryList.remove(this)
+        owner.buildingList.remove(this)
+        owner.quarryList.remove(this)
     }
 
     override fun hurt(dmg: Int) {
         this.health -= dmg
-    }
-
-    companion object {
-        val COST = Resources(15, 20, 0, 0)
     }
 }

@@ -9,7 +9,7 @@ import fraction.Fraction
 import math.vec2
 
 open class Building {
-    var owner: Fraction? = null
+    lateinit var owner: Fraction
 
     open var p = vec2(0.0f, 0.0f)
     open var field: Rectangle2D? = null
@@ -22,6 +22,10 @@ open class Building {
     open fun update() {}
 
     open fun hurt(dmg: Int) {}
+
+    init {
+        field = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
+    }
 
     companion object {
         var random = Random()

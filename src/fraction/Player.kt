@@ -25,9 +25,9 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
         this.center = start.copy()
         this.color = c
         this.resources = resources
-        this.teamNumber = teamNumber
-        Game.camera.x = -start.x + Canvas.WIDTH / 2
-        Game.camera.y = -start.y + Canvas.HEIGHT / 2
+        this.teamNumber = teamNumber;
+        Game.camera.x = -start.x + Canvas.width / 2
+        Game.camera.y = -start.y + Canvas.height / 2
         buildingList.add(Tower(start, this, teamNumber))
     }
 

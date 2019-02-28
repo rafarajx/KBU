@@ -76,7 +76,4 @@ data class vec2(var x: Float, var y: Float) {
         return hypot(x, y)
     }
 
-
-
-
 }

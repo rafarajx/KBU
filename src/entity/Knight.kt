@@ -10,13 +10,14 @@ import core.Screen
 import fraction.Fraction
 import math.vec2
 import sound.SimpleSound
+import kotlin.math.sqrt
 
-class Knight(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
+class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 
     init {
         super.p = p
         super.owner = owner
-        super.teamNumber = teamIndex
+        super.teamNumber = teamNumber
         edgeLength = 16
         health = 100
         damage = 20
@@ -39,12 +40,12 @@ class Knight(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     override fun update() {
         if (health < 0) die()
         field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
-        if (this.tick % 20 == 0)
+        if (tick % 20 == 0)
             target = getNearestEnemy(p, teamNumber)
 
         if (target != null) {
             val delta = target!! - p
-            val d = delta.square().sum()
+            val d = sqrt(delta.square().sum())
             if (d == 0.0f) {
                 move = vec2(0.0f, 0.0f)
             } else {
@@ -55,7 +56,7 @@ class Knight(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
         if (tick % 60 == 0) {
             fight(20, teamNumber, field as Rectangle2D)
         }
-        if (tick % 1200 == 0) {
+        if (tick % 1500 == 0) {
             if (owner!!.resources.food > 0)
                 owner!!.resources.pay(0, 0, 0, 1)
             else

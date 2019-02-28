@@ -14,10 +14,23 @@ import math.vec2
 import nature.Wheat
 import sound.SimpleSound
 import kotlin.math.hypot
+import kotlin.math.sqrt
 
-class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
+class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
     private var wheat = 0
     var mill: Mill? = null
+
+    init {
+        super.p = p
+        super.owner = owner
+        super.teamNumber = teamNumber
+        edgeLength = 16
+        health = 50
+        damage = 10
+        speed = 0.75f
+        owner.population++
+        field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
+    }
 
     private fun nearestWheat(): vec2 {
         var max = Float.MAX_VALUE
@@ -34,18 +47,6 @@ class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
             }
         }
         return target
-    }
-
-    init {
-        super.p = p
-        super.owner = owner
-        super.teamNumber = teamIndex
-        edgeLength = 16
-        health = 50
-        damage = 10
-        speed = 0.75f
-        owner.population++
-        update()
     }
 
     override fun render(g2d: Graphics2D) {
@@ -68,11 +69,14 @@ class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
         if (health < 0) die()
         field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
         if (mill == null) {
-            for (i in owner!!.millList.indices) {
-                val m = owner!!.millList[i]
+            for (m in owner!!.millList) {
                 if (m.miller[0] == null) {
                     mill = m
                     mill!!.miller[0] = this
+                    break
+                } else if (m.miller[1] == null) {
+                    mill = m
+                    mill!!.miller[1] = this
                     break
                 }
             }
@@ -81,7 +85,7 @@ class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
                 if (tick % 15 == 0) {
                     target = nearestWheat()
                 }
-                if (tick % 100 == 0) {
+                if (tick % 400 == 0) {
                     gatherWheat()
                 }
             } else {
@@ -94,7 +98,7 @@ class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
             }
             if (target != null) {
                 val delta = (target!! - p)
-                val d = hypot(delta.x, delta.y)
+                val d = sqrt(delta.square().sum())
                 if (d == 0.0f) {
                     move = vec2(0.0f, 0.0f)
                 } else {
@@ -103,7 +107,7 @@ class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
                 p += move * speed
             }
         }
-        if (tick % 1200 == 0) {
+        if (tick % 1500 == 0) {
             owner!!.resources.food--
         }
         tick++
@@ -131,6 +135,12 @@ class Miller(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
         SimpleSound.Die.play()
         owner!!.population--
         owner!!.entityList.remove(this)
-        mill!!.miller[0] = null
+        if(mill != null) {
+            if (mill!!.miller[0] != null) {
+                mill!!.miller[0] = null
+            } else if (mill!!.miller[1] != null) {
+                mill!!.miller[1] = null
+            }
+        }
     }
 }

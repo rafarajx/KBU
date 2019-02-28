@@ -8,10 +8,10 @@ import gametype.Game
 import math.vec2
 
 class Wheat(p: vec2) : Nature() {
-    var num = 0
+    var num = 1
 
     companion object {
-        val EDGE_SIZE = 16
+        const val EDGE_SIZE = 16
     }
 
     init {
@@ -23,6 +23,7 @@ class Wheat(p: vec2) : Nature() {
         Screen.drawTile(g2d, 8, 3, p.x.toInt() - EDGE_SIZE / 2, p.y.toInt() - EDGE_SIZE / 2 + 2, EDGE_SIZE, EDGE_SIZE)
         Screen.drawTile(g2d, 7 + num, 6, p.x.toInt() - EDGE_SIZE / 2, p.y.toInt() - EDGE_SIZE / 2, EDGE_SIZE, EDGE_SIZE)
     }
+
 
     override fun update() {
         if (tick % 1200 == 0 && num < 7) num++

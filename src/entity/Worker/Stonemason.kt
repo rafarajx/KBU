@@ -13,6 +13,7 @@ import fraction.Fraction
 import gametype.Game
 import math.vec2
 import nature.Rock
+import kotlin.math.sqrt
 
 class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     private var hasStone: Boolean = false
@@ -65,7 +66,7 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
         }
         if (target != null) {
             val delta = target!! - p
-            val d = delta.square().sum()
+            val d = sqrt(delta.square().sum())
             if (d == 0.0f) {
                 move = vec2(0.0f, 0.0f)
             } else {
@@ -73,7 +74,7 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
             }
             p += move * speed
         }
-        if (tick % 1200 == 0) {
+        if (tick % 1500 == 0) {
             owner!!.resources.pay(Resources(0, 0, 0, 1))
         }
         tick++

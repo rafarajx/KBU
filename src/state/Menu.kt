@@ -20,29 +20,24 @@ object Menu {
     private var tick = 0
 
     init {
-        try {
-            BG = ImageIO.read(Menu::class.java!!.getResourceAsStream("/MenuBackground.png"))
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-
+        BG = ImageIO.read(Menu::class.java.getResourceAsStream("/MenuBackground.png"))
     }
 
     fun render(g2d: Graphics2D) {
-        g2d.drawImage(BG, 0, 0, Canvas.WIDTH, Canvas.HEIGHT, null)
+        g2d.drawImage(BG, 0, 0, Canvas.width, Canvas.height, null)
         Screen.drawString(g2d, "fps: " + Canvas.FPS, 20, 20, 1.0)
-        Screen.drawString(g2d, Main.GAME_TITLE, Canvas.WIDTH / 2 - Main.GAME_TITLE.length / 2 * 32, 70, 4.0)
+        Screen.drawString(g2d, Main.GAME_TITLE, Canvas.width / 2 - Main.GAME_TITLE.length / 2 * 32, 70, 4.0)
         g2d.color = Color(180, 180, 180, 180)
-        g2d.fill3DRect(312, 190, 285, 170, true)
+        g2d.fill3DRect(Canvas.width / 2 - 200, Canvas.height / 2 - 250, 400, 300, true)
         for (i in OPTIONS.indices) {
             if (cursor == i) {
                 if (tick % 30 / 15 == 0) {
-                    Screen.drawString(g2d, OPTIONS[i] + "<", Canvas.WIDTH / 2 - OPTIONS[i].length / 2 * 3 * 8, 200 + i * 45, 3.0)
+                    Screen.drawString(g2d, OPTIONS[i] + "<", Canvas.width / 2 - OPTIONS[i].length / 2 * 3 * 8, 200 + i * 45, 3.0)
                 } else {
-                    Screen.drawString(g2d, OPTIONS[i] + "<", Canvas.WIDTH / 2 - OPTIONS[i].length / 2 * 3 * 8, 200 + i * 45 + 2, 3.0)
+                    Screen.drawString(g2d, OPTIONS[i] + "<", Canvas.width / 2 - OPTIONS[i].length / 2 * 3 * 8, 200 + i * 45 + 2, 3.0)
                 }
             } else {
-                Screen.drawString(g2d, OPTIONS[i], Canvas.WIDTH / 2 - OPTIONS[i].length / 2 * 3 * 8, 200 + i * 45, 3.0)
+                Screen.drawString(g2d, OPTIONS[i], Canvas.width / 2 - OPTIONS[i].length / 2 * 3 * 8, 200 + i * 45, 3.0)
             }
         }
     }

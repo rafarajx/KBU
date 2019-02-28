@@ -9,6 +9,7 @@ import core.Screen
 import fraction.Fraction
 import math.vec2
 import sound.SimpleSound
+import kotlin.math.sqrt
 
 class Zombie(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 
@@ -38,7 +39,7 @@ class Zombie(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
         }
         if (target != null) {
             val delta = target!! - p
-            val d = delta.square().sum()
+            val d = sqrt(delta.square().sum())
             if (d == 0.0f) {
                 move = vec2(0.0f, 0.0f)
             } else {

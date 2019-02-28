@@ -10,19 +10,24 @@ import entity.Worker.Miller
 import entity.Worker.Stonemason
 import entity.Worker.Woodcutter
 import fraction.Fraction
+import fraction.Player
 import gametype.Game
 import math.vec2
 import nature.Cloud
 
-class House(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
-    override var range: Rectangle2D? = null
+class House(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
+
     var health = 200
 
+    companion object {
+        val COST = Resources(10, 5, 0, 0)
+        private const val EDGE_LENGTH = 32
+        private const val RANGE = 150
+    }
+
     private fun freeMill(): Mill? {
-        for (i in owner!!.millList.indices) {
-            val m = owner!!.millList[i]
-            if (m.miller == null)
-                return m
+        for (m in owner.millList) {
+            if (m.miller[0] == null || m.miller[1] == null) return m
         }
         return null
     }
@@ -30,7 +35,7 @@ class House(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
     init {
         super.p = p
         this.owner = owner
-        this.teamNumber = teamIndex
+        this.teamNumber = teamNumber
         this.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
         this.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
         owner.maxPopulation += 4
@@ -41,7 +46,7 @@ class House(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
     override fun render(g2d: Graphics2D) {
         Screen.drawTile(g2d, 0, 0, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
         Building.drawBar(g2d, p.x, p.y - 10, health, 200, Color.RED)
-        if (owner!!.population < owner!!.maxPopulation)
+        if (owner.population < owner.maxPopulation && owner.resources.food > 4)
             Building.drawBar(g2d, p, tick % 1000, 1000, Color.ORANGE)
     }
 
@@ -50,21 +55,24 @@ class House(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
         if (tick % 100 == 0 || tick % 173 == 0) {
             Game.natureList.add(Cloud(p - vec2(3.0f, 5.0f)))
         }
-        if (tick % 1000 == 0 && owner!!.population < owner!!.maxPopulation && owner!!.resources.enough(0, 0, 0, 5)) {
-            val mill: Mill?
-            if (freeMill() != null) {
-                mill = freeMill()
-                owner!!.entityList.add(Miller(p, owner!!, teamNumber))
-                val miller = Miller(p, owner!!, teamNumber)
+        if (tick % 1000 == 0 && owner.population < owner.maxPopulation && owner.resources.food > 4) {
+            val mill = freeMill()
+            if (mill != null) {
+                val miller = Miller(p, owner, teamNumber)
                 miller.mill = mill
-                mill!!.miller[0] = miller
-                owner!!.resources.food -= 5
-            } else if (countEntities(Stonemason::class.simpleName) < owner!!.quarryList.size) {
-                owner!!.entityList.add(Stonemason(p, owner!!, teamNumber))
-                owner!!.resources.food -= 5
-            } else if (countEntities(Woodcutter::class.simpleName) < owner!!.woodCampList.size) {
-                owner!!.entityList.add(Woodcutter(p, owner!!, teamNumber))
-                owner!!.resources.food -= 5
+                if (mill.miller[0] == null) {
+                    mill.miller[0] = miller
+                } else if (mill.miller[1] == null) {
+                    mill.miller[1] = miller
+                }
+                owner.entityList.add(miller)
+                owner.resources.food -= 5
+            } else if (countEntities(Stonemason::class.simpleName) < owner.quarryList.size) {
+                owner.entityList.add(Stonemason(p, owner, teamNumber))
+                owner.resources.food -= 5
+            } else if (countEntities(Woodcutter::class.simpleName) < owner.woodCampList.size) {
+                owner.entityList.add(Woodcutter(p, owner, teamNumber))
+                owner.resources.food -= 5
             }
         }
         tick++
@@ -72,24 +80,18 @@ class House(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 
     private fun countEntities(name: String?): Int {
         var n = 0
-        for (i in owner!!.entityList.indices)
-            if (owner!!.entityList[i]::class.simpleName == name) n++
+        for (i in owner.entityList.indices)
+            if (owner.entityList[i]::class.simpleName == name) n++
         return n
     }
 
     fun die() {
-        owner!!.maxPopulation -= 4
-        owner!!.buildingList.remove(this)
-        owner!!.houseList.remove(this)
+        owner.maxPopulation -= 4
+        owner.buildingList.remove(this)
+        owner.houseList.remove(this)
     }
 
     override fun hurt(dmg: Int) {
         health -= dmg
-    }
-
-    companion object {
-        val COST = Resources(10, 5, 0, 0)
-        private val EDGE_LENGTH = 32
-        private val RANGE = 150
     }
 }

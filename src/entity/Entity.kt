@@ -12,6 +12,7 @@ import gametype.Game
 import math.vec2
 import sound.SimpleSound
 import kotlin.math.hypot
+import kotlin.math.sqrt
 
 open class Entity {
     var p = vec2(0.0f, 0.0f)
@@ -27,7 +28,7 @@ open class Entity {
     protected var edgeLength: Int = 0
     protected var tick = 1
 
-    open fun render(g2d: Graphics2D) {}
+    open fun render(g2d: Graphics2D) { }
 
     fun drawAnimatedEntity(g2d: Graphics2D, tileX: Int, tileY: Int) {
         val sx = p.x.toInt() - edgeLength / 2
@@ -53,26 +54,22 @@ open class Entity {
         health -= dmg
     }
 
-    fun getNearestEnemy(p : vec2, TeamIndex: Int): vec2 {
+    fun getNearestEnemy(p : vec2, teamNumber: Int): vec2 {
         var max = Float.MAX_VALUE
         var targetPosition = p.copy()
-        for (i in Game.fractionList.indices) {
-            val fraction = Game.fractionList[i]
-            for (j in fraction.entityList.indices) {
-                val entity = fraction.entityList[j]
-                if (entity.teamNumber == TeamIndex) break
-                var delta = entity.p - p
-                val d = hypot(delta.x, delta.y)
+        for (fraction in Game.fractionList) {
+            if (fraction.teamNumber == teamNumber) continue
+            for (entity in fraction.entityList) {
+                val delta = entity.p - p
+                val d = sqrt(delta.square().sum())
                 if (max > d) {
                     max = d
                     targetPosition = entity.p.copy()
                 }
             }
-            for (j in fraction.buildingList.indices) {
-                val building = fraction.buildingList[j]
-                if (building.teamNumber == TeamIndex) break
+            for (building in fraction.buildingList) {
                 val delta = building.p - p
-                val d = hypot(delta.x, delta.y)
+                val d = sqrt(delta.square().sum())
                 if (max > d) {
                     max = d
                     targetPosition = building.p.copy()
