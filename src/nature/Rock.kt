@@ -33,10 +33,20 @@ class Rock(p: vec2) : Nature() {
     }
 
     fun die() {
-        Game.natureList.remove(this)
+        remove()
     }
 
     override fun gatherResources(amount: Int) {
         resources -= amount
+    }
+    
+    fun add(){
+        Game.natureList.add(this)
+        Game.rockList.add(this)
+    }
+    
+    fun remove(){
+        Game.natureList.remove(this)
+        Game.rockList.remove(this)
     }
 }

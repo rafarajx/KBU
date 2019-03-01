@@ -31,11 +31,11 @@ object ZombieApocalypse : Game() {
 			val c = Color(red, green, blue)
 			start = vec2(random.nextInt(2000), random.nextInt(2000))
 			fractionList.add(
-                StandardAI(
-                    start, c,
-                    Resources(200 / difficulty, 120 / difficulty, 20 / difficulty, 60 / difficulty),
-	                (5 - difficulty) * 50, 0
-                )
+				StandardAI(
+					start, c,
+					Resources(200 / difficulty, 120 / difficulty, 20 / difficulty, 60 / difficulty),
+					(5 - difficulty) * 50, 0
+				)
 			)
 		}
 		fractionList.add(ZombieAI(1000, 1000, Color.RED, 1))

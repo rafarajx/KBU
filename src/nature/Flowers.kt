@@ -5,6 +5,7 @@ import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
 
 import core.Screen
+import gametype.Game
 import math.vec2
 
 class Flowers(p: vec2) : Nature() {
@@ -29,4 +30,14 @@ class Flowers(p: vec2) : Nature() {
     }
 
     override fun gatherResources(amount: Int) {}
+    
+    fun add(){
+        Game.natureList.add(this)
+        Game.flowersList.add(this)
+    }
+    
+    fun remove(){
+        Game.natureList.remove(this)
+        Game.flowersList.remove(this)
+    }
 }

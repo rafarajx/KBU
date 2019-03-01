@@ -28,10 +28,20 @@ class Cloud(p: vec2) : Nature() {
             p += vec2((Nature.r.nextInt(4) - 1).toFloat(), -(Nature.r.nextInt(1) + 3).toFloat())
         }
         if (this.spreadLevel == 5) {
-            Game.natureList.remove(this)
+            remove()
         }
         tick++
     }
 
     override fun gatherResources(amount: Int) {}
+    
+    fun add(){
+        Game.natureList.add(this)
+        Game.cloudList.add(this)
+    }
+    
+    fun remove(){
+        Game.natureList.remove(this)
+        Game.cloudList.remove(this)
+    }
 }

@@ -16,7 +16,7 @@ class Wheat(p: vec2) : Nature() {
 
     init {
         super.p = p
-        field = Rectangle2D.Float(p.x, p.y, 1.0f, 1.0f)
+        field = Rectangle2D.Float(p.x - EDGE_SIZE / 2 , p.y - EDGE_SIZE / 2, EDGE_SIZE.toFloat(), EDGE_SIZE.toFloat())
     }
 
     override fun render(g2d: Graphics2D) {
@@ -31,12 +31,22 @@ class Wheat(p: vec2) : Nature() {
     }
 
     fun gather(): Int {
-        Game.natureList.remove(this)
+        remove()
         return num + 1
     }
 
     override fun gatherResources(amount: Int) {
         num -= amount
-        if (num < 0) Game.natureList.remove(this)
+        if (num < 0) remove()
+    }
+    
+    fun add(){
+        Game.natureList.add(this)
+        Game.wheatList.add(this)
+    }
+    
+    fun remove(){
+        Game.natureList.remove(this)
+        Game.wheatList.remove(this)
     }
 }

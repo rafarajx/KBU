@@ -53,19 +53,28 @@ open class Fraction {
 
     fun renderBuildings(g2d: Graphics2D) {
         for (i in buildingList.indices) {
-            val b = buildingList[i]
-            g2d.color = color
-            g2d.draw(b.field)
-            b.render(g2d)
+            if(buildingList.indices.contains(i)) {
+                val b = buildingList[i]
+                g2d.color = color
+                g2d.draw(b.field)
+                b.render(g2d)
+            }
         }
     }
 
     fun renderEntities(g2d: Graphics2D) {
         for (i in entityList.indices) {
-            val e = entityList[i]
-            g2d.color = color
-            g2d.drawRect(e.field!!.x.toInt(), e.field!!.y.toInt(), e.field!!.width.toInt(), e.field!!.height.toInt())
-            e.render(g2d)
+            if(entityList.indices.contains(i)) {
+                val e = entityList[i]
+                g2d.color = color
+                g2d.drawRect(
+                    e.field!!.x.toInt(),
+                    e.field!!.y.toInt(),
+                    e.field!!.width.toInt(),
+                    e.field!!.height.toInt()
+                )
+                e.render(g2d)
+            }
         }
     }
 
@@ -82,8 +91,10 @@ open class Fraction {
     fun updateCenter() {
         var center = vec2(0.0f, 0.0f)
         for (i in buildingList.indices) {
-            val building = buildingList[i]
-            center += building.p
+            if(buildingList.indices.contains(i)) {
+                val building = buildingList[i]
+                center += building.p
+            }
         }
         center /= buildingList.size.toFloat()
         this.center = center

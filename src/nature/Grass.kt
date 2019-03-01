@@ -4,6 +4,7 @@ import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
 import core.Screen
+import gametype.Game
 import math.vec2
 
 class Grass(p: vec2) : Nature() {
@@ -28,4 +29,14 @@ class Grass(p: vec2) : Nature() {
     }
 
     override fun gatherResources(amount: Int) {}
+    
+    fun add(){
+        Game.natureList.add(this)
+        Game.grassList.add(this)
+    }
+    
+    fun remove(){
+        Game.natureList.remove(this)
+        Game.grassList.remove(this)
+    }
 }

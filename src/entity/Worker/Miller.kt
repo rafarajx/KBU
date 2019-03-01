@@ -35,15 +35,12 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
     private fun nearestWheat(): vec2 {
         var max = Float.MAX_VALUE
         var target = p.copy()
-        for (i in Game.natureList.indices) {
-            val nature = Game.natureList[i]
-            if (nature::class.simpleName == Wheat::class.simpleName) {
-                if (vec2(mill!!.p.x - nature.p.x, mill!!.p.y - nature.p.y).square().sum() > 120.0f * 120.0f) continue
-                val d = (nature.p - p).length()
-                if (max > d) {
-                    max = d
-                    target = nature.p.copy()
-                }
+        for (wheat in Game.wheatList) {
+            if (vec2(mill!!.p.x - wheat.p.x, mill!!.p.y - wheat.p.y).square().sum() > 120.0f * 120.0f) continue
+            val d = (wheat.p - p).length()
+            if (max > d) {
+                max = d
+                target = wheat.p.copy()
             }
         }
         return target

@@ -8,36 +8,43 @@ import gametype.Game
 import math.vec2
 
 class Tree(p: vec2) : Nature() {
-    var range: Rectangle2D? = null
-    var resources = 200
-    private var num: Int = 0
+	var resources = 200
+	private var num: Int = 0
+	
+	companion object {
+		const val EDGE_LENGTH = 32
+	}
 
-    init {
-        super.p = p
-        this.num = Nature.r.nextInt(2)
-        this.field = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
-    }
+	init {
+		super.p = p
+		this.num = Nature.r.nextInt(2)
+		this.field = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
+	}
 
-    override fun render(g2d: Graphics2D) {
-        Screen.drawTile(g2d, 8, 3, p.x.toInt() - 16, p.y.toInt() - 16 + 7, 32, 32)
-        Screen.drawTile(g2d, resources / 15, 15 - num, p.x.toInt() - 16, p.y.toInt() - 16, 32, 32)
-    }
+	override fun render(g2d: Graphics2D) {
+		Screen.drawTile(g2d, 8, 3, p.x.toInt() - 16, p.y.toInt() - 16 + 7, 32, 32)
+		Screen.drawTile(g2d, resources / 15, 15 - num, p.x.toInt() - 16, p.y.toInt() - 16, 32, 32)
+	}
 
-    override fun update() {
-        if (resources <= 0) {
-            die()
-        }
-    }
+	override fun update() {
+		if (resources <= 0) die()
+	}
 
-    fun die() {
-        Game.natureList.remove(this)
-    }
+	fun die() {
+		remove()
+	}
 
-    override fun gatherResources(amount: Int) {
-        resources -= amount
-    }
-
-    companion object {
-        const val EDGE_LENGTH = 32
-    }
+	override fun gatherResources(amount: Int) {
+		resources -= amount
+	}
+	
+	fun add(){
+		Game.natureList.add(this)
+		Game.treeList.add(this)
+	}
+	
+	fun remove(){
+		Game.natureList.remove(this)
+		Game.treeList.remove(this)
+	}
 }

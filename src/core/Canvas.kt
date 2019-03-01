@@ -38,6 +38,14 @@ object Canvas : java.awt.Canvas() {
 		var lastUpdate = System.nanoTime()
 		var lastSecond = System.nanoTime()
 		var updatesCount = 0
+		
+		Thread {
+			while(true){
+				setupRender()
+			}
+		}.start()
+		
+		
 		while (true) {
 			if (System.nanoTime() - lastUpdate > UPDATE_TIME) {
 				StateManager.update()
@@ -51,7 +59,7 @@ object Canvas : java.awt.Canvas() {
 					UPDATE_TIME = SECOND / UPS
 				}
 			}
-			setupRender()
+			
 			updatesCount++
 			if (System.nanoTime() - lastSecond > SECOND) {
 				FPS = updatesCount
@@ -59,6 +67,7 @@ object Canvas : java.awt.Canvas() {
 				lastSecond += SECOND
 			}
 		}
+		
 	}
 
 	private fun setupRender() {

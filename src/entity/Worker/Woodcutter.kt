@@ -58,7 +58,7 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
             }
         } else {
             if (tick % 15 == 0) {
-                target = getNearestNature(Tree::class.simpleName)
+                target = getNearestTree()
             }
             if (tick % 100 == 0) {
                 chopTree()
@@ -81,10 +81,9 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     }
 
     private fun chopTree() {
-        for (i in Game.natureList.indices) {
-            val nature = Game.natureList[i]
-            if (nature.field!!.intersects(field!!)) {
-                nature.gatherResources(1)
+        for (tree in Game.treeList) {
+            if (tree.field!!.intersects(field!!)) {
+                tree.gatherResources(1)
                 hasWood = true
                 return
             }
@@ -92,9 +91,8 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     }
 
     private fun leaveWood() {
-        for (j in owner!!.buildingList.indices) {
-            val building = owner!!.buildingList[j]
-            if (building::class.simpleName == WoodCamp::class.simpleName && building.field!!.intersects(field!!)) {
+        for (woodCamp in owner!!.woodCampList) {
+            if (woodCamp.field!!.intersects(field!!)) {
                 owner!!.resources.gain(Resources(1, 0, 0, 0))
                 hasWood = false
                 return

@@ -27,6 +27,25 @@ open class Entity {
     protected var target: vec2? = null
     protected var edgeLength: Int = 0
     protected var tick = 1
+    
+    companion object {
+        var random = Random()
+        
+        fun drawBar(g2d: Graphics2D, x: Int, y: Int, current: Int, max: Int, c: Color) {
+            g2d.color = c
+            g2d.fillRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
+            g2d.color = Color.BLACK
+            g2d.drawRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
+        }
+        
+        fun drawBar(g2d: Graphics2D, p: vec2, current: Int, max: Int, c: Color) {
+            drawBar(g2d, p.x.toInt(), p.y.toInt(), current, max, c)
+        }
+        
+        fun drawBar(g2d: Graphics2D, x: Float, y: Float, current: Int, max: Int, c: Color) {
+            drawBar(g2d, x.toInt(), y.toInt(), current, max, c)
+        }
+    }
 
     open fun render(g2d: Graphics2D) { }
 
@@ -95,6 +114,34 @@ open class Entity {
         }
         return target
     }
+    
+    fun getNearestRock(): vec2 {
+        var max = Float.MAX_VALUE
+        var target = p.copy()
+        for (rock in Game.natureList) {
+            val delta = rock.p - p
+            val d = hypot(delta.x, delta.y)
+            if (max > d) {
+                max = d
+                target = rock.p.copy()
+            }
+        }
+        return target
+    }
+    
+    fun getNearestTree(): vec2 {
+        var max = Float.MAX_VALUE
+        var target = p.copy()
+        for (tree in Game.treeList) {
+            val delta = tree.p - p
+            val d = hypot(delta.x, delta.y)
+            if (max > d) {
+                max = d
+                target = tree.p.copy()
+            }
+        }
+        return target
+    }
 
     fun getNearestBuilding(name: String?): vec2 {
         var max = Float.MAX_VALUE
@@ -139,24 +186,5 @@ open class Entity {
         SimpleSound.Die.play()
         owner!!.population--
         owner!!.entityList.remove(this)
-    }
-
-    companion object {
-        var random = Random()
-
-        fun drawBar(g2d: Graphics2D, x: Int, y: Int, current: Int, max: Int, c: Color) {
-            g2d.color = c
-            g2d.fillRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
-            g2d.color = Color.BLACK
-            g2d.drawRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
-        }
-
-        fun drawBar(g2d: Graphics2D, p: vec2, current: Int, max: Int, c: Color) {
-            drawBar(g2d, p.x.toInt(), p.y.toInt(), current, max, c)
-        }
-
-        fun drawBar(g2d: Graphics2D, x: Float, y: Float, current: Int, max: Int, c: Color) {
-            drawBar(g2d, x.toInt(), y.toInt(), current, max, c)
-        }
     }
 }

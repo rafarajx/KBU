@@ -58,7 +58,7 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
             }
         } else {
             if (tick % 15 == 0) {
-                target = getNearestNature(Rock::class.simpleName)
+                target = getNearestRock()
             }
             if (this.tick % 100 == 0) {
                 gatherStone()
@@ -81,10 +81,9 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     }
 
     private fun gatherStone() {
-        for (i in Game.natureList.indices) {
-            val nature = Game.natureList[i]
-            if (nature::class.simpleName == Rock::class.simpleName && nature.field!!.intersects(field!!)) {
-                nature.gatherResources(1)
+        for (rock in Game.natureList) {
+            if (rock.field!!.intersects(field!!)) {
+                rock.gatherResources(1)
                 hasStone = true
                 return
             }
@@ -92,9 +91,8 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
     }
 
     private fun leaveStone() {
-        for (i in owner!!.buildingList.indices) {
-            val building = owner!!.buildingList[i]
-            if (building.javaClass.simpleName == Quarry::class.simpleName && building.field!!.intersects(field!!)) {
+        for (quarry in owner!!.quarryList) {
+            if (quarry.field!!.intersects(field!!)) {
                 val n = Entity.random.nextInt(4)
                 if (n == 0)
                     owner!!.resources.gain(Resources(0, 0, 1, 0))

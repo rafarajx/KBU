@@ -56,7 +56,7 @@ class Mill(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 					if (building.field!!.intersects(r)) return
 			for (nature in Game.natureList)
 				if (nature.field!!.intersects(r)) return
-			Game.natureList.add(Wheat(vec2(x1, y1)))
+			Wheat(vec2(x1, y1)).add()
 		}
 		if (tick % 15L == 1L) {
 			theta += 0.15
