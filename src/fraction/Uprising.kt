@@ -42,7 +42,7 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
         }
         
 		if (isDefeated) return
-		if (tick % 1200 == 0) {
+		if (tick % 1000 == 0) {
 			val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
 			val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
 			placeBuilding(buildingQueue[queueNum % buildingQueue.size], vec2(x, y) + Game.camera)

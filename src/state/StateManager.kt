@@ -1,37 +1,24 @@
 package state
 
+import core.GameState
 import java.awt.Graphics2D
-
-import gametype.Game
 
 object StateManager {
 
-	private var state = State.Menu
-	var game: Game = Game()
-    
-	enum class State {
-		Menu, GameOptions, Help, Game
+	var state: GameState = Menu
+	set(value) {
+		field = value
+		field.onSet()
 	}
-
-	fun changeState(s: State) {
-		state = s
+	
+	init {
+		state.onSet()
 	}
-
+	
 	fun render(g2d: Graphics2D) {
-		when (state) {
-			StateManager.State.Game -> game.render(g2d)
-			StateManager.State.GameOptions -> GameOptions.render(g2d)
-			StateManager.State.Help -> Help.render(g2d)
-			StateManager.State.Menu -> Menu.render(g2d)
-		}
+		state.render(g2d)
 	}
-
 	fun update() {
-		when (state) {
-			StateManager.State.Game -> game.update()
-			StateManager.State.GameOptions -> GameOptions.update()
-			StateManager.State.Help -> Help.update()
-			StateManager.State.Menu -> Menu.update()
-		}
+		state.update()
 	}
 }

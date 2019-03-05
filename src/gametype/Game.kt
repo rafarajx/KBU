@@ -1,5 +1,6 @@
 package gametype
 
+import building.*
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics2D
@@ -9,37 +10,105 @@ import java.awt.image.BufferedImage
 import java.util.ArrayList
 import java.util.Random
 
-import building.Barrack
-import building.Barricade
-import building.House
-import building.Mill
-import building.Quarry
-import building.Tower
-import building.WoodCamp
-import core.Canvas
-import core.Input
-import core.Resources
-import core.Screen
+import core.*
 import fraction.Fraction
 import fraction.Player
 import math.vec2
 import nature.*
+import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
 
-open class Game {
+open class Game: GameState(){
 	
-	open fun render(g2d: Graphics2D) {}
+	override fun render(g2d: Graphics2D) {}
 	
-	open fun update() {}
+	override fun update() {}
+	
+	override var id: Int = 0
+	
+	var x1 = 0.0f
+	var y1 = 0.0f
+	
+	override fun onSet() {
+		
+		Input.mouseDragged = object: Input.MEvent {
+			override fun get(e: MouseEvent) {
+				
+				
+				val b1 = MouseEvent.BUTTON1_DOWN_MASK
+				val b2 = MouseEvent.BUTTON2_DOWN_MASK
+				val b3 = MouseEvent.BUTTON3_DOWN_MASK
+				
+				if(e.modifiersEx and b1 == b1)
+					player.placeBuilding(selectedBuilding, vec2(e.x.toFloat(), e.y.toFloat()))
+				
+				if ((e.modifiersEx and b3) == b3) {
+					val x2 = e.x.toFloat()
+					val y2 = e.y.toFloat()
+					val xd = x2 - x1
+					val yd = y2 - y1
+					x1 = e.x.toFloat()
+					y1 = e.y.toFloat()
+					camera.x += xd
+					camera.y += yd
+				}
+			}
+		}
+		
+		Input.mousePressed = object: Input.MEvent {
+			override fun get(e: MouseEvent){
+				
+			
+				
+				
+			}
+		}
+		
+		Input.mouseMoved = object: Input.MEvent{
+			override fun get(e: MouseEvent){
+				
+				
+				x1 = e.x.toFloat()
+				y1 = e.y.toFloat()
+				mouseX = e.x
+				mouseY = e.y
+				
+				canBuild = inRange(player.buildingList, Rectangle2D.Float(e.x - camera.x, e.y - camera.y, 1.0f, 1.0f))
+			}
+		}
+		
+	
+		Input.keyPressed = object: Input.KEvent{
+			override fun get(e: KeyEvent){
+				when(e.keyCode) {
+					KeyEvent.VK_LEFT -> if (selectedBuilding > 0) selectedBuilding--
+					KeyEvent.VK_RIGHT -> if (selectedBuilding < MENU_BAR.size - 1) selectedBuilding++
+					KeyEvent.VK_ADD -> if (Canvas.UPS < 600) {
+						Canvas.UPS++
+						Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
+					}
+					KeyEvent.VK_SUBTRACT -> if(Canvas.UPS > 20) {
+						Canvas.UPS--
+						Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
+					}
+					KeyEvent.VK_SPACE -> showHealth = true
+				}
+			}
+		}
+		
+	}
 	
 	companion object {
+		
+		var showHealth = false
+		var canBuild = false
 		
 		@JvmStatic
 		var camera = vec2(0.0f, 0.0f)
 		var random = Random()
 		val MAP_SIZE = 2000
-		var mouseX: Int = 0
-		var mouseY: Int = 0
-		//val PLAYER_INDEX = 0
+		var mouseX = 0
+		var mouseY = 0
 		var fractionList = ArrayList<Fraction>()
 		var player: Player = Player(vec2(1000.0f, 100.0f), Color.BLUE, Resources(100, 60, 10, 200), 0)
 		
@@ -61,30 +130,19 @@ open class Game {
 			intArrayOf(0, 5),
 			intArrayOf(0, 6)
 		)
-		var MENU_BAR_SCALE = 3
-		var SELECTED_BUILDING = 0
+		
+		var selectedBuilding = 0
 		private val COSTS = arrayOf(House.COST, Mill.COST, Tower.COST, WoodCamp.COST, Quarry.COST, Barrack.COST, Barricade.COST)
 		private val RESOURCE_NAMES = arrayOf("Wood", "Stone", "Iron", "Food")
 		private const val youWon = "You Won!"
 		private const val youLost = "You Lost!"
-		var MBFields = ArrayList<Rectangle2D>()
 		var AF: AffineTransform? = null
-		var x1: Float = 0.0f
-		var y1: Float = 0.0f
 		private const val MINIMAP_SIZE = 100
 		private var minimap = BufferedImage(MINIMAP_SIZE, MINIMAP_SIZE, BufferedImage.TYPE_INT_RGB)
 		var tick = 1
 		
 		fun setupMenuBar() {
-			for (i in MENU_BAR.indices)
-				MBFields.add(
-					Rectangle2D.Float(
-						i * 16.0f * MENU_BAR_SCALE,
-						Canvas.height - 60.0f,
-						16.0f * MENU_BAR_SCALE,
-						16.0f * MENU_BAR_SCALE
-					)
-				)
+		
 		}
 		
 		fun setupNature(fractions: Int) {
@@ -169,7 +227,6 @@ open class Game {
 					natureList[i].render(g2d)
 			}
 			
-			
 			for(i in fractionList.indices){
 				if(fractionList.indices.contains(i))
 					fractionList[i].drawStatus(g2d)
@@ -179,22 +236,22 @@ open class Game {
 		}
 		
 		fun drawInterface(g2d: Graphics2D) {
+			
 			createMinimap()
 			g2d.drawImage(minimap, Canvas.width - MINIMAP_SIZE - 5, Canvas.height - MINIMAP_SIZE - 5, null)
 			
-			g2d.color = Color(80, 80, 80, 180)
-			g2d.fillRoundRect(0, 0, 100, 70, 10, 10)
+			g2d.color = Color(80, 80, 80, 255)
+			g2d.fillRect(0, 0, 300, 70)
 			
 			g2d.color = Color(0, 0, 0, 255)
-			g2d.drawString("fps: " + Canvas.FPS, 5 + 1, 15 + 1)
-			g2d.drawString("ups: " + Canvas.UPS, 5 + 1, 30 + 1)
+			g2d.drawString("FPS: " + Canvas.FPS, 5 + 1, 15 + 1)
+			g2d.drawString("UPS: " + Canvas.UPS, 5 + 1, 30 + 1)
+			g2d.drawString("TUPS: " + Canvas.TUPS, 5 + 1, 45 + 1)
 			
 			g2d.color = Color(255, 255, 255, 255)
-			g2d.drawString("fps: " + Canvas.FPS, 5, 15)
-			g2d.drawString("ups: " + Canvas.UPS, 5, 30)
-			
-			g2d.color = Color(80, 80, 80, 180)
-			g2d.fillRoundRect(105, 0, 100, 70, 10, 10)
+			g2d.drawString("FPS: " + Canvas.FPS, 5, 15)
+			g2d.drawString("UPS: " + Canvas.UPS, 5, 30)
+			g2d.drawString("TUPS: " + Canvas.TUPS, 5 + 1, 45 + 1)
 			
 			g2d.color = Color(0, 0, 0, 255)
 			g2d.drawString("Wood: " + player.resources.wood, 115 + 1, 15 + 1)
@@ -207,9 +264,6 @@ open class Game {
 			g2d.drawString("Stone: " + player.resources.stone, 115, 30)
 			g2d.drawString("Iron: " + player.resources.iron, 115, 45)
 			g2d.drawString("Food: " + player.resources.food, 115, 60)
-			
-			g2d.color = Color(80, 80, 80, 180)
-			g2d.fillRoundRect(210, 0, 100, 70, 10, 10)
 			
 			g2d.color = Color(0, 0, 0, 255)
 			g2d.drawString("Pop: " + player.population, 220 + 1, 15 + 1)
@@ -227,7 +281,7 @@ open class Game {
 			g2d.fillRoundRect(0, Canvas.height - 60, MENU_BAR.size * 50, 70, 10, 10)
 			g2d.color = Color.BLACK
 			g2d.stroke = BasicStroke(1.5f)
-			g2d.drawRect(SELECTED_BUILDING * 16 * 3, Canvas.height - 60, 48, 48)
+			g2d.drawRect(selectedBuilding * 16 * 3, Canvas.height - 60, 48, 48)
 			for (i in MENU_BAR.indices) {
 				Screen.drawTile(g2d, MENU_BAR[i][0], MENU_BAR[i][1], 48 * i, Canvas.height - 60, 48, 48)
 				if (i == 1) Screen.drawTile(g2d, 7, 2, 48 * i, Canvas.height - 60, 48, 48)
@@ -235,11 +289,7 @@ open class Game {
 					Screen.drawTile(g2d, 8, 2, 48 * i, Canvas.height - 60, 48, 48)
 				}
 			}
-			for (i in MENU_BAR.indices) {
-				if (MBFields[i].contains(mouseX.toDouble(), mouseY.toDouble())) {
-					Screen.showInfo(g2d, mouseX.toFloat(), mouseY - 80.0f, "", RESOURCE_NAMES, COSTS[i])
-				}
-			}
+			
 			if (fractionList.size < 2 && !player.isDefeated) {
 				val youWonScale = 4 + Math.sin(tick / 20.0f % Math.PI * 2)
 				val youWonX = Canvas.width / 2 - Screen.LETTER_WIDTH * youWon.length / 2 * youWonScale
@@ -248,14 +298,8 @@ open class Game {
 			}
 			if (player.isDefeated) {
 				val youLostScale = 4.0
-				val youLostX =
-					Canvas.width / 2 - Screen.LETTER_WIDTH * youLost.length / 2 * youLostScale + (tick shr 3 and 1) * (random.nextInt(
-						10 + 1
-					) - 5)
-				val youLostY =
-					Canvas.height / 2 - Screen.LETTER_HEIGHT / 2 * youLostScale + (tick shr 3 and 1) * (random.nextInt(
-						10 + 1
-					) - 5)
+				val youLostX = Canvas.width / 2 - Screen.LETTER_WIDTH * youLost.length / 2 * youLostScale + (tick shr 3 and 1) * (random.nextInt(10 + 1) - 5)
+				val youLostY = Canvas.height / 2 - Screen.LETTER_HEIGHT / 2 * youLostScale + (tick shr 3 and 1) * (random.nextInt(10 + 1) - 5)
 				Screen.drawString(g2d, youLost, youLostX.toInt(), youLostY.toInt(), youLostScale)
 			}
 		}
@@ -268,7 +312,7 @@ open class Game {
 				g2d.color = fraction.color
 				for (i in fraction.buildingList.indices) {
 					if(fraction.buildingList.indices.contains(i)) {
-						var building = fraction.buildingList[i]
+						val building = fraction.buildingList[i]
 						val x = Math.min(Math.max(0, (building.p.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
 						val y = Math.min(Math.max(0, (building.p.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
 						g2d.fillRect(x, y, 2, 2)
@@ -276,7 +320,7 @@ open class Game {
 				}
 				for (i in fraction.entityList.indices) {
 					if(fraction.entityList.indices.contains(i)) {
-						var entity = fraction.entityList[i]
+						val entity = fraction.entityList[i]
 						val x = Math.min(Math.max(0, (entity.p.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
 						val y = Math.min(Math.max(0, (entity.p.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
 						g2d.fillRect(x, y, 1, 1)
@@ -311,32 +355,14 @@ open class Game {
 			}
 		}
 		
-		fun updateInput() {
-			if (Input.mousePressed) {
-				if (Input.mouseButton == 1) {
-					player.placeBuilding(SELECTED_BUILDING, vec2(Input.mouseX.toFloat(), Input.mouseY.toFloat()))
+		fun <T: Building> inRange(arrayList: ArrayList<T>, r: Rectangle2D): Boolean {
+			for (i in arrayList.indices) {
+				val b = arrayList[i]
+				if (b.range!!.intersects(r)) {
+					return true
 				}
 			}
-			if (Input.mouseMoved) {
-				mouseX = Input.mouseX
-				mouseY = Input.mouseY
-				x1 = Input.mouseX.toFloat()
-				y1 = Input.mouseY.toFloat()
-			}
-			if (Input.mouseButton == 3 || Input.mouseButton == 2) {
-				val x2 = Input.mouseX.toFloat()
-				val y2 = Input.mouseY.toFloat()
-				val xd = x2 - x1
-				val yd = y2 - y1
-				x1 = Input.mouseX.toFloat()
-				y1 = Input.mouseY.toFloat()
-				camera.x += xd
-				camera.y += yd
-			}
-			if (tick % 5 == 0) {
-				if (Input.isKeyDown(37) && SELECTED_BUILDING > 0) SELECTED_BUILDING--
-				if (Input.isKeyDown(39) && SELECTED_BUILDING < MENU_BAR.size - 1) SELECTED_BUILDING++
-			}
+			return false
 		}
 		
 		fun toTicks(time: IntArray): Int {

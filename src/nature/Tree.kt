@@ -8,8 +8,8 @@ import gametype.Game
 import math.vec2
 
 class Tree(p: vec2) : Nature() {
-	var resources = 200
-	private var num: Int = 0
+	var resources = 127
+	private var appearance: Int = 0
 	
 	companion object {
 		const val EDGE_LENGTH = 32
@@ -17,13 +17,13 @@ class Tree(p: vec2) : Nature() {
 
 	init {
 		super.p = p
-		this.num = Nature.r.nextInt(2)
+		this.appearance = Nature.r.nextInt(2)
 		this.field = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
 	}
 
 	override fun render(g2d: Graphics2D) {
 		Screen.drawTile(g2d, 8, 3, p.x.toInt() - 16, p.y.toInt() - 16 + 7, 32, 32)
-		Screen.drawTile(g2d, resources / 15, 15 - num, p.x.toInt() - 16, p.y.toInt() - 16, 32, 32)
+		Screen.drawTile(g2d, resources / 8, 15 - appearance, p.x.toInt() - 16, p.y.toInt() - 16, 32, 32)
 	}
 
 	override fun update() {

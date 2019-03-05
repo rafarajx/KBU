@@ -4,11 +4,13 @@ import java.awt.Color
 import java.awt.Graphics2D
 
 import core.Canvas
+import core.GameState
 import core.Input
 import core.Screen
 import sound.SimpleSound
+import java.awt.event.KeyEvent
 
-object Help {
+object Help: GameState(){
     
     private val HELP_TEXT = arrayOf(
         "Control:",
@@ -18,8 +20,23 @@ object Help {
         "Numpad +/- to adjust speed of the game",
         "Press escape to quit..."
     )
-
-    fun render(g2d: Graphics2D) {
+    
+    private var keyPressed: Input.KEvent? = null
+    
+    override fun onSet() {
+        keyPressed = object: Input.KEvent {
+            override fun get(e: KeyEvent) {
+                if (e.keyCode == 27) {
+                    SimpleSound.pickup.play()
+                    Input.keyPressed = null
+                    StateManager.state = Menu
+                }
+            }
+        }
+        Input.keyPressed = keyPressed
+    }
+    
+    override fun render(g2d: Graphics2D) {
         g2d.drawImage(Menu.BG, 0, 0, Canvas.width, Canvas.height, null)
         g2d.color = Color(180, 180, 180, 180)
         Screen.drawString(g2d, "FPS: " + Canvas.FPS, 20, 20, 1.0)
@@ -29,10 +46,7 @@ object Help {
         }
     }
 
-    fun update() {
-        if (Input.isKeyDown(27)) {
-            SimpleSound.pickup.play()
-            StateManager.changeState(StateManager.State.Menu)
-        }
+    override fun update() {
+    
     }
 }

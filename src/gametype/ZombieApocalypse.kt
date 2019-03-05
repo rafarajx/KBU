@@ -58,7 +58,6 @@ object ZombieApocalypse : Game() {
 
 	override fun update() {
 		updateObjects()
-		updateInput()
 		tick++
 	}
 }

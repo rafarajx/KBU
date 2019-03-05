@@ -18,14 +18,13 @@ class Grave(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 		private const val RANGE = 150
 		val COST = Resources(0)
 	}
-
-
+	
 	init {
 		super.p = p
-		this.owner = owner
-		this.teamNumber = teamIndex
-		this.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
-		this.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
+		super.owner = owner
+		super.teamNumber = teamIndex
+		field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
+		range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
 		owner.buildingList.add(this)
 	}
 	
@@ -35,16 +34,16 @@ class Grave(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 	}
 
 	override fun update() {
-		if (this.health <= 0) {
-			Die()
+		if (health <= 0) die()
+		
+		if (tick % 1100 == 0) {
+			var z = Zombie(p, owner, teamNumber)
+			owner.entityList.add(z)
 		}
-		if (this.tick % 1100 == 0) {
-			owner.entityList.add(Zombie(p, owner, teamNumber))
-		}
-		this.tick++
+		tick++
 	}
 
-	fun Die() {
+	fun die() {
 		owner.buildingList.remove(this)
 		//owner.graveList.remove(this);
 	}

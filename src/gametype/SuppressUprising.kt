@@ -46,7 +46,6 @@ object SuppressUprising : Game() {
 
 	override fun update() {
 		Game.updateObjects()
-		Game.updateInput()
 		Game.tick++
 	}
 }

@@ -37,7 +37,6 @@ object FFA : Game() {
 	
 	override fun update() {
 		updateObjects()
-		updateInput()
 		tick++
 	}
 }
