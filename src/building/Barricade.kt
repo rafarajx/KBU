@@ -30,7 +30,7 @@ class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 0, 6, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+		g2d.drawImage(Screen.barricade, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		Building.drawBar(g2d, p, health, 250, Color.RED)
 	}
 	
@@ -39,6 +39,10 @@ class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	fun die() {
+		remove()
+	}
+	
+	@Synchronized fun remove(){
 		owner.buildingList.remove(this)
 		owner.barricadeList.remove(this)
 	}

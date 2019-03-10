@@ -7,7 +7,6 @@ import java.awt.geom.Rectangle2D
 import building.*
 import core.Resources
 import math.vec2
-import java.util.*
 
 class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: Int, teamNumber: Int) : Fraction() {
 	
@@ -92,7 +91,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				resources.pay(House.COST)
 				House(vec2(x, y), this, teamNumber)
 			}
-			Building.MILL -> if (resources.enough(Mill.COST)) {
+			Building.MILL -> if (resources.enough(Windmill.COST)) {
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
 				val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
@@ -100,8 +99,8 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 					this.AIRange += 50
 					return
 				}
-				resources.pay(Mill.COST)
-				Mill(vec2(x, y), this, teamNumber)
+				resources.pay(Windmill.COST)
+				Windmill(vec2(x, y), this, teamNumber)
 			}
 			Building.TOWER -> if (resources.enough(Tower.COST)) {
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x

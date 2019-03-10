@@ -35,7 +35,7 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 0, 2, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+		g2d.drawImage(Screen.tower, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		g2d.color = Color.RED
 		if (target.x != p.x && target.y != p.y)
 			g2d.draw(Line2D.Float(p.x, p.y, target.x, target.y))
@@ -77,6 +77,10 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	fun die() {
+		remove()
+	}
+	
+	@Synchronized fun remove(){
 		owner.buildingList.remove(this)
 		owner.towerList.remove(this)
 	}

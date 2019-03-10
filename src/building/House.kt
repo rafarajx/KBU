@@ -10,7 +10,6 @@ import entity.Worker.Miller
 import entity.Worker.Stonemason
 import entity.Worker.Woodcutter
 import fraction.Fraction
-import fraction.Player
 import gametype.Game
 import math.vec2
 import nature.Cloud
@@ -25,7 +24,7 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 		private const val RANGE = 150
 	}
 	
-	private fun freeMill(): Mill? {
+	private fun freeMill(): Windmill? {
 		for (m in owner.millList)
 			if (m.miller[0] == null || m.miller[1] == null) return m
 		return null
@@ -43,7 +42,7 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 0, 0, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+		g2d.drawImage(Screen.house, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		Building.drawBar(g2d, p.x, p.y - 10, health, 200, Color.RED)
 		if (owner.population < owner.maxPopulation && owner.resources.food > 4)
 			Building.drawBar(g2d, p, tick % 1000, 1000, Color.ORANGE)
@@ -55,14 +54,14 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 			Game.natureList.add(Cloud(p - vec2(3.0f, 5.0f)))
 		}
 		if (tick % 1000 == 0 && owner.population < owner.maxPopulation && owner.resources.food > 4) {
-			val mill = freeMill()
-			if (mill != null) {
+			val windmill = freeMill()
+			if (windmill != null) {
 				val miller = Miller(p, owner, teamNumber)
-				miller.mill = mill
-				if (mill.miller[0] == null) {
-					mill.miller[0] = miller
-				} else if (mill.miller[1] == null) {
-					mill.miller[1] = miller
+				miller.windmill = windmill
+				if (windmill.miller[0] == null) {
+					windmill.miller[0] = miller
+				} else if (windmill.miller[1] == null) {
+					windmill.miller[1] = miller
 				}
 				owner.entityList.add(miller)
 				owner.resources.food -= 5
@@ -86,6 +85,10 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	
 	fun die() {
 		owner.maxPopulation -= 4
+		remove()
+	}
+	
+	@Synchronized fun remove(){
 		owner.buildingList.remove(this)
 		owner.houseList.remove(this)
 	}

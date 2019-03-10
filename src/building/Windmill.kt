@@ -13,9 +13,9 @@ import gametype.Game
 import math.vec2
 import nature.Wheat
 
-class Mill(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
+class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 
-	var AF: AffineTransform? = null
+	var at: AffineTransform? = null
 	var theta = 0.0
 	var health = 200
 	var miller : Array<Miller?> = arrayOf(null, null)
@@ -28,20 +28,20 @@ class Mill(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 
 	init {
 		super.p = p
-		this.owner = owner
-		this.teamNumber = teamIndex
-		this.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
-		this.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
+		super.owner = owner
+		super.teamNumber = teamIndex
+		super.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
+		super.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
 		owner.buildingList.add(this)
 		owner.millList.add(this)
 	}
 
 	override fun render(g2d: Graphics2D) {
-		AF = g2d.transform
-		Screen.drawTile(g2d, 0, 1, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+		at = g2d.transform
+		g2d.drawImage(Screen.windmill, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		g2d.rotate(theta, p.x.toDouble(), p.y.toDouble())
 		Screen.drawTile(g2d, 7, 2, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
-		g2d.transform = AF
+		g2d.transform = at
 		Building.drawBar(g2d, p, health, 200, Color.RED)
 	}
 
@@ -65,8 +65,12 @@ class Mill(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 	}
 
 	fun die() {
-		if(miller[0] != null) miller[0]!!.mill = null
-		if(miller[1] != null) miller[1]!!.mill = null
+		if(miller[0] != null) miller[0]!!.windmill = null
+		if(miller[1] != null) miller[1]!!.windmill = null
+		remove()
+	}
+	
+	@Synchronized fun remove() {
 		owner.buildingList.remove(this)
 		owner.millList.remove(this)
 	}

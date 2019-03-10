@@ -2,13 +2,22 @@ package core
 
 import math.vec2
 import java.awt.Color
-import java.awt.Font
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
+import javax.imageio.ImageIO
 
 object Screen {
 	
 	var TilesetArray = ArrayList<BufferedImage>()
+	
+	var house = ImageIO.read(Main::class.java.getResourceAsStream("/House.png"))!!
+	var windmill = ImageIO.read(Main::class.java.getResourceAsStream("/Windmill.png"))!!
+	var tower = ImageIO.read(Main::class.java.getResourceAsStream("/Tower.png"))!!
+	var woodCamp = ImageIO.read(Main::class.java.getResourceAsStream("/WoodCamp.png"))!!
+	var quarry = ImageIO.read(Main::class.java.getResourceAsStream("/Quarry.png"))!!
+	var barracks = ImageIO.read(Main::class.java.getResourceAsStream("/Barracks.png"))!!
+	var barricade = ImageIO.read(Main::class.java.getResourceAsStream("/Barricade.png"))!!
+	
 	private const val TILESET_WIDTH = 16
 	private const val TILESET_HEIGHT = 16
 	var fontArray = ArrayList<BufferedImage>()
@@ -54,12 +63,6 @@ object Screen {
 		}
 	}
 	
-	fun drawString(g2d: Graphics2D, text: String, x: Int, y: Int, Size: Int, c: Color) {
-		g2d.font = Font("Arial", 1, Size)
-		g2d.color = c
-		g2d.drawString(text, x, y)
-	}
-	
 	private fun getLetterId(letter: Char): Int {
 		for (i in 0 until CHARACTERS.length) {
 			if (letter == CHARACTERS[i]) {
@@ -79,8 +82,8 @@ object Screen {
 	
 	fun showInfo(g2d: Graphics2D, PositionX: Float, PositionY: Float, Title: String, Text: Array<String>, Numbers: IntArray) {
 		g2d.color = Color(80, 80, 80, 180)
-		g2d.fillRoundRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30, 10, 10)
-		g2d.drawRoundRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30, 10, 10)
+		g2d.fillRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
+		g2d.drawRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
 		g2d.color = Color(255, 255, 200, 180)
 		g2d.drawString(Title, 10 + PositionX.toInt(), 15 + PositionY.toInt())
 		g2d.color = Color(255, 255, 255, 180)
@@ -91,8 +94,8 @@ object Screen {
 	
 	fun showInfo(g2d: Graphics2D, PositionX: Float, PositionY: Float, Title: String, Text: Array<String>, resources: Resources) {
 		g2d.color = Color(80, 80, 80, 180)
-		g2d.fillRoundRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30, 10, 10)
-		g2d.drawRoundRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30, 10, 10)
+		g2d.fillRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
+		g2d.drawRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
 		g2d.color = Color(255, 255, 200, 180)
 		g2d.drawString(Title, 10 + PositionX.toInt(), 15 + PositionY.toInt())
 		g2d.color = Color(255, 255, 255, 180)
@@ -101,5 +104,4 @@ object Screen {
 		g2d.drawString(Text[2] + ": " + resources.iron, 10 + PositionX.toInt(), 2 * 15 + 35 + PositionY.toInt())
 		g2d.drawString(Text[3] + ": " + resources.food, 10 + PositionX.toInt(), 3 * 15 + 35 + PositionY.toInt())
 	}
-	
 }

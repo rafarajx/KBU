@@ -37,13 +37,17 @@ class Grave(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 		if (health <= 0) die()
 		
 		if (tick % 1100 == 0) {
-			var z = Zombie(p, owner, teamNumber)
+			val z = Zombie(p, owner, teamNumber)
 			owner.entityList.add(z)
 		}
 		tick++
 	}
 
 	fun die() {
+		remove()
+	}
+	
+	@Synchronized fun remove(){
 		owner.buildingList.remove(this)
 		//owner.graveList.remove(this);
 	}

@@ -17,6 +17,8 @@ import math.vec2
 import nature.*
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
+import kotlin.math.max
+import kotlin.math.min
 
 open class Game: GameState(){
 	
@@ -24,93 +26,22 @@ open class Game: GameState(){
 	
 	override fun update() {}
 	
-	override var id: Int = 0
-	
-	var x1 = 0.0f
-	var y1 = 0.0f
-	
-	override fun onSet() {
-		
-		Input.mouseDragged = object: Input.MEvent {
-			override fun get(e: MouseEvent) {
-				
-				
-				val b1 = MouseEvent.BUTTON1_DOWN_MASK
-				val b2 = MouseEvent.BUTTON2_DOWN_MASK
-				val b3 = MouseEvent.BUTTON3_DOWN_MASK
-				
-				if(e.modifiersEx and b1 == b1)
-					player.placeBuilding(selectedBuilding, vec2(e.x.toFloat(), e.y.toFloat()))
-				
-				if ((e.modifiersEx and b3) == b3) {
-					val x2 = e.x.toFloat()
-					val y2 = e.y.toFloat()
-					val xd = x2 - x1
-					val yd = y2 - y1
-					x1 = e.x.toFloat()
-					y1 = e.y.toFloat()
-					camera.x += xd
-					camera.y += yd
-				}
-			}
-		}
-		
-		Input.mousePressed = object: Input.MEvent {
-			override fun get(e: MouseEvent){
-				
-			
-				
-				
-			}
-		}
-		
-		Input.mouseMoved = object: Input.MEvent{
-			override fun get(e: MouseEvent){
-				
-				
-				x1 = e.x.toFloat()
-				y1 = e.y.toFloat()
-				mouseX = e.x
-				mouseY = e.y
-				
-				canBuild = inRange(player.buildingList, Rectangle2D.Float(e.x - camera.x, e.y - camera.y, 1.0f, 1.0f))
-			}
-		}
-		
-	
-		Input.keyPressed = object: Input.KEvent{
-			override fun get(e: KeyEvent){
-				when(e.keyCode) {
-					KeyEvent.VK_LEFT -> if (selectedBuilding > 0) selectedBuilding--
-					KeyEvent.VK_RIGHT -> if (selectedBuilding < MENU_BAR.size - 1) selectedBuilding++
-					KeyEvent.VK_ADD -> if (Canvas.UPS < 600) {
-						Canvas.UPS++
-						Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
-					}
-					KeyEvent.VK_SUBTRACT -> if(Canvas.UPS > 20) {
-						Canvas.UPS--
-						Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
-					}
-					KeyEvent.VK_SPACE -> showHealth = true
-				}
-			}
-		}
-		
-	}
+	override fun onSet() { setBasicInput() }
 	
 	companion object {
-		
+		var x1 = 0.0f
+		var y1 = 0.0f
 		var showHealth = false
 		var canBuild = false
 		
 		@JvmStatic
 		var camera = vec2(0.0f, 0.0f)
 		var random = Random()
-		val MAP_SIZE = 2000
+		val MAP_SIZE = 3200
 		var mouseX = 0
 		var mouseY = 0
 		var fractionList = ArrayList<Fraction>()
-		var player: Player = Player(vec2(1000.0f, 100.0f), Color.BLUE, Resources(100, 60, 10, 200), 0)
+		var player: Player = Player(vec2(0.0f, -900.0f), Color.BLUE, Resources(100, 60, 10, 200), 0)
 		
 		var natureList = ArrayList<Nature>()
 		var cloudList = ArrayList<Cloud>()
@@ -119,6 +50,9 @@ open class Game: GameState(){
 		var rockList = ArrayList<Rock>()
 		var treeList = ArrayList<Tree>()
 		var wheatList = ArrayList<Wheat>()
+		
+		//var rockTree = QuadTree<Rock>(vec2(-2000, -2000), vec2(2000, 2000))
+		var treeTree = QuadTree<Tree>(vec2(-2000, -2000), vec2(2000, 2000))
 		
 		
 		private val MENU_BAR = arrayOf(
@@ -132,7 +66,7 @@ open class Game: GameState(){
 		)
 		
 		var selectedBuilding = 0
-		private val COSTS = arrayOf(House.COST, Mill.COST, Tower.COST, WoodCamp.COST, Quarry.COST, Barrack.COST, Barricade.COST)
+		private val COSTS = arrayOf(House.COST, Windmill.COST, Tower.COST, WoodCamp.COST, Quarry.COST, Barrack.COST, Barricade.COST)
 		private val RESOURCE_NAMES = arrayOf("Wood", "Stone", "Iron", "Food")
 		private const val youWon = "You Won!"
 		private const val youLost = "You Lost!"
@@ -145,10 +79,76 @@ open class Game: GameState(){
 		
 		}
 		
+		fun setBasicInput(){
+			Input.mouseDragged = object: Input.MEvent {
+				override fun get(e: MouseEvent) {
+					
+					mouseX = e.x
+					mouseY = e.y
+					
+					val b1 = MouseEvent.BUTTON1_DOWN_MASK
+					val b2 = MouseEvent.BUTTON2_DOWN_MASK
+					val b3 = MouseEvent.BUTTON3_DOWN_MASK
+					
+					if(e.modifiersEx and b1 == b1)
+						player.placeBuilding(selectedBuilding, vec2(e.x.toFloat(), e.y.toFloat()))
+					
+					if (e.modifiersEx and b3 == b3) {
+						val x2 = e.x.toFloat()
+						val y2 = e.y.toFloat()
+						val xd = x2 - x1
+						val yd = y2 - y1
+						x1 = e.x.toFloat()
+						y1 = e.y.toFloat()
+						camera.x += xd
+						camera.y += yd
+					}
+				}
+			}
+			
+			Input.mousePressed = object: Input.MEvent {
+				override fun get(e: MouseEvent){
+				
+				}
+			}
+			
+			Input.mouseMoved = object: Input.MEvent{
+				override fun get(e: MouseEvent){
+					x1 = e.x.toFloat()
+					y1 = e.y.toFloat()
+					mouseX = e.x
+					mouseY = e.y
+					
+					canBuild = inRange(player.buildingList, Rectangle2D.Float(e.x - camera.x, e.y - camera.y, 1.0f, 1.0f))
+					
+					
+					
+				}
+			}
+			
+			Input.keyPressed = object: Input.KEvent{
+				override fun get(e: KeyEvent){
+					when(e.keyCode) {
+						KeyEvent.VK_LEFT -> if (selectedBuilding > 0) selectedBuilding--
+						KeyEvent.VK_RIGHT -> if (selectedBuilding < MENU_BAR.size - 1) selectedBuilding++
+						KeyEvent.VK_ADD -> if (Canvas.UPS < 600) {
+							Canvas.UPS++
+							Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
+						}
+						KeyEvent.VK_SUBTRACT -> if(Canvas.UPS > 20) {
+							Canvas.UPS--
+							Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
+						}
+						KeyEvent.VK_SPACE -> showHealth = true
+					}
+				}
+			}
+		}
+		
 		fun setupNature(fractions: Int) {
 			for (i in 0..1000) {
-				val x = random.nextInt(3200) - 600.toFloat()
-				val y = random.nextInt(3200) - 600.toFloat()
+				val x = random.nextFloat() * 3200.0f - 1600.0f
+				val y = random.nextFloat() * 3200.0f - 1600.0f
 				if (!isColliding(
 						Rectangle2D.Float(
 							x - Tree.EDGE_LENGTH / 2,
@@ -162,25 +162,25 @@ open class Game: GameState(){
 				}
 			}
 			for (i in 0..49) {
-				val x = random.nextInt(3200) - 600.toFloat()
-				val y = random.nextInt(3200) - 600.toFloat()
+				val x = random.nextFloat() * 3200.0f - 1600.0f
+				val y = random.nextFloat() * 3200.0f - 1600.0f
 				if (!isColliding(Rectangle2D.Float(x - 8.0f, y - 8.0f, 16.0f, 16.0f))) {
 					Flowers(vec2(x, y)).add()
 				}
 			}
 			for (i in 0..49) {
-				val x = random.nextInt(3200) - 600.toFloat()
-				val y = random.nextInt(3200) - 600.toFloat()
+				val x = random.nextFloat() * 3200.0f - 1600.0f
+				val y = random.nextFloat() * 3200.0f - 1600.0f
 				if (!isColliding(Rectangle2D.Float(x - 8.0f, y - 8.0f, 16.0f, 16.0f))) {
 					Grass(vec2(x, y)).add()
 				}
 			}
 			for (i1 in 0 until 4 * fractions) {
-				val x1 = random.nextInt(3200) - 600.toFloat()
-				val y1 = random.nextInt(3200) - 600.toFloat()
+				val x1 = random.nextFloat() * 3200.0f - 1600.0f
+				val y1 = random.nextFloat() * 3200.0f - 1600.0f
 				for (i2 in 0..9) {
-					val x2 = random.nextInt(200).toFloat()
-					val y2 = random.nextInt(200).toFloat()
+					val x2 = random.nextFloat() * 200.0f
+					val y2 = random.nextFloat() * 200.0f
 					if (!isColliding(Rectangle2D.Float(x1 + x2 - 8.0f, y1 + y2 - 8.0f, 16.0f, 16.0f))) {
 						Rock(vec2(x1 + x2, y1 + y2)).add()
 					}
@@ -211,6 +211,13 @@ open class Game: GameState(){
 			AF = g2d.transform
 			g2d.translate(camera.x.toInt(), camera.y.toInt())
 			
+			g2d.color = Color(200, 0, 0)
+			treeTree.draw(g2d)
+			
+			
+			val qt = treeTree.search(vec2(mouseX - camera.x, mouseY - camera.y))
+			g2d.color = Color.GREEN
+			g2d.fillRect(qt.aabb.ul.x.toInt(), qt.aabb.ul.y.toInt(), (qt.aabb.dr.x - qt.aabb.ul.x).toInt(), (qt.aabb.dr.y - qt.aabb.ul.y).toInt())
 			
 			for(i in fractionList.indices){
 				if(fractionList.indices.contains(i))
@@ -230,6 +237,12 @@ open class Game: GameState(){
 			for(i in fractionList.indices){
 				if(fractionList.indices.contains(i))
 					fractionList[i].drawStatus(g2d)
+			}
+			
+			val t = treeTree.nearest(vec2(mouseX - camera.x, mouseY - camera.y))
+			g2d.color = Color.BLUE
+			if(t != null) {
+				g2d.fillRect(t.p.x.toInt(), t.p.y.toInt(), 3, 3)
 			}
 			
 			g2d.transform = AF
@@ -296,6 +309,7 @@ open class Game: GameState(){
 				val youWonY = Canvas.height / 2 - Screen.LETTER_HEIGHT * youWonScale / 2
 				Screen.drawString(g2d, youWon, youWonX.toInt(), youWonY.toInt(), youWonScale)
 			}
+			
 			if (player.isDefeated) {
 				val youLostScale = 4.0
 				val youLostX = Canvas.width / 2 - Screen.LETTER_WIDTH * youLost.length / 2 * youLostScale + (tick shr 3 and 1) * (random.nextInt(10 + 1) - 5)
@@ -312,18 +326,18 @@ open class Game: GameState(){
 				g2d.color = fraction.color
 				for (i in fraction.buildingList.indices) {
 					if(fraction.buildingList.indices.contains(i)) {
-						val building = fraction.buildingList[i]
-						val x = Math.min(Math.max(0, (building.p.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
-						val y = Math.min(Math.max(0, (building.p.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
-						g2d.fillRect(x, y, 2, 2)
+						val b = fraction.buildingList[i]
+						val x = ((b.p.x + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).coerceIn(0.0f, MAP_SIZE.toFloat())
+						val y = ((b.p.y + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).coerceIn(0.0f, MAP_SIZE.toFloat())
+						g2d.fillRect(x.toInt(), y.toInt(), 2, 2)
 					}
 				}
 				for (i in fraction.entityList.indices) {
 					if(fraction.entityList.indices.contains(i)) {
-						val entity = fraction.entityList[i]
-						val x = Math.min(Math.max(0, (entity.p.x / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
-						val y = Math.min(Math.max(0, (entity.p.y / MAP_SIZE * MINIMAP_SIZE).toInt()), MAP_SIZE)
-						g2d.fillRect(x, y, 1, 1)
+						val e = fraction.entityList[i]
+						val x = ((e.p.x + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).coerceIn(0.0f, MAP_SIZE.toFloat())
+						val y = ((e.p.y + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).coerceIn(0.0f, MAP_SIZE.toFloat())
+						g2d.fillRect(x.toInt(), y.toInt(), 1, 1)
 					}
 				}
 			}
@@ -333,10 +347,10 @@ open class Game: GameState(){
 			g2d.drawLine(MINIMAP_SIZE - 1, MINIMAP_SIZE - 1, 0, MINIMAP_SIZE - 1)
 			g2d.drawLine(0, MINIMAP_SIZE - 1, 0, 0)
 			
-			val cx1 = ((-camera.x) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
-			val cx2 = ((-camera.x + Canvas.width) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
-			val cy1 = ((-camera.y) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
-			val cy2 = ((-camera.y + Canvas.height) / Game.MAP_SIZE * MINIMAP_SIZE).toInt()
+			val cx1 = ((-camera.x + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).toInt()
+			val cx2 = ((-camera.x + MAP_SIZE / 2 + Canvas.width) / MAP_SIZE * MINIMAP_SIZE).toInt()
+			val cy1 = ((-camera.y + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).toInt()
+			val cy2 = ((-camera.y + MAP_SIZE / 2 + Canvas.height) / MAP_SIZE * MINIMAP_SIZE).toInt()
 			
 			g2d.drawLine(cx1, cy1, cx2, cy1)
 			g2d.drawLine(cx2, cy1, cx2, cy2)

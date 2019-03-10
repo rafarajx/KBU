@@ -18,7 +18,7 @@ object Menu: GameState() {
 	
 	init {
 		BG = ImageIO.read(Menu::class.java.getResourceAsStream("/MenuBackground.png"))
-		SimpleSound.soundtrack.loop(Int.MAX_VALUE)
+		//SimpleSound.soundtrack.loop(Int.MAX_VALUE)
 	}
 	
 	private var keyPressed: Input.KEvent? = null

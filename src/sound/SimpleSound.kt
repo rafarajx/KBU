@@ -17,16 +17,11 @@ class SimpleSound(name: String) {
 	}
 
 	fun play() {
-		Thread{
-            clip.start()
-			Thread.sleep(1000)
-        }.start()
+		clip.start()
 	}
 
 	fun loop(times: Int) {
-		Thread{
-            clip.loop(times)
-        }.start()
+		clip.loop(times)
 	}
 
 	fun stop() {

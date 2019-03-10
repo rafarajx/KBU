@@ -45,7 +45,7 @@ class Rock(p: vec2) : Nature() {
 		Game.rockList.add(this)
 	}
 	
-	fun remove(){
+	@Synchronized fun remove(){
 		Game.natureList.remove(this)
 		Game.rockList.remove(this)
 	}

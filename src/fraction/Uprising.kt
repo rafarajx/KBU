@@ -62,9 +62,9 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
 				resources.pay(House.COST)
 				buildingList.add(House(p - camera, this, teamNumber))
 			}
-			Building.MILL -> if (resources.enough(Mill.COST)) {
-				resources.pay(Mill.COST)
-				buildingList.add(Mill(p - camera, this, teamNumber))
+			Building.MILL -> if (resources.enough(Windmill.COST)) {
+				resources.pay(Windmill.COST)
+				buildingList.add(Windmill(p - camera, this, teamNumber))
 			}
 			Building.TOWER -> if (resources.enough(Tower.COST)) {
 				resources.pay(Tower.COST)

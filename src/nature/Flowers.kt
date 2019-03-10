@@ -36,7 +36,7 @@ class Flowers(p: vec2) : Nature() {
 		Game.flowersList.add(this)
 	}
 	
-	fun remove(){
+	@Synchronized fun remove(){
 		Game.natureList.remove(this)
 		Game.flowersList.remove(this)
 	}

@@ -10,9 +10,11 @@ import fraction.Uprising
 import math.vec2
 
 object SuppressUprising : Game() {
-
-	fun init(friendsNumber: Int, difficulty: Int) {
-		var difficulty = difficulty
+	
+	var difficulty = 0
+	var friendsNumber = 0
+	
+	override fun onSet() {
         difficulty = 6 - difficulty
 		setupMenuBar()
 		Game.natureList.clear()
@@ -37,6 +39,8 @@ object SuppressUprising : Game() {
 		}
 		start = vec2(1000.0f, 1000.0f)
 		Game.fractionList.add(Uprising(start, Color.RED, 100, 1))
+		
+		setBasicInput()
 	}
 
 	override fun render(g2d: Graphics2D) {

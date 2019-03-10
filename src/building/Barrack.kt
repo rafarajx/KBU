@@ -31,7 +31,7 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 0, 5, p - 16.0f, EDGE_LENGTH, EDGE_LENGTH)
+		g2d.drawImage(Screen.barracks, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		Building.drawBar(g2d, p.x, p.y - 10.0f, health, 200, Color.RED)
 		if (owner.resources.food > 20 && owner.population < owner.maxPopulation)
 			Building.drawBar(g2d, p.x, p.y, tick % 600, 600, Color.BLUE)
@@ -49,6 +49,10 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 	}
 	
 	fun die() {
+		remove()
+	}
+	
+	@Synchronized fun remove(){
 		owner.buildingList.remove(this)
 		owner.barrackList.remove(this)
 	}

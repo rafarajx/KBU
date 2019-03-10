@@ -13,7 +13,7 @@ import core.Screen
 import entity.Entity
 import gametype.Game
 import building.House
-import building.Mill
+import building.Windmill
 import building.Tower
 import building.WoodCamp
 import building.Quarry
@@ -32,7 +32,7 @@ open class Fraction {
 	var buildingList = ArrayList<Building>()
 	
 	var houseList = ArrayList<House>()
-	var millList = ArrayList<Mill>()
+	var millList = ArrayList<Windmill>()
 	var towerList = ArrayList<Tower>()
 	var woodCampList = ArrayList<WoodCamp>()
 	var quarryList = ArrayList<Quarry>()

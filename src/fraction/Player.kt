@@ -7,14 +7,12 @@ import java.awt.geom.Rectangle2D
 import building.Barrack
 import building.Barricade
 import building.House
-import building.Mill
+import building.Windmill
 import building.Quarry
 import building.Tower
 import building.WoodCamp
 import core.Canvas
-import core.Input
 import core.Resources
-import core.Screen
 import gametype.Game
 import math.vec2
 import sound.SimpleSound
@@ -65,10 +63,10 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 				SimpleSound.explosion.play()
 				this.buildingList.add(House(p - camera, this, teamNumber))
 			}
-			1 -> if (resources.enough(Mill.COST)) {
-				resources.pay(Mill.COST)
+			1 -> if (resources.enough(Windmill.COST)) {
+				resources.pay(Windmill.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(Mill(p - camera, this, teamNumber))
+				this.buildingList.add(Windmill(p - camera, this, teamNumber))
 			}
 			2 -> if (resources.enough(Tower.COST)) {
 				resources.pay(Tower.COST)

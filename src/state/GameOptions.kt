@@ -31,16 +31,14 @@ object GameOptions : GameState() {
 						Input.keyPressed = null
 						when (gameMode) {
 							0 -> {
+								FFA.opponentsNumber = numberOfEnemies
+								FFA.difficulty = difficulty + 1
 								StateManager.state = FFA
-								FFA.init(numberOfEnemies, difficulty + 1)
 							}
 							1 -> {
+								SuppressUprising.friendsNumber = numberOfEnemies
+								SuppressUprising.difficulty = difficulty + 1
 								StateManager.state = SuppressUprising
-								SuppressUprising.init(numberOfEnemies, difficulty + 1)
-							}
-							2 -> {
-								StateManager.state = ZombieApocalypse
-								ZombieApocalypse.init(numberOfEnemies, difficulty + 1)
 							}
 						}
 					}

@@ -53,7 +53,7 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 			if (tick % 15 == 0) target = getNearestBuilding(owner!!.woodCampList)
 			if (tick % 100 == 0) leaveWood()
 		} else {
-			if (tick % 15 == 0) target = getNearestNature(Game.treeList)
+			if (tick % 15 == 0) target = Game.treeTree.nearest(p)!!.p/*getNearestNature(Game.treeList)*/
 			if (tick % 100 == 0) chopTree()
 		}
 		if (target != null) {

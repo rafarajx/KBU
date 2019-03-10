@@ -29,7 +29,7 @@ class Quarry(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 	}
 	
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 0, 4, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+		g2d.drawImage(Screen.quarry, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		Building.drawBar(g2d, p, health, 200, Color.RED)
 	}
 	
@@ -38,6 +38,10 @@ class Quarry(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 	}
 	
 	fun die() {
+		remove()
+	}
+	
+	@Synchronized fun remove(){
 		owner.buildingList.remove(this)
 		owner.quarryList.remove(this)
 	}

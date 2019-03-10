@@ -4,20 +4,18 @@ import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
-import building.Mill
-import core.Input
+import building.Windmill
 import core.Screen
 import entity.Entity
 import fraction.Fraction
 import gametype.Game
 import math.vec2
-import nature.Wheat
 import sound.SimpleSound
 import kotlin.math.sqrt
 
 class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 	private var wheatNum = 0
-	var mill: Mill? = null
+	var windmill: Windmill? = null
 	
 	init {
 		super.p = p
@@ -50,15 +48,15 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 	override fun update() {
 		if (health < 0) die()
 		field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
-		if (mill == null) {
+		if (windmill == null) {
 			for (m in owner!!.millList) {
 				if (m.miller[0] == null) {
-					mill = m
-					mill!!.miller[0] = this
+					windmill = m
+					windmill!!.miller[0] = this
 					break
 				} else if (m.miller[1] == null) {
-					mill = m
-					mill!!.miller[1] = this
+					windmill = m
+					windmill!!.miller[1] = this
 					break
 				}
 			}
@@ -67,7 +65,7 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 				if (tick % 15 == 0) target = getNearestNature(Game.wheatList)
 				if (tick % 400 == 0) gatherWheat()
 			} else {
-				if (tick % 15 == 0) target = vec2(mill!!.p.x, mill!!.p.y)
+				if (tick % 15 == 0) target = vec2(windmill!!.p.x, windmill!!.p.y)
 				if (tick % 100 == 0) leaveWheat()
 			}
 			if (target != null) {
@@ -84,7 +82,7 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 	}
 	
 	private fun leaveWheat() {
-		if (mill!!.field!!.intersects(field!!)) {
+		if (windmill!!.field!!.intersects(field!!)) {
 			owner!!.resources.food += wheatNum
 			wheatNum = 0
 			return
@@ -105,11 +103,11 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 		SimpleSound.die.play()
 		owner!!.population--
 		owner!!.entityList.remove(this)
-		if(mill != null) {
-			if (mill!!.miller[0] != null) {
-				mill!!.miller[0] = null
-			} else if (mill!!.miller[1] != null) {
-				mill!!.miller[1] = null
+		if(windmill != null) {
+			if (windmill!!.miller[0] != null) {
+				windmill!!.miller[0] = null
+			} else if (windmill!!.miller[1] != null) {
+				windmill!!.miller[1] = null
 			}
 		}
 	}

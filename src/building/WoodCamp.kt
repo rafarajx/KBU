@@ -31,20 +31,23 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 	}
 
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 0, 3, p - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH)
+		g2d.drawImage(Screen.woodCamp, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
 		Building.drawBar(g2d, p, health, 200, Color.RED)
 	}
 
 	override fun update() {
 		if (health <= 0) die()
 
-		if (tick % 100 == 0 || tick % 173 == 0) {
+		if (tick % 100 == 0 || tick % 173 == 0)
 			Game.natureList.add(Cloud(p - vec2(3.0f, 5.0f)))
-		}
 		tick++
 	}
 
 	fun die() {
+		remove()
+	}
+	
+	@Synchronized fun remove() {
 		owner.buildingList.remove(this)
 		owner.woodCampList.remove(this)
 	}

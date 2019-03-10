@@ -45,7 +45,7 @@ class Wheat(p: vec2) : Nature() {
 		Game.wheatList.add(this)
 	}
 	
-	fun remove(){
+	@Synchronized fun remove(){
 		Game.natureList.remove(this)
 		Game.wheatList.remove(this)
 	}
