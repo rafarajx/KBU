@@ -1,20 +1,15 @@
 package core
 
+import state.StateManager
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.RenderingHints
-import java.awt.event.KeyEvent
-
 import javax.imageio.ImageIO
-
-import state.StateManager
-import java.awt.Dimension
 import kotlin.math.abs
-import kotlin.math.ceil
 
 object Canvas : java.awt.Canvas() {
 
-	val SECOND: Long = 1_000_000_000
+	const val SECOND: Long = 1_000_000_000
 	var UPS: Long = 60
 	var UPDATE_TIME = SECOND / UPS
 	var FPS: Int = 60
@@ -28,7 +23,7 @@ object Canvas : java.awt.Canvas() {
 		addMouseListener(Input)
 		addMouseMotionListener(Input)
 		addKeyListener(Input)
-	
+		
 		Screen.init(
 			ImageIO.read(Main::class.java.getResourceAsStream("/Tileset.png")),
 			ImageIO.read(Main::class.java.getResourceAsStream("/Font.png"))

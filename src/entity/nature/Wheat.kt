@@ -1,27 +1,29 @@
-package nature
+package entity.nature
 
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
 import core.Screen
 import gametype.Game
+import math.AABB
 import math.vec2
 
 class Wheat(p: vec2) : Nature() {
 	var num = 1
 	
 	companion object {
-		const val EDGE_SIZE = 16
+		const val EDGE_LENGTH = 16
+		const val HALF_EDGE = EDGE_LENGTH / 2
 	}
 	
 	init {
 		super.p = p
-		field = Rectangle2D.Float(p.x - EDGE_SIZE / 2 , p.y - EDGE_SIZE / 2, EDGE_SIZE.toFloat(), EDGE_SIZE.toFloat())
+		field = AABB(p, 0.5f)
 	}
 	
 	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 8, 3, p.x.toInt() - EDGE_SIZE / 2, p.y.toInt() - EDGE_SIZE / 2 + 2, EDGE_SIZE, EDGE_SIZE)
-		Screen.drawTile(g2d, 7 + num, 6, p.x.toInt() - EDGE_SIZE / 2, p.y.toInt() - EDGE_SIZE / 2, EDGE_SIZE, EDGE_SIZE)
+		Screen.drawTile(g2d, 8, 3, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE + 2, EDGE_LENGTH, EDGE_LENGTH)
+		Screen.drawTile(g2d, 7 + num, 6, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH)
 	}
 	
 	

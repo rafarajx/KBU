@@ -2,7 +2,7 @@ package core
 
 data class Resources(var wood: Int, var stone: Int, var iron: Int, var food: Int) {
 	
-	constructor(value: Int) : this(value, value, value, value) {}
+	constructor(value: Int) : this(value, value, value, value)
 	
 	fun pay(cost: Resources) {
 		wood -= cost.wood

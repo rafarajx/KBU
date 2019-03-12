@@ -1,21 +1,14 @@
 package fraction
 
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
-import building.Barrack
-import building.Barricade
-import building.House
-import building.Windmill
-import building.Quarry
-import building.Tower
-import building.WoodCamp
 import core.Canvas
 import core.Resources
+import entity.building.*
 import gametype.Game
+import math.AABB
 import math.vec2
 import sound.SimpleSound
+import java.awt.Color
+import java.awt.Graphics2D
 
 class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fraction() {
 	
@@ -23,10 +16,10 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 		this.center = start.copy()
 		this.color = c
 		this.resources = resources
-		this.teamNumber = teamNumber;
+		this.teamNumber = teamNumber
 		Game.camera.x = -start.x + Canvas.width / 2
 		Game.camera.y = -start.y + Canvas.height / 2
-		buildingList.add(Tower(start, this, teamNumber))
+		Tower(start, this, teamNumber).add()
 	}
 	
 	override fun render(g2d: Graphics2D) {
@@ -48,50 +41,46 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 	}
 	
 	override fun placeBuilding(id: Int, p: vec2) {
-		val camera = Game.camera
-		val area: Rectangle2D
-		if (id == 6) {
-			area = Rectangle2D.Float(p.x - camera.x - 8.0f, p.y - camera.y - 8.0f, 16.0f, 16.0f)
-		} else {
-			area = Rectangle2D.Float(p.x - camera.x - 16.0f, p.y - camera.y - 16.0f, 32.0f, 32.0f)
-		}
+		
+		val area = if (id == 6) AABB(p, 8) else AABB(p, 16)
+		
 		if (!inRange(buildingList, area)) return
 		if (isColliding(area)) return
 		when (id) {
 			0 -> if (resources.enough(House.COST)) {
 				resources.pay(House.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(House(p - camera, this, teamNumber))
+				House(p, this, teamNumber).add()
 			}
 			1 -> if (resources.enough(Windmill.COST)) {
 				resources.pay(Windmill.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(Windmill(p - camera, this, teamNumber))
+				Windmill(p, this, teamNumber).add()
 			}
 			2 -> if (resources.enough(Tower.COST)) {
 				resources.pay(Tower.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(Tower(p - camera, this, teamNumber))
+				Tower(p, this, teamNumber).add()
 			}
 			3 -> if (resources.enough(WoodCamp.COST)) {
 				resources.pay(WoodCamp.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(WoodCamp(p - camera, this, teamNumber))
+				WoodCamp(p, this, teamNumber).add()
 			}
 			4 -> if (resources.enough(Quarry.COST)) {
 				resources.pay(Quarry.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(Quarry(p - camera, this, teamNumber))
+				Quarry(p, this, teamNumber).add()
 			}
 			5 -> if (resources.enough(Barrack.COST)) {
 				resources.pay(Barrack.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(Barrack(p - camera, this, teamNumber))
+				Barrack(p, this, teamNumber).add()
 			}
 			6 -> if (resources.enough(Barricade.COST)) {
 				resources.pay(Barricade.COST)
 				SimpleSound.explosion.play()
-				this.buildingList.add(Barricade(p - camera, this, teamNumber))
+				Barricade(p, this, teamNumber).add()
 			}
 		}
 	}

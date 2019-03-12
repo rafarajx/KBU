@@ -17,9 +17,11 @@ object Input : MouseListener, MouseMotionListener, KeyListener {
 	}
 	
 	var keyPressed: KEvent? = null
+	
 	var mousePressed: MEvent? = null
 	var mouseMoved: MEvent? = null
 	var mouseDragged: MEvent? = null
+	var mouseClicked: MEvent? = null
 	
 	override fun keyPressed(e: KeyEvent) {
 		if(keyPressed != null) keyPressed!!.get(e)
@@ -37,7 +39,9 @@ object Input : MouseListener, MouseMotionListener, KeyListener {
 		if(mouseMoved != null) mouseMoved!!.get(e)
 	}
 	
-	override fun mouseClicked(e: MouseEvent) {}
+	override fun mouseClicked(e: MouseEvent) {
+		if(mouseClicked != null) mouseClicked!!.get(e)
+	}
 	
 	override fun mouseEntered(e: MouseEvent) {}
 	

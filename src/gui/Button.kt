@@ -3,8 +3,6 @@ package gui
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 
-import core.Input
-
 class Button(private val x: Int, private val y: Int, private val w: Int, private val h: Int) {
 	private var content: BufferedImage? = null
 	

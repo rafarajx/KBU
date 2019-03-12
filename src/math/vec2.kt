@@ -6,6 +6,8 @@ data class vec2(var x: Float, var y: Float) {
 	
 	constructor(value: Float) : this(value, value)
 	
+	constructor(value: Int) : this(value.toFloat(), value.toFloat())
+	
 	constructor(x: Int, y: Int) : this(x.toFloat(), y.toFloat())
 	
 	operator fun plus(v: vec2): vec2 {
@@ -74,6 +76,11 @@ data class vec2(var x: Float, var y: Float) {
 	
 	fun length(): Float{
 		return hypot(x, y)
+	}
+	
+	fun normalize() : vec2 {
+	    var f = length()
+		return this / length()
 	}
 	
 }

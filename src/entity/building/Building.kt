@@ -1,30 +1,24 @@
-package building
+package entity.building
 
+import entity.Entity
+import math.AABB
+import math.Circle
+import math.vec2
 import java.awt.Color
 import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-import java.util.Random
+import java.util.*
 
-import fraction.Fraction
-import math.vec2
-
-open class Building {
-	lateinit var owner: Fraction
+open class Building: Entity(){
 	
-	open var p = vec2(0.0f, 0.0f)
-	open var field: Rectangle2D? = null
-	open var range: Rectangle2D? = null
-	open var teamNumber: Int = -1
-	open var tick : Int = 1
+	override fun render(g2d: Graphics2D) {}
 	
-	open fun render(g2d: Graphics2D) {}
+	override fun update() {}
 	
-	open fun update() {}
-	
-	open fun hurt(dmg: Int) {}
+	override fun hurt(dmg: Int) {}
 	
 	init {
-		field = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
+		field = AABB(p, 32)
+		range = Circle(p, 200)
 	}
 	
 	companion object {
@@ -37,6 +31,7 @@ open class Building {
 		const val QUARRY = 4
 		const val BARRACK = 5
 		const val BARRICADE = 6
+		
 		
 		fun drawBar(g2d: Graphics2D, x: Int, y: Int, current: Int, max: Int, c: Color) {
 			if (current == max) return

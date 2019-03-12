@@ -1,18 +1,14 @@
-package entity.Worker
+package entity.worker
 
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
-import building.Quarry
-import core.Input
-import core.Resources
 import core.Screen
 import entity.Entity
 import fraction.Fraction
 import gametype.Game
+import math.AABB
 import math.vec2
-import nature.Rock
+import sound.SimpleSound
+import java.awt.Color
+import java.awt.Graphics2D
 import kotlin.math.sqrt
 
 class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
@@ -23,6 +19,7 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 		this.owner = owner
 		this.teamNumber = teamIndex
 		edgeLength = 16
+		field = AABB(p, edgeLength / 2)
 		health = 50
 		damage = 10
 		speed = 0.75f
@@ -48,12 +45,12 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 	
 	override fun update() {
 		if (health < 0) die()
-		field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
+		field = AABB(p, edgeLength / 2)
 		if (hasStone) {
-			if (tick % 15 == 0) target = getNearestBuilding(owner!!.quarryList)
+			if (tick % 15 == 0) target = getNearestEntity(owner!!.quarryList).p
 			if (tick % 100 == 0) leaveStone()
 		} else {
-			if (tick % 15 == 0) target = getNearestNature(Game.rockList)
+			if (tick % 15 == 0) target = Game.rockTree.nearest(p)!!.p
 			if (tick % 100 == 0) gatherStone()
 		}
 		if (target != null) {
@@ -68,12 +65,12 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 	}
 	
 	private fun gatherStone() {
-		for (rock in Game.rockList) {
-			if (rock.field!!.intersects(field!!)) {
-				rock.gatherResources(1)
-				hasStone = true
-				return
-			}
+		val rock = Game.rockTree.nearest(p)!!
+		
+		if (rock.field!!.intersects(field!!)) {
+			rock.gatherResources(1)
+			hasStone = true
+			return
 		}
 	}
 	
@@ -87,5 +84,15 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 				return
 			}
 		}
+	}
+	
+	override fun die() {
+		SimpleSound.die.play()
+		owner!!.population--
+		remove()
+	}
+	
+	@Synchronized fun remove(){
+		owner!!.entityList.remove(this)
 	}
 }

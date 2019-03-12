@@ -1,19 +1,20 @@
-package nature
+package entity.nature
 
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
 import core.Screen
 import gametype.Game
+import math.AABB
 import math.vec2
 
 class Cloud(p: vec2) : Nature() {
-	var spreadLevel = 0
+	private var spreadLevel = 0
 	var fieldSize = 16
 	
 	init {
 		super.p = p
-		field = Rectangle2D.Float(p.x, p.y, 1.0f, 1.0f)
+		field = AABB(p, 0.5f)
 	}
 	
 	override fun render(g2d: Graphics2D) {
@@ -21,15 +22,11 @@ class Cloud(p: vec2) : Nature() {
 	}
 	
 	override fun update() {
-		if (tick % 30 == 0) {
-			spreadLevel++
-		}
-		if (tick % 20 == 0) {
-			p += vec2((Nature.r.nextInt(4) - 1).toFloat(), -(Nature.r.nextInt(1) + 3).toFloat())
-		}
-		if (spreadLevel == 5) {
-			remove()
-		}
+		if (tick % 30 == 0) spreadLevel++
+		if (tick % 20 == 0) p += vec2((random.nextInt(4) - 1).toFloat(), -(random.nextInt(1) + 3).toFloat())
+		if (spreadLevel == 5) remove()
+		field = AABB(p, 0.5f)
+		
 		tick++
 	}
 	

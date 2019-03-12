@@ -1,8 +1,6 @@
 package sound
 
 import core.Main
-import java.applet.Applet
-import java.applet.AudioClip
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.FloatControl
 
@@ -17,10 +15,12 @@ class SimpleSound(name: String) {
 	}
 
 	fun play() {
+		clip.framePosition = 0
 		clip.start()
 	}
 
 	fun loop(times: Int) {
+		clip.framePosition = 0
 		clip.loop(times)
 	}
 
@@ -29,6 +29,8 @@ class SimpleSound(name: String) {
 	}
 
 	companion object {
+		
+		
 		val die = SimpleSound("/playerhurt.wav")
 		val playerDeath = SimpleSound("/death.wav")
 		val monsterHurt = SimpleSound("/monsterhurt.wav")

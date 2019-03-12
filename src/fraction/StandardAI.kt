@@ -1,12 +1,12 @@
 package fraction
 
+import core.Resources
+import entity.building.*
+import gametype.Game
+import math.AABB
+import math.vec2
 import java.awt.Color
 import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
-import building.*
-import core.Resources
-import math.vec2
 
 class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: Int, teamNumber: Int) : Fraction() {
 	
@@ -21,7 +21,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 		status.y = center.y
 		statusText[0] = "Ally"
 		statusText[1] = "Enemy"
-		Tower(start, this, teamNumber)
+		Tower(start, this, teamNumber).add()
 	}
 	
 	override fun render(g2d: Graphics2D) {}
@@ -83,75 +83,75 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 			Building.HOUSE -> if (resources.enough(House.COST)) {
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
-				val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
+				val r = AABB(vec2(x, y), 16)
 				if (isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
 				resources.pay(House.COST)
-				House(vec2(x, y), this, teamNumber)
+				House(vec2(x, y), this, teamNumber).add()
 			}
 			Building.MILL -> if (resources.enough(Windmill.COST)) {
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
-				val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
+				val r = AABB(vec2(x, y), 16)
 				if (isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
 				resources.pay(Windmill.COST)
-				Windmill(vec2(x, y), this, teamNumber)
+				Windmill(vec2(x, y), this, teamNumber).add()
 			}
 			Building.TOWER -> if (resources.enough(Tower.COST)) {
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
-				val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
+				val r = AABB(vec2(x, y), 16)
 				if (isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
 				resources.pay(Tower.COST)
-				Tower(vec2(x, y), this, teamNumber)
+				Tower(vec2(x, y), this, teamNumber).add()
 			}
 			Building.WOODCAMP -> if (resources.enough(WoodCamp.COST)) {
-				val p = getNearestTree(center)
+				val p = Game.treeTree.nearest(center)!!.p.copy()
 				
 				p.x += (random.nextInt(100) - 50).toFloat()
 				p.y += (random.nextInt(100) - 50).toFloat()
 				
-				val r = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
+				val r = AABB(p, 16)
 				if (isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
 				resources.pay(WoodCamp.COST)
-				WoodCamp(p, this, teamNumber)
+				WoodCamp(p, this, teamNumber).add()
 			}
 			Building.QUARRY -> if (resources.enough(Quarry.COST)) {
-				val p = getNearestRock(center)
+				val p = Game.rockTree.nearest(center)!!.p.copy()
 				
 				p.x += (random.nextInt(100) - 50).toFloat()
 				p.y += (random.nextInt(100) - 50).toFloat()
 				
-				val r = Rectangle2D.Float(p.x - 16.0f, p.y - 16.0f, 32.0f, 32.0f)
+				val r = AABB(p, 16)
 				if (isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
 				resources.pay(Quarry.COST)
-				Quarry(p, this, teamNumber)
+				Quarry(p, this, teamNumber).add()
 			
 			}
 			Building.BARRACK -> if (resources.enough(Barrack.COST)) {
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
-				val r = Rectangle2D.Float(x - 16.0f, y - 16.0f, 32.0f, 32.0f)
+				val r = AABB(vec2(x, y), 16)
 				if (isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
 				resources.pay(Barrack.COST)
-				Barrack(vec2(x, y), this, teamNumber)
+				Barrack(vec2(x, y), this, teamNumber).add()
 			}
 		}
 		

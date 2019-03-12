@@ -1,26 +1,16 @@
 package fraction
 
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-import java.util.ArrayList
-import java.util.Random
-
-import math.vec2
-import building.Building
 import core.Resources
 import core.Screen
 import entity.Entity
+import entity.building.*
 import gametype.Game
-import building.House
-import building.Windmill
-import building.Tower
-import building.WoodCamp
-import building.Quarry
-import building.Barrack
-import building.Barricade
-import nature.Rock
-import nature.Tree
+import math.AABB
+import math.vec2
+import java.awt.Color
+import java.awt.Graphics2D
+import java.util.*
+import kotlin.math.hypot
 
 open class Fraction {
 	var random = Random()
@@ -39,7 +29,11 @@ open class Fraction {
 	var barrackList = ArrayList<Barrack>()
 	var barricadeList = ArrayList<Barricade>()
 	
+	//var houseTree = QuadTree<House>(null, vec2(-3000, -3000), vec2(3000, 3000))
+	//var woodCampTree = QuadTree<WoodCamp>(null, vec2(-3000, -3000), vec2(3000, 3000))
+	
 	var entityList = ArrayList<Entity>()
+	
 	var resources: Resources = Resources(0)
 	var population = 0
 	var maxPopulation = 0
@@ -56,7 +50,7 @@ open class Fraction {
 			if(buildingList.indices.contains(i)) {
 				val b = buildingList[i]
 				g2d.color = color
-				g2d.draw(b.field)
+				Screen.draw(g2d, b.field!!)
 				b.render(g2d)
 			}
 		}
@@ -79,6 +73,7 @@ open class Fraction {
 	}
 	
 	fun drawStatus(g2d: Graphics2D) {
+		
 		if (isDefeated) return
 		if (teamNumber == 0)
 			Screen.drawString(g2d, statusText[0], status.x.toInt() - statusText[1].length / 2 * Screen.LETTER_WIDTH * 2, status.y.toInt() - 30, 2.0)
@@ -112,7 +107,7 @@ open class Fraction {
 	
 	open fun placeBuilding(id: Int, p: vec2) {}
 	
-	fun isConstructionColliding(r: Rectangle2D): Boolean {
+	fun isConstructionColliding(r: AABB): Boolean {
 		for (i in Game.fractionList.indices) {
 			val fraction = Game.fractionList[i]
 			for (j in fraction.buildingList.indices) {
@@ -127,7 +122,7 @@ open class Fraction {
 		return false
 	}
 	
-	fun isColliding(r: Rectangle2D): Boolean {
+	fun isColliding(r: AABB): Boolean {
 		for (i in Game.fractionList.indices) {
 			val fraction = Game.fractionList[i]
 			for (j in fraction.buildingList.indices) {
@@ -139,46 +134,35 @@ open class Fraction {
 				if (entity.field!!.intersects(r)) return true
 			}
 		}
-		val it = Game.natureList.iterator()
-		for (n in it) {
-			if (n.field!!.intersects(r)) return true
+		for (i in Game.natureList.indices) {
+			if(Game.natureList.indices.contains(i)){
+				if(Game.natureList[i].field == null) continue
+				if (Game.natureList[i].field!!.intersects(r)) return true
+			}
 		}
 		return false
 	}
 	
-	fun <T: Building> inRange(arrayList: ArrayList<T>, r: Rectangle2D): Boolean {
+	fun <T: Building> inRange(arrayList: ArrayList<T>, r: AABB): Boolean {
 		for (i in arrayList.indices) {
 			val b = arrayList[i]
-			if (b.range!!.intersects(r)) {
-				return true
-			}
+			if (b.range!!.intersects(r)) return true
 		}
 		return false
 	}
 	
-	private fun getNearestNature(from: vec2, name: String?): vec2 {
+	fun <T: Entity> getNearestEntity(p: vec2, arrayList: ArrayList<T>): vec2 {
 		var max = Float.MAX_VALUE
-		var target = from.copy()
-		for (i in Game.natureList.indices) {
-			val nature = Game.natureList[i]
-			if (nature::class.simpleName == name) {
-				val delta = nature.p - from
-				val d = delta.square().sum()
-				if (max > d) {
-					max = d
-					target = nature.p.copy()
-				}
+		var target = p.copy()
+		for (i in arrayList.indices) {
+			val entity = arrayList[i]
+			val delta = entity.p - p
+			val d = hypot(delta.x, delta.y)
+			if (max > d) {
+				max = d
+				target = entity.p.copy()
 			}
 		}
 		return target
 	}
-	
-	fun getNearestTree(from: vec2): vec2 {
-		return getNearestNature(from, Tree::class.simpleName)
-	}
-	
-	fun getNearestRock(from: vec2): vec2 {
-		return getNearestNature(from, Rock::class.simpleName)
-	}
-	
 }

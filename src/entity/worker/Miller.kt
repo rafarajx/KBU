@@ -1,16 +1,15 @@
-package entity.Worker
+package entity.worker
 
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
-import building.Windmill
 import core.Screen
 import entity.Entity
+import entity.building.Windmill
 import fraction.Fraction
 import gametype.Game
+import math.AABB
 import math.vec2
 import sound.SimpleSound
+import java.awt.Color
+import java.awt.Graphics2D
 import kotlin.math.sqrt
 
 class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
@@ -25,8 +24,8 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 		health = 50
 		damage = 10
 		speed = 0.75f
+		field = AABB(p, edgeLength / 2)
 		owner.population++
-		field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
 	}
 	
 	override fun render(g2d: Graphics2D) {
@@ -47,7 +46,7 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 	
 	override fun update() {
 		if (health < 0) die()
-		field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
+		field = AABB(p, edgeLength / 2)
 		if (windmill == null) {
 			for (m in owner!!.millList) {
 				if (m.miller[0] == null) {
@@ -62,7 +61,7 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 			}
 		} else {
 			if (wheatNum == 0) {
-				if (tick % 15 == 0) target = getNearestNature(Game.wheatList)
+				if (tick % 15 == 0) target = getNearestEntity(Game.wheatList).p.copy()
 				if (tick % 400 == 0) gatherWheat()
 			} else {
 				if (tick % 15 == 0) target = vec2(windmill!!.p.x, windmill!!.p.y)
@@ -102,7 +101,6 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 	override fun die() {
 		SimpleSound.die.play()
 		owner!!.population--
-		owner!!.entityList.remove(this)
 		if(windmill != null) {
 			if (windmill!!.miller[0] != null) {
 				windmill!!.miller[0] = null
@@ -110,5 +108,10 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 				windmill!!.miller[1] = null
 			}
 		}
+		remove()
+	}
+	
+	@Synchronized fun remove(){
+		owner!!.entityList.remove(this)
 	}
 }

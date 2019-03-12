@@ -1,22 +1,22 @@
-package building
-
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
+package entity.building
 
 import core.Resources
 import core.Screen
+import entity.nature.Cloud
 import fraction.Fraction
 import gametype.Game
+import math.AABB
+import math.Circle
 import math.vec2
-import nature.Cloud
+import java.awt.Color
+import java.awt.Graphics2D
 
 class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
-	internal var health = 200
- 
+
 	companion object {
 		private const val EDGE_LENGTH = 32
-		private const val RANGE = 150
+		private const val HALF_EDGE = EDGE_LENGTH / 2
+		private const val RANGE = 200
 		val COST = Resources(20, 5, 0, 0)
 	}
 
@@ -24,14 +24,13 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 		super.p = p
 		this.owner = owner
 		this.teamNumber = teamIndex
-		this.field = Rectangle2D.Float(p.x - EDGE_LENGTH / 2, p.y - EDGE_LENGTH / 2, EDGE_LENGTH.toFloat(), EDGE_LENGTH.toFloat())
-		this.range = Rectangle2D.Float(p.x - RANGE / 2, p.y - RANGE / 2, RANGE.toFloat(), RANGE.toFloat())
-		owner.buildingList.add(this)
-		owner.woodCampList.add(this)
+		field = AABB(p, HALF_EDGE)
+		range = Circle(p, RANGE)
+		health = 200
 	}
 
 	override fun render(g2d: Graphics2D) {
-		g2d.drawImage(Screen.woodCamp, p.x.toInt() - EDGE_LENGTH / 2, p.y.toInt() - EDGE_LENGTH / 2, EDGE_LENGTH, EDGE_LENGTH, null)
+		g2d.drawImage(Screen.woodCamp, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH, null)
 		Building.drawBar(g2d, p, health, 200, Color.RED)
 	}
 
@@ -43,13 +42,20 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building() {
 		tick++
 	}
 
-	fun die() {
+	override fun die() {
 		remove()
 	}
 	
+	fun add(){
+		owner!!.buildingList.add(this)
+		owner!!.woodCampList.add(this)
+		//owner!!.woodCampTree.add(this)
+	}
+	
 	@Synchronized fun remove() {
-		owner.buildingList.remove(this)
-		owner.woodCampList.remove(this)
+		owner!!.buildingList.remove(this)
+		owner!!.woodCampList.remove(this)
+		//qt!!.remove()
 	}
 
 	override fun hurt(dmg: Int) {

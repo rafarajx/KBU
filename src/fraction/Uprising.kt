@@ -1,14 +1,13 @@
 package fraction
 
-import building.*
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
 import core.Main
 import core.Resources
+import entity.building.*
 import gametype.Game
+import math.AABB
 import math.vec2
+import java.awt.Color
+import java.awt.Graphics2D
 
 class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : Fraction() {
 	var queueNum = 0
@@ -24,7 +23,7 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
         maxPopulation = Main.BILLION
         statusText[0] = "Allied Rebels"
         statusText[1] = "Rebels"
-        Tower(start, this, teamNumber)
+        Tower(start, this, teamNumber).add()
     }
 
 	override fun render(g2d: Graphics2D) {}
@@ -51,8 +50,8 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
 	}
 
 	override fun placeBuilding(id: Int, p: vec2) {
-		val camera = Game.camera
-		val r = Rectangle2D.Float(p.x - camera.x - 16.0f, p.y - camera.y - 16.0f, 32.0f, 32.0f)
+		
+		val r = AABB(p, 16)
 		if (isColliding(r)) {
 			this.AIRange += 100
 			return
@@ -60,31 +59,31 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
 		when (id) {
 			Building.HOUSE -> if (resources.enough(House.COST)) {
 				resources.pay(House.COST)
-				buildingList.add(House(p - camera, this, teamNumber))
+				buildingList.add(House(p, this, teamNumber))
 			}
 			Building.MILL -> if (resources.enough(Windmill.COST)) {
 				resources.pay(Windmill.COST)
-				buildingList.add(Windmill(p - camera, this, teamNumber))
+				buildingList.add(Windmill(p, this, teamNumber))
 			}
 			Building.TOWER -> if (resources.enough(Tower.COST)) {
 				resources.pay(Tower.COST)
-				buildingList.add(Tower(p - camera, this, teamNumber))
+				buildingList.add(Tower(p, this, teamNumber))
 			}
 			Building.WOODCAMP -> if (resources.enough(WoodCamp.COST)) {
 				resources.pay(WoodCamp.COST)
-				buildingList.add(WoodCamp(p - camera, this, teamNumber))
+				buildingList.add(WoodCamp(p, this, teamNumber))
 			}
 			Building.QUARRY -> if (resources.enough(Quarry.COST)) {
 				resources.pay(Quarry.COST)
-				buildingList.add(Quarry(p - camera, this, teamNumber))
+				buildingList.add(Quarry(p, this, teamNumber))
 			}
 			Building.BARRACK -> if (resources.enough(Barrack.COST)) {
 				resources.pay(Barrack.COST)
-				buildingList.add(Barrack(p - camera, this, teamNumber))
+				buildingList.add(Barrack(p, this, teamNumber))
 			}
 			Building.BARRICADE -> if (resources.enough(Barricade.COST)) {
 				resources.pay(Barricade.COST)
-				buildingList.add(Barricade(p - camera, this, teamNumber))
+				buildingList.add(Barricade(p, this, teamNumber))
 			}
 		}
 		AIRange = baseAIRange

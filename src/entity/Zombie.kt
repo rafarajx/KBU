@@ -8,6 +8,7 @@ import core.Input
 import core.Screen
 import fraction.Fraction
 import gametype.Game
+import math.AABB
 import math.vec2
 import sound.SimpleSound
 import kotlin.math.sqrt
@@ -22,7 +23,7 @@ class Zombie(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 		health = 50
 		damage = 5
 		speed = 0.4f
-		update()
+		field = AABB(p, edgeLength / 2)
 	}
 	
 	override fun render(g2d: Graphics2D) {
@@ -34,7 +35,7 @@ class Zombie(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 	
 	override fun update() {
 		if (health < 0) die()
-		field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
+		field = AABB(p, edgeLength / 2)
 		if (tick % 15 == 0) target = getNearestEnemy(p, teamNumber)
 		if (target != null) {
 			val delta = target!! - p
@@ -42,7 +43,7 @@ class Zombie(p: vec2, owner: Fraction, teamNumber: Int) : Entity() {
 			move = if (d == 0.0f) vec2(0.0f, 0.0f) else delta / d
 			p += move * speed
 		}
-		if (tick % 60 == 0) fight(5, teamNumber, field as Rectangle2D)
+		if (tick % 60 == 0) fight(5, teamNumber, field as AABB)
 		tick++
 	}
 	

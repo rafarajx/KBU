@@ -7,8 +7,8 @@ object StateManager {
 
 	var state: GameState = Menu
 	set(value) {
+		value.onSet()
 		field = value
-		field.onSet()
 	}
 	
 	init {
@@ -18,6 +18,7 @@ object StateManager {
 	fun render(g2d: Graphics2D) {
 		state.render(g2d)
 	}
+	
 	fun update() {
 		state.update()
 	}

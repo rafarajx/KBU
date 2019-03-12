@@ -1,16 +1,16 @@
 package core
 
+import entity.Entity
 import math.AABB
 import math.Circle
 import math.vec2
-import nature.Nature
 import java.awt.Color
 import java.awt.Graphics2D
 import kotlin.math.sqrt
 
-class QuadTree<T : Nature>(var aabb: AABB) {
+class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 	
-	constructor(ul: vec2, dr: vec2): this(AABB(ul, dr))
+	constructor(parent: QuadTree<T>?, ul: vec2, dr: vec2): this(parent, AABB(ul, dr))
 	
 	var value: T? = null
 	
@@ -27,48 +27,60 @@ class QuadTree<T : Nature>(var aabb: AABB) {
 	
 	var isSubdivided = false
 	
+	fun clear(){
+		a = null
+		b = null
+		c = null
+		d = null
+	}
+	
 	fun add(obj: T) {
 	
-		if (this.value == null && !isSubdivided){
-			this.value = obj
+		if (value == null && !isSubdivided){
+			value = obj
+			obj.qt = this as QuadTree<Entity>
 			return
 		}
 		
-		if (aabb.mid.y >= obj.p.y) {
-			if (aabb.mid.x >= obj.p.x) {
-				subdivide()
+		if (aabb.center.y >= obj.p.y) {
+			if (aabb.center.x >= obj.p.x) {
+				if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
+				isSubdivided = true
 				a!!.add(obj)
 				reinsert()
 			} else {
-				subdivide()
+				if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
+				isSubdivided = true
 				b!!.add(obj)
 				reinsert()
 			}
 		} else {
-			if (aabb.mid.x >= obj.p.x) {
-				subdivide()
+			if (aabb.center.x >= obj.p.x) {
+				if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
+				isSubdivided = true
 				c!!.add(obj)
 				reinsert()
 			} else {
-				subdivide()
+				if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
+				isSubdivided = true
 				d!!.add(obj)
 				reinsert()
 			}
 		}
 	}
 	
-	fun subdivide(){
-		if(a == null) a = QuadTree(aabb.ul, aabb.mid)
-		if(b == null) b = QuadTree(vec2(aabb.mid.x, aabb.ul.y), vec2(aabb.dr.x, aabb.mid.y))
-		if(c == null) c = QuadTree(vec2(aabb.ul.x, aabb.mid.y), vec2(aabb.mid.x, aabb.dr.y))
-		if(d == null) d = QuadTree(aabb.mid, aabb.dr)
+	fun split(){
+		if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
+		if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
+		if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
+		if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
 		isSubdivided = true
 	}
 	
 	fun reinsert(){
-		if(this.value != null) {
-			val t = this.value
-			this.value = null
+		if(value != null) {
+			val t = value
+			value = null
 			add(t!!)
 		}
 	}
@@ -86,8 +98,8 @@ class QuadTree<T : Nature>(var aabb: AABB) {
 	}
 	
 	fun search(p: vec2): QuadTree<T> {
-		if (aabb.mid.x >= p.x) {
-			if (aabb.mid.y >= p.y) {
+		if (aabb.center.x >= p.x) {
+			if (aabb.center.y >= p.y) {
 				if (a == null)
 					return this
 				return a!!.search(p)
@@ -97,7 +109,7 @@ class QuadTree<T : Nature>(var aabb: AABB) {
 				return c!!.search(p)
 			}
 		} else {
-			if (aabb.mid.y >= p.y) {
+			if (aabb.center.y >= p.y) {
 				if (b == null)
 					return this
 				return b!!.search(p)
@@ -143,11 +155,12 @@ class QuadTree<T : Nature>(var aabb: AABB) {
 		if(circle.intersects(aabb)){
 		
 			if(value != null) temp.add(value!!)
+			
 			if(isSubdivided) {
-				a!!.getNodesInRange(circle, temp)
-				b!!.getNodesInRange(circle, temp)
-				c!!.getNodesInRange(circle, temp)
-				d!!.getNodesInRange(circle, temp)
+				if (a != null) a!!.getNodesInRange(circle, temp)
+				if (b != null) b!!.getNodesInRange(circle, temp)
+				if (c != null) c!!.getNodesInRange(circle, temp)
+				if (d != null) d!!.getNodesInRange(circle, temp)
 			}
 		}
 	}
@@ -164,7 +177,13 @@ class QuadTree<T : Nature>(var aabb: AABB) {
 		}
 	}
 	
-	fun remove(obj: T) {
-	
+	fun remove() {
+		value = null
+		if(parent != null) {
+			if (parent!!.a == this) parent!!.a = null
+			if (parent!!.b == this) parent!!.b = null
+			if (parent!!.c == this) parent!!.c = null
+			if (parent!!.d == this) parent!!.d = null
+		}
 	}
 }

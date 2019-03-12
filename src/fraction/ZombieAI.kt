@@ -4,8 +4,9 @@ import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
-import building.Grave
+import entity.building.Grave
 import gametype.Game
+import math.AABB
 import math.vec2
 
 class ZombieAI(StartX: Int, StartY: Int, c: Color, TeamIndex: Int) : Fraction() {
@@ -49,10 +50,9 @@ class ZombieAI(StartX: Int, StartY: Int, c: Color, TeamIndex: Int) : Fraction() 
 	
 	override fun placeBuilding(id: Int, p: vec2) {
 		val camera = Game.camera
-		val r = Rectangle2D.Double(p.x - camera.x - 16.0, p.y - camera.y - 16.0, 32.0, 32.0)
-		if (isColliding(r)) {
-			return
-		}
+		val r = AABB(p - vec2(camera.x - 16.0f, camera.y - 16.0f), vec2(32.0f, 32.0f))
+		if (isColliding(r)) return
+		
 		when (id) {
 			0 -> this.buildingList.add(Grave(p, this, teamNumber))
 		}

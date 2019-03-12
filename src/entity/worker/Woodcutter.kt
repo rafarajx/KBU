@@ -1,18 +1,15 @@
-package entity.Worker
+package entity.worker
 
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
-import building.WoodCamp
-import core.Input
 import core.Resources
 import core.Screen
 import entity.Entity
 import fraction.Fraction
 import gametype.Game
+import math.AABB
 import math.vec2
-import nature.Tree
+import sound.SimpleSound
+import java.awt.Color
+import java.awt.Graphics2D
 import kotlin.math.sqrt
 
 class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
@@ -22,12 +19,12 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 		super.p = p
 		super.owner = owner
 		super.teamNumber = teamIndex
+		field = AABB(p, edgeLength / 2)
 		edgeLength = 16
 		health = 50
 		damage = 10
 		speed = 0.75f
 		owner.population++
-		update()
 	}
 
 	override fun render(g2d: Graphics2D) {
@@ -48,12 +45,12 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 
 	override fun update() {
 		if (health < 0) die()
-		field = Rectangle2D.Float(p.x - edgeLength / 2, p.y - edgeLength / 2, edgeLength.toFloat(), edgeLength.toFloat())
+		field = AABB(p, edgeLength / 2)
 		if (hasWood) {
-			if (tick % 15 == 0) target = getNearestBuilding(owner!!.woodCampList)
+			if (tick % 15 == 0) target = getNearestEntity(owner!!.woodCampList).p.copy()
 			if (tick % 100 == 0) leaveWood()
 		} else {
-			if (tick % 15 == 0) target = Game.treeTree.nearest(p)!!.p/*getNearestNature(Game.treeList)*/
+			if (tick % 15 == 0) target = Game.treeTree.nearest(p)!!.p
 			if (tick % 100 == 0) chopTree()
 		}
 		if (target != null) {
@@ -67,13 +64,15 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 	}
 
 	private fun chopTree() {
-		for (tree in Game.treeList) {
-			if (tree.field!!.intersects(field!!)) {
-				tree.gatherResources(1)
-				hasWood = true
-				return
-			}
+		
+		val tree = Game.treeTree.nearest(p)!!
+		
+		if (tree.field!!.intersects(field!!)) {
+			tree.gatherResources(1)
+			hasWood = true
+			return
 		}
+	
 	}
 
 	private fun leaveWood() {
@@ -84,5 +83,15 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 				return
 			}
 		}
+	}
+	
+	override fun die() {
+		SimpleSound.die.play()
+		owner!!.population--
+		remove()
+	}
+	
+	@Synchronized fun remove(){
+		owner!!.entityList.remove(this)
 	}
 }

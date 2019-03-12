@@ -1,24 +1,21 @@
 package gametype
 
-import building.*
+import core.*
+import entity.Knight
+import entity.building.*
+import entity.nature.*
+import fraction.Fraction
+import fraction.Player
+import math.AABB
+import math.vec2
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics2D
-import java.awt.geom.AffineTransform
-import java.awt.geom.Rectangle2D
-import java.awt.image.BufferedImage
-import java.util.ArrayList
-import java.util.Random
-
-import core.*
-import fraction.Fraction
-import fraction.Player
-import math.vec2
-import nature.*
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
-import kotlin.math.max
-import kotlin.math.min
+import java.awt.geom.AffineTransform
+import java.awt.image.BufferedImage
+import java.util.*
 
 open class Game: GameState(){
 	
@@ -37,7 +34,7 @@ open class Game: GameState(){
 		@JvmStatic
 		var camera = vec2(0.0f, 0.0f)
 		var random = Random()
-		val MAP_SIZE = 3200
+		const val MAP_SIZE = 3200
 		var mouseX = 0
 		var mouseY = 0
 		var fractionList = ArrayList<Fraction>()
@@ -52,8 +49,13 @@ open class Game: GameState(){
 		var wheatList = ArrayList<Wheat>()
 		
 		//var rockTree = QuadTree<Rock>(vec2(-2000, -2000), vec2(2000, 2000))
-		var treeTree = QuadTree<Tree>(vec2(-2000, -2000), vec2(2000, 2000))
+		var treeTree = QuadTree<Tree>(null, vec2(-3000, -3000), vec2(3000, 3000))
+		var rockTree = QuadTree<Rock>(null, vec2(-3000, -3000), vec2(3000, 3000))
 		
+		
+		var knightList = ArrayList<Knight>(100)
+		
+		//var knightTree = QuadTree<Knight>(null, vec2(-3000, -3000), vec2(3000, 3000))
 		
 		private val MENU_BAR = arrayOf(
 			IntArray(2),
@@ -90,9 +92,6 @@ open class Game: GameState(){
 					val b2 = MouseEvent.BUTTON2_DOWN_MASK
 					val b3 = MouseEvent.BUTTON3_DOWN_MASK
 					
-					if(e.modifiersEx and b1 == b1)
-						player.placeBuilding(selectedBuilding, vec2(e.x.toFloat(), e.y.toFloat()))
-					
 					if (e.modifiersEx and b3 == b3) {
 						val x2 = e.x.toFloat()
 						val y2 = e.y.toFloat()
@@ -106,9 +105,18 @@ open class Game: GameState(){
 				}
 			}
 			
+			Input.mouseClicked = object: Input.MEvent {
+				override fun get(e: MouseEvent) {
+				
+					
+				}
+			}
+			
 			Input.mousePressed = object: Input.MEvent {
 				override fun get(e: MouseEvent){
-				
+					if(e.button == 1){
+						player.placeBuilding(selectedBuilding, vec2(e.x.toFloat() - Game.camera.x, e.y.toFloat() - Game.camera.y))
+					}
 				}
 			}
 			
@@ -119,9 +127,7 @@ open class Game: GameState(){
 					mouseX = e.x
 					mouseY = e.y
 					
-					canBuild = inRange(player.buildingList, Rectangle2D.Float(e.x - camera.x, e.y - camera.y, 1.0f, 1.0f))
-					
-					
+					canBuild = inRange(player.buildingList, AABB(vec2(e.x, e.y) - camera, vec2(1.0f)))
 					
 				}
 			}
@@ -131,12 +137,12 @@ open class Game: GameState(){
 					when(e.keyCode) {
 						KeyEvent.VK_LEFT -> if (selectedBuilding > 0) selectedBuilding--
 						KeyEvent.VK_RIGHT -> if (selectedBuilding < MENU_BAR.size - 1) selectedBuilding++
-						KeyEvent.VK_ADD -> if (Canvas.UPS < 600) {
-							Canvas.UPS++
+						KeyEvent.VK_ADD -> if (Canvas.UPS + 60 <= 600) {
+							Canvas.UPS += 60
 							Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
 						}
-						KeyEvent.VK_SUBTRACT -> if(Canvas.UPS > 20) {
-							Canvas.UPS--
+						KeyEvent.VK_SUBTRACT -> if(Canvas.UPS - 60 >= 60) {
+							Canvas.UPS -= 60
 							Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
 						}
 						KeyEvent.VK_SPACE -> showHealth = true
@@ -146,49 +152,33 @@ open class Game: GameState(){
 		}
 		
 		fun setupNature(fractions: Int) {
-			for (i in 0..1000) {
-				val x = random.nextFloat() * 3200.0f - 1600.0f
-				val y = random.nextFloat() * 3200.0f - 1600.0f
-				if (!isColliding(
-						Rectangle2D.Float(
-							x - Tree.EDGE_LENGTH / 2,
-							y - Tree.EDGE_LENGTH / 2,
-							Tree.EDGE_LENGTH.toFloat(),
-							Tree.EDGE_LENGTH.toFloat()
-						)
-					)
-				) {
-					Tree(vec2(x, y)).add()
-				}
+			for (i in 0..5000) {
+				val x = random.nextFloat() * 6000.0f - 3000.0f
+				val y = random.nextFloat() * 6000.0f - 3000.0f
+				if (!isColliding(AABB(vec2(x, y), Tree.HALF_EDGE))) Tree(vec2(x, y)).add()
 			}
-			for (i in 0..49) {
-				val x = random.nextFloat() * 3200.0f - 1600.0f
-				val y = random.nextFloat() * 3200.0f - 1600.0f
-				if (!isColliding(Rectangle2D.Float(x - 8.0f, y - 8.0f, 16.0f, 16.0f))) {
-					Flowers(vec2(x, y)).add()
-				}
+			for (i in 0..100) {
+				val x = random.nextFloat() * 6000.0f - 3000.0f
+				val y = random.nextFloat() * 6000.0f - 3000.0f
+				if (!isColliding(AABB(vec2(x, y), 8.0f))) Flowers(vec2(x, y)).add()
 			}
-			for (i in 0..49) {
-				val x = random.nextFloat() * 3200.0f - 1600.0f
-				val y = random.nextFloat() * 3200.0f - 1600.0f
-				if (!isColliding(Rectangle2D.Float(x - 8.0f, y - 8.0f, 16.0f, 16.0f))) {
-					Grass(vec2(x, y)).add()
-				}
+			for (i in 0..100) {
+				val x = random.nextFloat() * 6000.0f - 3000.0f
+				val y = random.nextFloat() * 6000.0f - 3000.0f
+				if (!isColliding(AABB(vec2(x, y), 8.0f))) Grass(vec2(x, y)).add()
 			}
 			for (i1 in 0 until 4 * fractions) {
-				val x1 = random.nextFloat() * 3200.0f - 1600.0f
-				val y1 = random.nextFloat() * 3200.0f - 1600.0f
+				val x1 = random.nextFloat() * 4000.0f - 2000.0f
+				val y1 = random.nextFloat() * 4000.0f - 2000.0f
 				for (i2 in 0..9) {
 					val x2 = random.nextFloat() * 200.0f
 					val y2 = random.nextFloat() * 200.0f
-					if (!isColliding(Rectangle2D.Float(x1 + x2 - 8.0f, y1 + y2 - 8.0f, 16.0f, 16.0f))) {
-						Rock(vec2(x1 + x2, y1 + y2)).add()
-					}
+					if (!isColliding(AABB(vec2(x1 + x2, y1 + y2), 8.0f))) Rock(vec2(x1 + x2, y1 + y2)).add()
 				}
 			}
 		}
 		
-		private fun isColliding(r: Rectangle2D): Boolean {
+		private fun isColliding(r: AABB): Boolean {
 			for (f in fractionList.indices) {
 				val fraction = fractionList[f]
 				for (j in fraction.buildingList.indices) {
@@ -211,13 +201,21 @@ open class Game: GameState(){
 			AF = g2d.transform
 			g2d.translate(camera.x.toInt(), camera.y.toInt())
 			
-			g2d.color = Color(200, 0, 0)
+			
+			/*
+			g2d.color = Color(255, 0, 0)
+			knightTree.draw(g2d)
+			*/
+			
+			/*
+			g2d.color = Color(255, 0, 0)
 			treeTree.draw(g2d)
 			
 			
 			val qt = treeTree.search(vec2(mouseX - camera.x, mouseY - camera.y))
 			g2d.color = Color.GREEN
 			g2d.fillRect(qt.aabb.ul.x.toInt(), qt.aabb.ul.y.toInt(), (qt.aabb.dr.x - qt.aabb.ul.x).toInt(), (qt.aabb.dr.y - qt.aabb.ul.y).toInt())
+			*/
 			
 			for(i in fractionList.indices){
 				if(fractionList.indices.contains(i))
@@ -239,11 +237,13 @@ open class Game: GameState(){
 					fractionList[i].drawStatus(g2d)
 			}
 			
+			/*
 			val t = treeTree.nearest(vec2(mouseX - camera.x, mouseY - camera.y))
 			g2d.color = Color.BLUE
 			if(t != null) {
 				g2d.fillRect(t.p.x.toInt(), t.p.y.toInt(), 3, 3)
 			}
+			*/
 			
 			g2d.transform = AF
 		}
@@ -322,7 +322,9 @@ open class Game: GameState(){
 			val g2d = minimap.graphics as Graphics2D
 			g2d.color = Color.BLACK
 			g2d.fillRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE)
-			for (fraction in fractionList) {
+			for (i in fractionList.indices) {
+				if(!fractionList.indices.contains(i)) return
+				val fraction = fractionList[i]
 				g2d.color = fraction.color
 				for (i in fraction.buildingList.indices) {
 					if(fraction.buildingList.indices.contains(i)) {
@@ -359,6 +361,14 @@ open class Game: GameState(){
 		}
 		
 		fun updateObjects() {
+			/*
+			knightTree = QuadTree<Knight>(null, vec2(-3000, -3000), vec2(3000, 3000))
+			
+			
+			for(knight in knightList){
+				knightTree.add(knight)
+			}
+			*/
 			for (i in fractionList.indices) {
 				if (fractionList.indices.contains(i))
 					fractionList[i].update()
@@ -369,7 +379,7 @@ open class Game: GameState(){
 			}
 		}
 		
-		fun <T: Building> inRange(arrayList: ArrayList<T>, r: Rectangle2D): Boolean {
+		fun <T: Building> inRange(arrayList: ArrayList<T>, r: AABB): Boolean {
 			for (i in arrayList.indices) {
 				val b = arrayList[i]
 				if (b.range!!.intersects(r)) {

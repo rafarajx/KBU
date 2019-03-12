@@ -1,10 +1,11 @@
-package nature
+package entity.nature
 
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
 
 import core.Screen
 import gametype.Game
+import math.AABB
 import math.vec2
 
 class Grass(p: vec2) : Nature() {
@@ -13,7 +14,7 @@ class Grass(p: vec2) : Nature() {
 	
 	init {
 		super.p = p
-		super.field = Rectangle2D.Float(p.x, p.y, 1.0f, 1.0f)
+		field = AABB(p, 0.5f)
 	}
 	
 	override fun render(g2d: Graphics2D) {
@@ -22,10 +23,8 @@ class Grass(p: vec2) : Nature() {
 	}
 	
 	override fun update() {
-		if (this.tick % 1000 == 0 && this.num < 7) {
-			this.num += 1
-		}
-		this.tick += 1
+		if (tick % 1000 == 0 && num < 7) num++
+		tick++
 	}
 	
 	override fun gatherResources(amount: Int) {}

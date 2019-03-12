@@ -1,5 +1,6 @@
 package core
 
+import math.AABB
 import math.vec2
 import java.awt.Color
 import java.awt.Graphics2D
@@ -70,6 +71,10 @@ object Screen {
 			}
 		}
 		return 0
+	}
+	
+	fun draw(g2d: Graphics2D, rect: AABB) {
+		g2d.drawRect(rect.x.toInt(), rect.y.toInt(), rect.width.toInt(), rect.height.toInt())
 	}
 	
 	fun drawTile(g2d: Graphics2D, TileX: Int, TileY: Int, x: Int, y: Int, width: Int, height: Int) {

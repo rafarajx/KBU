@@ -1,4 +1,4 @@
-package entity.Worker
+package entity.worker
 
 import entity.Entity
 
