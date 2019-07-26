@@ -41,21 +41,6 @@ object ZombieApocalypse : Game() {
 		fractionList.add(ZombieAI(1000, 1000, Color.RED, 1))
 	}
 
-	override fun render(g2d: Graphics2D) {
-		drawObjects(g2d)
-		drawInterface(g2d)
-		if (!this.showTime) {
-			return
-		}
-		val ticksLeft = tick - toTicks(intArrayOf(10))
-		val timeLeft = toTime(ticksLeft)
-		if (ticksLeft > 0) {
-			SimpleSound.bossdeath.play()
-			this.showTime = false
-		}
-		Screen.drawString(g2d, "Zombies will attack in: " + timeLeft[0] + ":" + timeLeft[1] + timeLeft[2], 200, 100, 2.0)
-	}
-
 	override fun update() {
 		updateObjects()
 		tick++

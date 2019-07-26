@@ -2,7 +2,6 @@ package core
 
 import math.AABB
 import math.vec2
-import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.image.BufferedImage
 import javax.imageio.ImageIO
@@ -10,15 +9,15 @@ import javax.imageio.ImageIO
 object Screen {
 	
 	var TilesetArray = ArrayList<BufferedImage>()
-	
-	var house = ImageIO.read(Main::class.java.getResourceAsStream("/House.png"))!!
-	var windmill = ImageIO.read(Main::class.java.getResourceAsStream("/Windmill.png"))!!
-	var tower = ImageIO.read(Main::class.java.getResourceAsStream("/Tower.png"))!!
-	var woodCamp = ImageIO.read(Main::class.java.getResourceAsStream("/WoodCamp.png"))!!
-	var quarry = ImageIO.read(Main::class.java.getResourceAsStream("/Quarry.png"))!!
-	var barracks = ImageIO.read(Main::class.java.getResourceAsStream("/Barracks.png"))!!
-	var barricade = ImageIO.read(Main::class.java.getResourceAsStream("/Barricade.png"))!!
-	
+
+	var house = ImageIO.read(Window::class.java.getResourceAsStream("/House.png"))!!
+	var windmill = ImageIO.read(Window::class.java.getResourceAsStream("/Windmill.png"))!!
+	var tower = ImageIO.read(Window::class.java.getResourceAsStream("/Tower.png"))!!
+	var woodCamp = ImageIO.read(Window::class.java.getResourceAsStream("/WoodCamp.png"))!!
+	var quarry = ImageIO.read(Window::class.java.getResourceAsStream("/Quarry.png"))!!
+	var barracks = ImageIO.read(Window::class.java.getResourceAsStream("/Barracks.png"))!!
+	var barricade = ImageIO.read(Window::class.java.getResourceAsStream("/Barricade.png"))!!
+
 	private const val TILESET_WIDTH = 16
 	private const val TILESET_HEIGHT = 16
 	var fontArray = ArrayList<BufferedImage>()
@@ -84,7 +83,7 @@ object Screen {
 	fun drawTile(g2d: Graphics2D, TileX: Int, TileY: Int, p: vec2, width: Int, height: Int) {
 		g2d.drawImage(TilesetArray[TileX + TILESET_WIDTH * TileY], p.x.toInt(), p.y.toInt(), width, height, null)
 	}
-	
+	/*
 	fun showInfo(g2d: Graphics2D, PositionX: Float, PositionY: Float, Title: String, Text: Array<String>, Numbers: IntArray) {
 		g2d.color = Color(80, 80, 80, 180)
 		g2d.fillRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
@@ -109,4 +108,5 @@ object Screen {
 		g2d.drawString(Text[2] + ": " + resources.iron, 10 + PositionX.toInt(), 2 * 15 + 35 + PositionY.toInt())
 		g2d.drawString(Text[3] + ": " + resources.food, 10 + PositionX.toInt(), 3 * 15 + 35 + PositionY.toInt())
 	}
+	*/
 }

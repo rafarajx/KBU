@@ -24,8 +24,6 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 		Tower(start, this, teamNumber).add()
 	}
 	
-	override fun render(g2d: Graphics2D) {}
-	
 	override fun update() {
 		
 		if (buildingList.size == 0) isDefeated = true
@@ -114,7 +112,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				Tower(vec2(x, y), this, teamNumber).add()
 			}
 			Building.WOODCAMP -> if (resources.enough(WoodCamp.COST)) {
-				val p = Game.treeTree.nearest(center)!!.p.copy()
+				val p = (getNearestEntity(center, Game.treeList) ?: return).p.copy()
 				
 				p.x += (random.nextInt(100) - 50).toFloat()
 				p.y += (random.nextInt(100) - 50).toFloat()
@@ -128,7 +126,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				WoodCamp(p, this, teamNumber).add()
 			}
 			Building.QUARRY -> if (resources.enough(Quarry.COST)) {
-				val p = Game.rockTree.nearest(center)!!.p.copy()
+				val p = (getNearestEntity(center, Game.rockList) ?: return).p.copy()
 				
 				p.x += (random.nextInt(100) - 50).toFloat()
 				p.y += (random.nextInt(100) - 50).toFloat()

@@ -1,31 +1,30 @@
 package entity
 
-import core.QuadTree
-import core.Screen
+import core.*
 import fraction.Fraction
 import gametype.Game
 import math.AABB
 import math.Circle
 import math.vec2
+import math.vec3
 import sound.SimpleSound
 import java.awt.Color
 import java.awt.Graphics2D
 import java.util.*
-import kotlin.math.hypot
-import kotlin.math.sqrt
+import kotlin.math.abs
 
-open class Entity {
+open class Entity (var owner: Fraction){
 	var p = vec2(0.0f, 0.0f)
 	var move = vec2(0.0f, 0.0f)
-	var owner: Fraction? = null
 	var field: AABB? = null
 	var range: Circle? = null
 	var teamNumber: Int = 0
-	var health: Int = 100
+	var health: Float = 100f
 	var damage: Int = 0
 	var speed: Float = 0.0f
-	var target: vec2? = null
-	var edgeLength: Int = 0
+	var target: Entity? = null
+	var edgelength: Int = 0
+	var halfedge: Int = 0
 	var tick = 1
 	
 	var qt: QuadTree<Entity>? = null
@@ -33,41 +32,38 @@ open class Entity {
 	companion object {
 		var random = Random()
 		
-		fun drawBar(g2d: Graphics2D, x: Int, y: Int, current: Int, max: Int, c: Color) {
-			g2d.color = c
-			g2d.fillRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
-			g2d.color = Color.BLACK
-			g2d.drawRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
-		}
-		
-		fun drawBar(g2d: Graphics2D, p: vec2, current: Int, max: Int, c: Color) {
-			drawBar(g2d, p.x.toInt(), p.y.toInt(), current, max, c)
-		}
-		
-		fun drawBar(g2d: Graphics2D, x: Float, y: Float, current: Int, max: Int, c: Color) {
-			drawBar(g2d, x.toInt(), y.toInt(), current, max, c)
+		fun drawBarGL(pos: vec2, current: Float, max: Float, color: vec3) {
+			RectRenderer.setColor(color)
+			RectRenderer.fill(pos - vec2(6, 0), vec2(current / max * 13f, 3f))
+			//g2d.color = Color.BLACK
+			//g2d.drawRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
 		}
 	}
-	
-	open fun render(g2d: Graphics2D) { }
-	
-	fun drawAnimatedEntity(g2d: Graphics2D, tileX: Int, tileY: Int) {
-		val sx = p.x.toInt() - edgeLength / 2
-		val sy = p.y.toInt() - edgeLength / 2
+
+	open fun render(g2d: Graphics2D) {}
+
+	open fun renderGL() { }
+
+	fun drawAnimatedEntityGL(sprite: Sprite, tileX: Int, tileY: Int) {
+		
+		sprite.updatePosition(vec2(p.x.toInt() - edgelength / 2, p.y.toInt() - edgelength / 2), vec2(edgelength))
+
 		if (move.x == 0f && move.y == 0f) {
-			Screen.drawTile(g2d, tileX, tileY, sx, sy, edgeLength, edgeLength)
+			sprite.updateTexCoords(vec2(tileX * 16, tileY * 16), vec2(16))
 			return
 		}
 		val frame = tick % 48 / 16
-		
-		val offset = if (move.x < 0 && move.x > Math.abs(move.y)) 9 //left
-		else if (move.x > 0 && move.x > Math.abs(move.y)) 6 //right
-		else if (move.y < 0 && move.y > Math.abs(move.x)) 3 //up
+
+		val offset = if (move.x < 0 && move.x > abs(move.y)) 9 //left
+		else if (move.x > 0 && move.x > abs(move.y)) 6 //right
+		else if (move.y < 0 && move.y > abs(move.x)) 3 //up
 		else 0
 		
-		Screen.drawTile(g2d, tileX + offset + frame, tileY, sx, sy, edgeLength, edgeLength)
+		
+		sprite.updateTexCoords(vec2((tileX + offset + frame) * 16, tileY * 16), vec2(16))
 	}
-	
+
+
 	open fun update() {
 	
 	}
@@ -76,60 +72,54 @@ open class Entity {
 		health -= dmg
 	}
 	
-	fun getNearestEnemy(p : vec2, teamNumber: Int): vec2 {
+	fun getNearestEnemy(teamNumber: Int): Entity? {
 		var max = Float.MAX_VALUE
-		var targetPosition = p.copy()
+		var target : Entity? = null
 		for (fraction in Game.fractionList) {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
-				val delta = entity.p - p
-				val d = sqrt(delta.square().sum())
+				val d = (entity.p - p).square().sum()
 				if (max > d) {
 					max = d
-					targetPosition = entity.p.copy()
+					target = entity
 				}
 			}
 			for (building in fraction.buildingList) {
-				val delta = building.p - p
-				val d = sqrt(delta.square().sum())
+				val d = (building.p - p).square().sum()
 				if (max > d) {
 					max = d
-					targetPosition = building.p.copy()
+					target = building
 				}
-			}
-		}
-		return targetPosition
-	}
-	
-	fun <T: Entity> getNearestEntity(arrayList: ArrayList<T>): Entity {
-		var max = Float.MAX_VALUE
-		var target = this
-		for (i in arrayList.indices) {
-			val entity = arrayList[i]
-			val delta = entity.p - p
-			val d = hypot(delta.x, delta.y)
-			if (max > d) {
-				max = d
-				target = entity
 			}
 		}
 		return target
 	}
 	
-	fun fight(damage: Int, TeamIndex: Int, field: AABB) {
-		for (i in Game.fractionList.indices) {
-			val fraction = Game.fractionList[i]
-			for (j in fraction.entityList.indices) {
-				val entity = fraction.entityList[j]
-				if (entity.teamNumber == TeamIndex) break
+	fun <T: Entity> getNearestEntity(arrayList: ArrayList<T>): T? {
+		var max = Float.MAX_VALUE
+		var res : T? = null
+		
+		for (entity in arrayList) {
+			if(entity == this) continue
+			val d = (entity.p - p).square().sum()
+			if (d < max) {
+				max = d
+				res = entity
+			}
+		}
+		return res
+	}
+	
+	fun fight(damage: Int, teamNumber: Int, field: AABB) {
+		for (fraction in Game.fractionList) {
+			if (fraction.teamNumber == teamNumber) continue
+			for (entity in fraction.entityList) {
 				if (entity.field!!.intersects(field)) {
 					entity.hurt(damage)
 					return
 				}
 			}
-			for (j in fraction.buildingList.indices) {
-				val building = fraction.buildingList[j]
-				if (building.teamNumber == TeamIndex) break
+			for (building in fraction.buildingList) {
 				if (building.field!!.intersects(field)) {
 					building.hurt(damage)
 					return
@@ -137,10 +127,21 @@ open class Entity {
 			}
 		}
 	}
+
+	@Synchronized
+	open fun add(){
 	
+	}
+
+	@Synchronized
+	open fun remove(){
+	
+	}
+
 	open fun die() {
 		SimpleSound.die.play()
-		owner!!.population--
-		owner!!.entityList.remove(this)
+		owner.population--
+		owner.entityList.remove(this)
+		remove()
 	}
 }

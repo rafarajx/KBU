@@ -35,38 +35,36 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 	}
 	
 	fun add(obj: T) {
-	
-		if (value == null && !isSubdivided){
+		
+		//println("${obj.p} ${value == null} $isSubdivided");
+		
+		if (value == null){
 			value = obj
 			obj.qt = this as QuadTree<Entity>
+			isSubdivided = true
 			return
 		}
 		
 		if (aabb.center.y >= obj.p.y) {
 			if (aabb.center.x >= obj.p.x) {
 				if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
-				isSubdivided = true
 				a!!.add(obj)
-				reinsert()
 			} else {
 				if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
-				isSubdivided = true
 				b!!.add(obj)
-				reinsert()
 			}
 		} else {
 			if (aabb.center.x >= obj.p.x) {
 				if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
-				isSubdivided = true
 				c!!.add(obj)
-				reinsert()
 			} else {
 				if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
-				isSubdivided = true
 				d!!.add(obj)
-				reinsert()
 			}
 		}
+	
+		
+		
 	}
 	
 	fun split(){
@@ -78,11 +76,9 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 	}
 	
 	fun reinsert(){
-		if(value != null) {
-			val t = value
-			value = null
-			add(t!!)
-		}
+		val t = value
+		value = null
+		add(t!!)
 	}
 	
 	fun draw(g2d: Graphics2D) {
@@ -129,6 +125,7 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 		var max = Float.MAX_VALUE
 		var best: T? = null
 		for(t in temp){
+			if(t.p == p) continue
 			val d = (t.p - p).square().sum()
 			if(d < max){
 				max = d
@@ -156,12 +153,12 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 		
 			if(value != null) temp.add(value!!)
 			
-			if(isSubdivided) {
-				if (a != null) a!!.getNodesInRange(circle, temp)
-				if (b != null) b!!.getNodesInRange(circle, temp)
-				if (c != null) c!!.getNodesInRange(circle, temp)
-				if (d != null) d!!.getNodesInRange(circle, temp)
-			}
+			
+			if (a != null) a!!.getNodesInRange(circle, temp)
+			if (b != null) b!!.getNodesInRange(circle, temp)
+			if (c != null) c!!.getNodesInRange(circle, temp)
+			if (d != null) d!!.getNodesInRange(circle, temp)
+			
 		}
 	}
 	
@@ -169,12 +166,10 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 		
 		if(value != null) temp.add(value!!)
 		
-		if(isSubdivided) {
-			if (a != null) a!!.listAllInner(temp)
-			if (b != null) b!!.listAllInner(temp)
-			if (c != null) c!!.listAllInner(temp)
-			if (d != null) d!!.listAllInner(temp)
-		}
+		if (a != null) a!!.listAllInner(temp)
+		if (b != null) b!!.listAllInner(temp)
+		if (c != null) c!!.listAllInner(temp)
+		if (d != null) d!!.listAllInner(temp)
 	}
 	
 	fun remove() {

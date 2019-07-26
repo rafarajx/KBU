@@ -22,10 +22,6 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 		Tower(start, this, teamNumber).add()
 	}
 	
-	override fun render(g2d: Graphics2D) {
-	
-	}
-	
 	override fun update() {
 		if (tick % 100 == 0 && buildingList.size == 0 && entityList.size == 0) isDefeated = true
 		for (i in entityList.indices) {
@@ -44,8 +40,8 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 		
 		val area = if (id == 6) AABB(p, 8) else AABB(p, 16)
 		
-		if (!inRange(buildingList, area)) return
-		if (isColliding(area)) return
+		//if (!inRange(buildingList, area)) return
+		if (isConstructionColliding(area)) return
 		when (id) {
 			0 -> if (resources.enough(House.COST)) {
 				resources.pay(House.COST)

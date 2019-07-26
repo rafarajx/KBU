@@ -4,11 +4,18 @@ import kotlin.math.hypot
 
 data class vec2(var x: Float, var y: Float) {
 	
+	val array
+		get() = floatArrayOf(x, y)
+	
 	constructor(value: Float) : this(value, value)
 	
 	constructor(value: Int) : this(value.toFloat(), value.toFloat())
 	
 	constructor(x: Int, y: Int) : this(x.toFloat(), y.toFloat())
+	
+	override operator fun equals(v: Any?): Boolean {
+		return v is vec2 && x == v.x && y == v.y
+	}
 	
 	operator fun plus(v: vec2): vec2 {
 		return vec2(x + v.x, y + v.y)
@@ -59,7 +66,7 @@ data class vec2(var x: Float, var y: Float) {
 	}
 	
 	operator fun get(i: Int): Float {
-		when(i){
+		when (i) {
 			0 -> return x
 			1 -> return y
 		}
@@ -70,16 +77,15 @@ data class vec2(var x: Float, var y: Float) {
 		return vec2(x * x, y * y)
 	}
 	
-	fun sum() : Float{
+	fun sum(): Float {
 		return x + y
 	}
 	
-	fun length(): Float{
+	fun length(): Float {
 		return hypot(x, y)
 	}
 	
-	fun normalize() : vec2 {
-	    var f = length()
+	fun normalize(): vec2 {
 		return this / length()
 	}
 	

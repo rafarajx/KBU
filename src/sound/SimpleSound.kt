@@ -1,6 +1,6 @@
 package sound
 
-import core.Main
+import core.Window
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.FloatControl
 
@@ -10,13 +10,16 @@ class SimpleSound(name: String) {
 	var gain: FloatControl
 	
 	init {
-		clip.open(AudioSystem.getAudioInputStream(Main::class.java.getResource(name)))
+		clip.open(AudioSystem.getAudioInputStream(Window::class.java.getResource(name)))
 		gain = clip.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
 	}
 
 	fun play() {
-		clip.framePosition = 0
-		clip.start()
+		Thread {
+			
+			clip.framePosition = 0
+			clip.start()
+		}.start()
 	}
 
 	fun loop(times: Int) {

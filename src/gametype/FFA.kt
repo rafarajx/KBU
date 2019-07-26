@@ -1,11 +1,14 @@
 package gametype
 
-import java.awt.Color
-import java.awt.Graphics2D
-
+import core.Fog
 import core.Resources
+import fraction.Player
 import fraction.StandardAI
 import math.vec2
+import java.awt.Color
+import java.awt.Graphics2D
+import kotlin.math.cos
+import kotlin.math.sin
 
 object FFA : Game() {
 	
@@ -27,13 +30,14 @@ object FFA : Game() {
 		
 		setupNature(opponentsNumber + 1)
 		
+		player = Player(vec2(0.0f, -900.0f), Color.BLUE, Resources(100, 60, 10, 200), 0)
 		fractionList.add(player)
 		
 		for (i in 0 until opponentsNumber) {
 			val color = Color.getHSBColor(1.0f / opponentsNumber * i, 1.0f, 1.0f)
 			val start = vec2(
-				(-Math.sin(Math.PI * 2 / (opponentsNumber + 1) * (i + 1)) * 900).toInt(),
-				(-Math.cos(Math.PI * 2 / (opponentsNumber + 1) * (i + 1)) * 900).toInt())
+				(-sin(Math.PI * 2 / (opponentsNumber + 1) * (i + 1)) * 900).toInt(),
+				(-cos(Math.PI * 2 / (opponentsNumber + 1) * (i + 1)) * 900).toInt())
 			fractionList.add(
 				StandardAI(
 					start, color,
@@ -42,12 +46,29 @@ object FFA : Game() {
 				)
 			)
 		}
-		setBasicInput()
+		
+		
+		/*
+		val f1 = StandardAI(vec2(1000, 1000), Color.RED, Resources(200), 1, 0)
+		val f2 = StandardAI(vec2(-1000, -1000), Color.BLUE, Resources(200), 1, 1)
+		
+		fractionList.add(f1)
+		fractionList.add(f2)
+		
+		Barrack(vec2(120, 100), f1, 0).add()
+		House(vec2(170, 100), f1, 0).add()
+		
+		Barrack(vec2(-120, -100), f2, 1).add()
+		House(vec2(-190, -100), f2, 1).add()
+		*/
+		
 	}
 
-	override fun render(g2d: Graphics2D) {
-		drawObjects(g2d)
-		drawInterface(g2d)
+	override fun renderGL() {
+		drawObjectsGL()
+		if(fogEnabled)
+			Fog.render(Game.player.buildingList)
+		drawInterfaceGL()
 	}
 	
 	override fun update() {

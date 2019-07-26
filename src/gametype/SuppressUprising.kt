@@ -17,19 +17,22 @@ object SuppressUprising : Game() {
 	override fun onSet() {
         difficulty = 6 - difficulty
 		setupMenuBar()
-		Game.natureList.clear()
-		Game.fractionList.clear()
-		Game.setupNature(friendsNumber + 1)
-		var start = vec2(Game.random.nextInt(2000), Game.random.nextInt(2000))
-		Game.player = Player(start, Color.BLUE, Resources(100, 60, 8, 30), 0)
-		Game.fractionList.add(Game.player)
+		natureList.clear()
+		fractionList.clear()
+		setupNature(friendsNumber + 1)
+		
+		var start = vec2(random.nextInt(2000), random.nextInt(2000))
+		
+		player = Player(start, Color.BLUE, Resources(100, 60, 8, 30), 0)
+		fractionList.add(player)
+		
 		for (i in 0 until friendsNumber) {
-			val red = Game.random.nextInt(255)
-			val green = Game.random.nextInt(255)
-			val blue = Game.random.nextInt(255)
+			val red = random.nextInt(255)
+			val green = random.nextInt(255)
+			val blue = random.nextInt(255)
 			val c = Color(red, green, blue)
-			start = vec2(Game.random.nextInt(2000), Game.random.nextInt(2000))
-			Game.fractionList.add(
+			start = vec2(random.nextInt(2000), random.nextInt(2000))
+			fractionList.add(
 				StandardAI(
 					start, c,
 					Resources(50 * difficulty, 30 * difficulty, 5 * difficulty, 50 * difficulty),
@@ -38,18 +41,12 @@ object SuppressUprising : Game() {
 			)
 		}
 		start = vec2(1000.0f, 1000.0f)
-		Game.fractionList.add(Uprising(start, Color.RED, 100, 1))
+		fractionList.add(Uprising(start, Color.RED, 100, 1))
 		
-		setBasicInput()
-	}
-
-	override fun render(g2d: Graphics2D) {
-		Game.drawObjects(g2d)
-		Game.drawInterface(g2d)
 	}
 
 	override fun update() {
-		Game.updateObjects()
-		Game.tick++
+		updateObjects()
+		tick++
 	}
 }

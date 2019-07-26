@@ -1,29 +1,43 @@
 package entity.nature
 
-import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-
+import core.G
 import core.Screen
+import core.Sprite
+import fraction.Fraction
 import gametype.Game
 import math.AABB
 import math.vec2
+import java.awt.Graphics2D
 
-class Cloud(p: vec2) : Nature() {
+class Cloud(owner: Fraction, p: vec2) : Nature(owner) {
 	private var spreadLevel = 0
 	var fieldSize = 16
 	
+	companion object {
+		
+		const val EDGE_LENGTH = 16
+		const val HALF_EDGE = EDGE_LENGTH / 2
+	}
+	
 	init {
 		super.p = p
+		edgelength = EDGE_LENGTH
+		halfedge = HALF_EDGE
 		field = AABB(p, 0.5f)
 	}
 	
-	override fun render(g2d: Graphics2D) {
-		Screen.drawTile(g2d, 7 + spreadLevel, 1, p, fieldSize, fieldSize)
+	var cloud = Sprite()
+	
+	override fun renderGL() {
+		//Screen.drawTile(g2d, 7 + spreadLevel, 1, p, fieldSize, fieldSize)
+
+		cloud.updatePosition(p, vec2(edgelength))
+		cloud.updateTexCoords(vec2((7 + spreadLevel) * 16, 1 * 16), vec2(16))
 	}
 	
 	override fun update() {
 		if (tick % 30 == 0) spreadLevel++
-		if (tick % 20 == 0) p += vec2((random.nextInt(4) - 1).toFloat(), -(random.nextInt(1) + 3).toFloat())
+		if (tick % 20 == 0) p += vec2((random.nextInt(4) - 1).toFloat(), (random.nextInt(1) + 3).toFloat())
 		if (spreadLevel == 5) remove()
 		field = AABB(p, 0.5f)
 		
@@ -32,12 +46,14 @@ class Cloud(p: vec2) : Nature() {
 	
 	override fun gatherResources(amount: Int) {}
 	
-	fun add(){
+	override fun add(){
+		G.batch.add(cloud)
 		Game.natureList.add(this)
 		Game.cloudList.add(this)
 	}
 	
-	@Synchronized fun remove(){
+	@Synchronized override fun remove(){
+		G.batch.remove(cloud)
 		Game.natureList.remove(this)
 		Game.cloudList.remove(this)
 	}

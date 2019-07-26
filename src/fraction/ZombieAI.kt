@@ -24,8 +24,6 @@ class ZombieAI(StartX: Int, StartY: Int, c: Color, TeamIndex: Int) : Fraction() 
 		maxPopulation = Integer.MAX_VALUE
 	}
 	
-	override fun render(g2d: Graphics2D) {}
-	
 	override fun update() {
 		if (tick < Game.toTicks(intArrayOf(10))) {
 			tick++

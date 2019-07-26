@@ -1,12 +1,16 @@
 package fraction
 
+import core.Canvas
 import core.Resources
 import core.Screen
+import core.TextRenderer
 import entity.Entity
+import entity.Knight
 import entity.building.*
 import gametype.Game
 import math.AABB
 import math.vec2
+import org.w3c.dom.Text
 import java.awt.Color
 import java.awt.Graphics2D
 import java.util.*
@@ -34,6 +38,8 @@ open class Fraction {
 	
 	var entityList = ArrayList<Entity>()
 	
+	var knightList = ArrayList<Knight>()
+	
 	var resources: Resources = Resources(0)
 	var population = 0
 	var maxPopulation = 0
@@ -43,23 +49,21 @@ open class Fraction {
 	var statusText = arrayOf("", "")
 	var tick = 1
 	
-	open fun render(g2d: Graphics2D) {}
-	
-	fun renderBuildings(g2d: Graphics2D) {
+	fun renderBuildingsGL() {
 		for (i in buildingList.indices) {
 			if(buildingList.indices.contains(i)) {
 				val b = buildingList[i]
-				g2d.color = color
-				Screen.draw(g2d, b.field!!)
-				b.render(g2d)
+				//Screen.draw(g2d, b.field!!)
+				b.renderGL()
 			}
 		}
 	}
 	
-	fun renderEntities(g2d: Graphics2D) {
+	fun renderEntitiesGL() {
 		for (i in entityList.indices) {
 			if(entityList.indices.contains(i)) {
 				val e = entityList[i]
+				/*
 				g2d.color = color
 				g2d.drawRect(
 					e.field!!.x.toInt(),
@@ -67,18 +71,26 @@ open class Fraction {
 					e.field!!.width.toInt(),
 					e.field!!.height.toInt()
 				)
-				e.render(g2d)
+				*/
+				e.renderGL()
 			}
 		}
 	}
 	
-	fun drawStatus(g2d: Graphics2D) {
-		
+	fun drawStatusGL() {
+
+		val p = vec2(
+			status.x.toInt() - statusText[1].length / 2 * Screen.LETTER_WIDTH * 2 + Game.camera.x.toInt(),
+			status.y.toInt() - 30 + Game.camera.y.toInt()
+		)
+
 		if (isDefeated) return
+		
+		TextRenderer.depth = -0.08f
 		if (teamNumber == 0)
-			Screen.drawString(g2d, statusText[0], status.x.toInt() - statusText[1].length / 2 * Screen.LETTER_WIDTH * 2, status.y.toInt() - 30, 2.0)
+			TextRenderer.draw(statusText[0], p, 2.0f)
 		else
-			Screen.drawString(g2d, statusText[1], status.x.toInt() - statusText[1].length / 2 * Screen.LETTER_WIDTH * 2, status.y.toInt() - 30, 2.0)
+			TextRenderer.draw(statusText[1], p, 2.0f)
 	}
 	
 	open fun update() {}
@@ -136,8 +148,10 @@ open class Fraction {
 		}
 		for (i in Game.natureList.indices) {
 			if(Game.natureList.indices.contains(i)){
-				if(Game.natureList[i].field == null) continue
-				if (Game.natureList[i].field!!.intersects(r)) return true
+				if(Game.natureList[i] == null) continue
+				val nature = Game.natureList[i]
+				if(nature.field == null) continue
+				if (nature.field!!.intersects(r)) return true
 			}
 		}
 		return false
@@ -151,16 +165,32 @@ open class Fraction {
 		return false
 	}
 	
-	fun <T: Entity> getNearestEntity(p: vec2, arrayList: ArrayList<T>): vec2 {
+	fun <T: Entity> getNearestEntity(p: vec2, arrayList: ArrayList<T>) : T? {
 		var max = Float.MAX_VALUE
-		var target = p.copy()
-		for (i in arrayList.indices) {
-			val entity = arrayList[i]
+		var target: T? = null
+		for (entity in arrayList) {
+			if(p == entity.p) continue
 			val delta = entity.p - p
 			val d = hypot(delta.x, delta.y)
 			if (max > d) {
 				max = d
-				target = entity.p.copy()
+				target = entity
+			}
+		}
+		return target
+	}
+	
+	fun <T: Entity> getNearestEnemy(e: T, arrayList: ArrayList<T>) : T {
+		var max = Float.MAX_VALUE
+		var target = e
+		for (i in arrayList.indices) {
+			val entity = arrayList[i]
+			if(e == entity) continue
+			val delta = entity.p - e.p
+			val d = hypot(delta.x, delta.y)
+			if (max > d) {
+				max = d
+				target = entity
 			}
 		}
 		return target

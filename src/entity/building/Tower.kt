@@ -1,7 +1,6 @@
 package entity.building
 
-import core.Resources
-import core.Screen
+import core.*
 import fraction.Fraction
 import gametype.Game
 import math.AABB
@@ -11,7 +10,7 @@ import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.geom.Line2D
 
-class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
+class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 
 	companion object {
 		private const val EDGE_LENGTH = 32
@@ -24,19 +23,26 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 		super.p = p
 		this.owner = owner
 		this.teamNumber = teamNumber
-		this.target = p.copy()
+		target = null
+		edgelength = EDGE_LENGTH
+		halfedge = HALF_EDGE
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
-		health = 400
+		health = 400f
 		damage = 10
 	}
 	
-	override fun render(g2d: Graphics2D) {
-		g2d.drawImage(Screen.tower, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH, null)
-		g2d.color = Color.RED
-		if (target!!.x != p.x && target!!.y != p.y)
-			g2d.draw(Line2D.Float(p.x, p.y, target!!.x, target!!.y))
-		Building.drawBar(g2d, p, health, 400, Color.RED)
+	var tower = Sprite()
+	
+	override fun renderGL() {
+
+
+
+		//g2d.drawImage(Screen.tower, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH, null)
+		//g2d.color = Color.RED
+		//if (target != null)
+		//	g2d.draw(Line2D.Float(p.x, p.y, target!!.p.x, target!!.p.y))
+		drawBarGL(p, health, 400f, Constants.RED)
 	}
 	
 	override fun update() {
@@ -51,13 +57,13 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
 				if (range!!.contains(entity.p)) {
-					target = entity.p.copy()
+					target = entity
 					entity.hurt(damage)
 					return
 				}
 			}
 		}
-		target = p.copy()
+		target = null
 	}
 	
 	private fun getNearestEnemy() {
@@ -65,26 +71,30 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building() {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
 				if (range!!.contains(entity.p)) {
-					target = entity.p.copy()
+					target = entity
 					return
 				}
 			}
 		}
-		target = p.copy()
+		target = null
 	}
 	
 	override fun die() {
 		remove()
 	}
 	
-	fun add(){
-		owner!!.buildingList.add(this)
-		owner!!.towerList.add(this)
+	override fun add(){
+		G.batch.add(tower)
+		tower.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
+		tower.updateTexCoords(vec2(0, 32), vec2(16))
+		owner.buildingList.add(this)
+		owner.towerList.add(this)
 	}
 	
-	@Synchronized fun remove(){
-		owner!!.buildingList.remove(this)
-		owner!!.towerList.remove(this)
+	@Synchronized override fun remove(){
+		G.batch.remove(tower)
+		owner.buildingList.remove(this)
+		owner.towerList.remove(this)
 	}
 	
 	override fun hurt(dmg: Int) {

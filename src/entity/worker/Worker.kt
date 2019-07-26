@@ -1,5 +1,6 @@
 package entity.worker
 
 import entity.Entity
+import fraction.Fraction
 
-class Worker : Entity()
+class Worker(owner: Fraction) : Entity(owner)

@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/kbux.iml" filepath="$PROJECT_DIR$/kbux.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KBUGL.iml" filepath="$PROJECT_DIR$/KBUGL.iml" />
     </modules>
   </component>
 </project>

@@ -1,6 +1,9 @@
 package entity.worker
 
+import core.Constants
+import core.G
 import core.Screen
+import core.Sprite
 import entity.Entity
 import fraction.Fraction
 import gametype.Game
@@ -9,77 +12,87 @@ import math.vec2
 import sound.SimpleSound
 import java.awt.Color
 import java.awt.Graphics2D
-import kotlin.math.sqrt
 
-class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
+class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 	private var hasStone: Boolean = false
+	
+	companion object{
+		private const val FULL_HEALTH = 50f
+	}
 	
 	init {
 		super.p = p
 		this.owner = owner
 		this.teamNumber = teamIndex
-		edgeLength = 16
-		field = AABB(p, edgeLength / 2)
-		health = 50
+		edgelength = 16
+		field = AABB(p, edgelength / 2)
+		health = FULL_HEALTH
 		damage = 10
 		speed = 0.75f
 		owner.population++
 		update()
 	}
 	
-	override fun render(g2d: Graphics2D) {
+	var stonemason = Sprite()
+	
+	override fun renderGL() {
+		stonemason.updatePosition(p - edgelength / 2, vec2(edgelength))
+
 		if (target == null) {
-			Screen.drawTile(g2d, 1, 8, p - edgeLength / 2, edgeLength, edgeLength)
+			//Screen.drawTile(g2d, 1, 8, p - edgelength / 2, edgelength, edgelength)
+			stonemason.updateTexCoords(vec2(1 * 16, 8 * 16), vec2(16))
 		} else {
-			if (this.hasStone) {
-				drawAnimatedEntity(g2d, 1, 9)
-				Screen.drawTile(g2d, 8, 0, p.x.toInt() - 8, p.y.toInt() - 14, 16, 16)
+			if (hasStone) {
+				drawAnimatedEntityGL(stonemason, 1, 9)
+				//Screen.drawTile(g2d, 8, 0, p.x.toInt() - 8, p.y.toInt() - 14, 16, 16)
 			} else {
-				drawAnimatedEntity(g2d, 1, 8)
+				drawAnimatedEntityGL(stonemason, 1, 8)
 			}
 		}
 		if (Game.showHealth) {
-			Entity.drawBar(g2d, p, health, 50, Color.RED)
+			drawBarGL(p, health, FULL_HEALTH, Constants.RED)
 		}
 	}
 	
 	override fun update() {
 		if (health < 0) die()
-		field = AABB(p, edgeLength / 2)
+		field = AABB(p, edgelength / 2)
 		if (hasStone) {
-			if (tick % 15 == 0) target = getNearestEntity(owner!!.quarryList).p
+			if (tick % 15 == 0){
+				target = getNearestEntity(owner.quarryList)
+			}
 			if (tick % 100 == 0) leaveStone()
 		} else {
-			if (tick % 15 == 0) target = Game.rockTree.nearest(p)!!.p
+			if (tick % 15 == 0) target = getNearestEntity(Game.rockList)
 			if (tick % 100 == 0) gatherStone()
 		}
 		if (target != null) {
-			val delta = target!! - p
-			val d = sqrt(delta.square().sum())
+			val delta = (target!!.p - p)
+			val d = delta.length()
 			move = if (d == 0.0f) vec2(0.0f, 0.0f) else delta / d
 			p += move * speed
 		}
-		if (tick % 1500 == 0) owner!!.resources.food--
+		if (tick % 1500 == 0) owner.resources.food--
 		
 		tick++
 	}
 	
 	private fun gatherStone() {
-		val rock = Game.rockTree.nearest(p)!!
-		
-		if (rock.field!!.intersects(field!!)) {
-			rock.gatherResources(1)
-			hasStone = true
-			return
+		for (rock in Game.rockList) {
+			if (rock.field!!.intersects(field!!)) {
+				rock.gatherResources(1)
+				hasStone = true
+				return
+			}
 		}
 	}
 	
 	private fun leaveStone() {
-		for (quarry in owner!!.quarryList) {
+		for (quarry in owner.quarryList) {
 			if (quarry.field!!.intersects(field!!)) {
 				val n = Entity.random.nextInt(4)
-				if (n == 0) owner!!.resources.iron++
-				else owner!!.resources.stone++
+				if (n == 0) owner.resources.iron++
+				else owner.resources.stone++
 				hasStone = false
 				return
 			}
@@ -88,11 +101,17 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity() {
 	
 	override fun die() {
 		SimpleSound.die.play()
-		owner!!.population--
+		owner.population--
 		remove()
 	}
+
+	override fun add() {
+		G.batch.add(stonemason)
+		owner.entityList.add(this)
+	}
 	
-	@Synchronized fun remove(){
-		owner!!.entityList.remove(this)
+	@Synchronized override fun remove(){
+		G.batch.remove(stonemason)
+		owner.entityList.remove(this)
 	}
 }
