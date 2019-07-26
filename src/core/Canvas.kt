@@ -6,7 +6,7 @@ import java.awt.Graphics2D
 import java.awt.RenderingHints
 import javax.imageio.ImageIO
 import kotlin.math.abs
-
+asdasdasd
 object Canvas : java.awt.Canvas() {
 
 	const val SECOND: Long = 1_000_000_000
