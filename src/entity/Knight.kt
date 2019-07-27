@@ -16,12 +16,16 @@ class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	
 	var knight = Sprite()
 	
+	companion object{
+		const val MAX_HEALTH = 100f
+	}
+	
 	init {
 		super.p = p
 		super.owner = owner
 		super.teamNumber = teamNumber
 		edgelength = 16
-		health = 100f
+		health = MAX_HEALTH
 		damage = 20
 		speed = 0.6f
 		field = AABB(p, edgelength / 2)
@@ -35,8 +39,8 @@ class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 			knight.updateTexCoords(vec2(1 * 16, 10 * 16), vec2(16))
 		} else {
 			drawAnimatedEntityGL(knight, 1, 10)
-			if (Game.showHealth) drawBarGL(p, health, 100f, Constants.RED)
 		}
+		if (Game.showHealth) drawBarGL(p, health, MAX_HEALTH, Constants.RED)
 	}
 	
 	override fun update() {

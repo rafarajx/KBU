@@ -23,7 +23,7 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		private const val EDGE_LENGTH = 32
 		private const val HALF_EDGE = EDGE_LENGTH / 2
 		private const val RANGE = 200
-		private const val FULL_HEALTH = 200f
+		private const val MAX_HEALTH = 200f
 	}
 
 	init {
@@ -34,7 +34,7 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		halfedge = HALF_EDGE
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
-		health = FULL_HEALTH
+		health = MAX_HEALTH
 	}
 	
 	var windmill = Sprite()
@@ -50,7 +50,7 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		Screen.drawTile(g2d, 7, 2, p - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH)
 		g2d.transform = at
 		*/
-		drawBarGL(p, health, FULL_HEALTH, Constants.RED)
+		if(health != MAX_HEALTH) drawBarGL(p, health, MAX_HEALTH, Constants.RED)
 		
 		
 	}

@@ -19,6 +19,7 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		private const val EDGE_LENGTH = 32
 		private const val HALF_EDGE = EDGE_LENGTH / 2
 		private const val RANGE = 200
+		const val MAX_HEALTH = 200f
 	}
 
 	init {
@@ -46,7 +47,7 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 
 
 
-		drawBarGL(p - vec2(0f, 10f), health, 200f, Constants.RED)
+		if(health != MAX_HEALTH) drawBarGL(p - vec2(0f, 10f), health, MAX_HEALTH, Constants.RED)
 		if (owner.population < owner.maxPopulation && owner.resources.food > 4)
 			drawBarGL(p, (tick % 1000).toFloat(), 1000f, Constants.ORANGE)
 	}

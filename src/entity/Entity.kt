@@ -35,11 +35,11 @@ open class Entity (var owner: Fraction){
 		fun drawBarGL(pos: vec2, current: Float, max: Float, color: vec3) {
 			RectRenderer.enableCamera()
 			
-			RectRenderer.depth = -0.01f
+			RectRenderer.depth = -0.03f
 			RectRenderer.setColor(color)
 			RectRenderer.fill(pos - vec2(6, 0), vec2(current / max * 13f, 3f))
 			
-			RectRenderer.depth = -0.02f
+			RectRenderer.depth = -0.04f
 			RectRenderer.setColor(0.0f)
 			RectRenderer.draw(pos - vec2(6, 0), vec2(current / max * 13f, 3f))
 			

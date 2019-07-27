@@ -17,7 +17,7 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		private const val HALF_EDGE = EDGE_LENGTH / 2
 		private const val RANGE = 200
 		val COST = Resources(20, 5, 0, 0)
-		private const val FULL_HEALTH = 200f
+		private const val MAX_HEALTH = 200f
 	}
 
 	init {
@@ -28,7 +28,7 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		halfedge = HALF_EDGE
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
-		health = FULL_HEALTH
+		health = MAX_HEALTH
 	}
 	
 	var woodcamp = Sprite()
@@ -36,7 +36,7 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 	override fun renderGL() {
 		//g2d.drawImage(Screen.woodCamp, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH, null)
 		
-		drawBarGL(p, health, FULL_HEALTH, Constants.RED)
+		if(health != MAX_HEALTH) drawBarGL(p, health, MAX_HEALTH, Constants.RED)
 		
 	}
 

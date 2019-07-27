@@ -17,6 +17,7 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		private const val HALF_EDGE = EDGE_LENGTH / 2
 		private const val RANGE = 150
 		val COST = Resources(20, 30, 5, 0)
+		const val MAX_HEALTH = 400f
 	}
 	
 	init {
@@ -28,7 +29,7 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		halfedge = HALF_EDGE
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
-		health = 400f
+		health = MAX_HEALTH
 		damage = 10
 	}
 	
@@ -42,7 +43,7 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		//g2d.color = Color.RED
 		//if (target != null)
 		//	g2d.draw(Line2D.Float(p.x, p.y, target!!.p.x, target!!.p.y))
-		drawBarGL(p, health, 400f, Constants.RED)
+		if(health != MAX_HEALTH) drawBarGL(p, health, MAX_HEALTH, Constants.RED)
 	}
 	
 	override fun update() {

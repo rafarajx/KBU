@@ -16,6 +16,7 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		private const val EDGE_LENGTH = 32
 		private const val HALF_EDGE = EDGE_LENGTH / 2
 		private const val RANGE = 200
+		const val MAX_HEALTH = 400f
 	}
 	
 	init {
@@ -26,7 +27,7 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		halfedge = HALF_EDGE
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
-		health = 400f
+		health = MAX_HEALTH
 	}
 	
 	var barracks = Sprite()
@@ -34,7 +35,7 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	override fun renderGL() {
 
 		
-		drawBarGL(p - vec2(0f, 10.0f), health, 400f, Constants.RED)
+		if(health != MAX_HEALTH) drawBarGL(p - vec2(0f, 10.0f), health, MAX_HEALTH, Constants.RED)
 		if (owner.resources.food > 20 && owner.population < owner.maxPopulation)
 			drawBarGL(p, (tick % 600).toFloat(), 600f, Constants.BLUE)
 	}
