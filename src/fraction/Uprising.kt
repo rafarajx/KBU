@@ -7,7 +7,6 @@ import gametype.Game
 import math.AABB
 import math.vec2
 import java.awt.Color
-import java.awt.Graphics2D
 
 class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : Fraction() {
 	var queueNum = 0

@@ -1,11 +1,18 @@
 package core
 
 import math.vec2
+import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL44.*
 import org.lwjgl.stb.*
 import org.lwjgl.stb.STBImage.*
 import java.nio.ByteBuffer
 import org.lwjgl.system.MemoryStack
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
+import java.io.FileNotFoundException
+import java.nio.channels.FileChannel
+import java.io.IOException
 
 
 
@@ -20,45 +27,30 @@ class Texture{
 		get() = vec2(width, height)
 
 	var image: ByteBuffer? = null
-
+	
 	constructor (filename: String) {
-
-		/*
-
-		image = ImageIO.read(Main::class.java.getResourceAsStream(filename))
-		//val data = (image.raster.dataBuffer as DataBufferByte).data
-		//val pixels: ByteBuffer = ByteBuffer.wrap(data)
-
-		width = image.width
-		height = image.height
-
-
-
-		val rawPixels = image.getRGB(0, 0, width, height, null, 0, width)
-
-		val pixels = BufferUtils.createByteBuffer(width * height * 4)
-
-		for(i in rawPixels.indices){
-			val c = rawPixels[i]
-			pixels.put(((c shr 0) or 0xFF).toByte())		//BLUE
-			pixels.put(((c shr 8) or 0xFF).toByte())		//GREEN
-			pixels.put(((c shr 16) or 0xFF).toByte())	//RED
-			pixels.put(((c shr 24) or 0xFF).toByte())	//ALPHA
-
-		}
-
-		pixels.flip()
-		*/
 
 		MemoryStack.stackPush().use { stack->
 			val w = stack.mallocInt(1)
 			val h = stack.mallocInt(1)
 			val comp = stack.mallocInt(1)
-
+			
+			val stream = Window::class.java.getResourceAsStream(filename)
+			val bytes = stream.readAllBytes()
+			
+			val buffer = BufferUtils.createByteBuffer(bytes.size)
+			buffer.put(bytes)
+			buffer.flip()
+			
 			stbi_set_flip_vertically_on_load(true)
-			image = stbi_load(filename, w, h, comp, 4)
+			image = stbi_load_from_memory(buffer, w, h, comp, 4)
+			
+			//stbi_set_flip_vertically_on_load(true)
+			//image = stbi_load(filename, w, h, comp, 4)
 			if (image == null)
-				throw RuntimeException("Failed to load a texture file!" + System.lineSeparator() + stbi_failure_reason())
+				throw RuntimeException(
+					"Failed to load a texture file!\n" + stbi_failure_reason() + "\n" + filename
+				)
 
 			width = w.get()
 			height = h.get()
@@ -83,7 +75,6 @@ class Texture{
 		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-		
 		
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, bits)
 		

@@ -1,6 +1,5 @@
 package fraction
 
-import core.Canvas
 import core.Resources
 import core.Window
 import entity.building.*
@@ -9,7 +8,6 @@ import math.AABB
 import math.vec2
 import sound.SimpleSound
 import java.awt.Color
-import java.awt.Graphics2D
 
 class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fraction() {
 	

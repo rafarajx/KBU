@@ -1,9 +1,8 @@
 package state
 
+import core.Window
 import core.*
 import math.vec2
-import java.awt.Color
-import java.awt.Graphics2D
 
 import org.lwjgl.glfw.GLFW
 import sound.SimpleSound

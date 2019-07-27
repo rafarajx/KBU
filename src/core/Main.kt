@@ -3,7 +3,6 @@ package core
 import math.vec2
 import org.lwjgl.Version
 import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.glfw.GLFWCharCallbackI
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryStack.stackPush
 
@@ -49,11 +48,34 @@ fun main(){
 		)
 	}
 
-	glfwSetWindowSizeCallback(Window.id) { _: Long, w: Int, h: Int -> Canvas.windowSizeCallback(w, h)}
-	glfwSetKeyCallback(Window.id) { _: Long, key: Int, scancode: Int, action: Int, mods: Int -> Canvas.keyCallback(key, scancode, action, mods)}
-	glfwSetMouseButtonCallback(Window.id) { _: Long, button: Int, action: Int, mods: Int -> Canvas.mouseButtonCallback(button, action, mods)}
-	glfwSetWindowPosCallback(Window.id) { _: Long, xpos: Int, ypos: Int -> Canvas.windowPosCallback(xpos, ypos)}
-	glfwSetCursorPosCallback(Window.id) { _: Long, xpos: Double, ypos: Double -> Canvas.cursorPosCallback(xpos.toFloat(), ypos.toFloat())}
+	glfwSetWindowSizeCallback(Window.id) { _: Long, w: Int, h: Int -> Canvas.windowSizeCallback(w, h) }
+	glfwSetKeyCallback(Window.id) { _: Long, key: Int, scancode: Int, action: Int, mods: Int ->
+		Canvas.keyCallback(
+			key,
+			scancode,
+			action,
+			mods
+		)
+	}
+	glfwSetMouseButtonCallback(Window.id) { _: Long, button: Int, action: Int, mods: Int ->
+		Canvas.mouseButtonCallback(
+			button,
+			action,
+			mods
+		)
+	}
+	glfwSetWindowPosCallback(Window.id) { _: Long, xpos: Int, ypos: Int ->
+		Canvas.windowPosCallback(
+			xpos,
+			ypos
+		)
+	}
+	glfwSetCursorPosCallback(Window.id) { _: Long, xpos: Double, ypos: Double ->
+		Canvas.cursorPosCallback(
+			xpos.toFloat(),
+			ypos.toFloat()
+		)
+	}
 	
 	
 	glfwMakeContextCurrent(Window.id)
@@ -63,7 +85,7 @@ fun main(){
 	glfwShowWindow(Window.id)
 
 	GL.createCapabilities()
-
+	
 	Canvas.init()
 
 	val clt = Thread { Canvas.loop() }

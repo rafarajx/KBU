@@ -1,7 +1,6 @@
 package core
 
 import math.vec2
-import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL45.*
 
 object ImageRenderer {

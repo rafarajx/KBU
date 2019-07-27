@@ -1,13 +1,8 @@
 package core
 
-import gametype.Game
 import org.lwjgl.opengl.*
 import org.lwjgl.opengl.GL45.*
 import state.StateManager
-import java.awt.Color
-import java.awt.Graphics2D
-import javax.imageio.ImageIO
-import kotlin.math.abs
 
 object Canvas {
 	
@@ -63,12 +58,10 @@ object Canvas {
 				println("ERROR source = $source id = $id severity = $severity message = $msg")
 		}, 0)
 
-		bra = Texture("./res/House.png")
-		tileset = Texture("./res/Tileset.png")
-		
+		bra = Texture("/House.png")
+		tileset = Texture("/Tileset.png")
 		
 		glEnable(GL_DEPTH_TEST)
-		
 		
 		glEnable(GL_BLEND)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -95,10 +88,7 @@ object Canvas {
 		batch.closePosition()
 		batch.closeTexCoords()
 		*/
-
-
 	}
-	
 
 	fun loop() {
 
@@ -135,15 +125,11 @@ object Canvas {
 			G.batch.updateTexCoords(i, vec2(0, 240), vec2(16, 16))
 		}
 		*/
-
 		StateManager.renderGL()
 		
-
 		G.batch.closePosition()
 		G.batch.closeTexCoords()
 
 		G.batch.render()
-
 	}
-	
 }

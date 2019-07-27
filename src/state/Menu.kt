@@ -1,5 +1,6 @@
 package state
 
+import core.Window
 import core.*
 import math.vec2
 import org.lwjgl.glfw.GLFW

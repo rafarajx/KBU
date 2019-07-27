@@ -1,5 +1,6 @@
 package gametype
 
+import core.Window
 import core.*
 import entity.Knight
 import entity.building.*
@@ -8,22 +9,14 @@ import fraction.Fraction
 import fraction.Player
 import math.AABB
 import math.vec2
-import math.vec3
-import math.vec4
 import org.lwjgl.glfw.GLFW
-import sound.SimpleSound
-import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics2D
-import java.awt.event.KeyEvent
-import java.awt.event.MouseEvent
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.util.*
-import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.sin
-import kotlin.system.exitProcess
 
 open class Game: GameState(){
 	

@@ -1,8 +1,7 @@
 package state
 
+import core.Window
 import core.*
-import java.awt.Color
-import java.awt.Graphics2D
 
 import gametype.FFA
 import gametype.SuppressUprising

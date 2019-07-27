@@ -6,17 +6,17 @@ class G {
     companion object{
         lateinit var batch: SpriteBatch
        
-        var millImage = Texture("./res/Mill.png")
+        var millImage = Texture("/Mill.png")
     
-        var bgImage = Texture("./res/MenuBackground.png")
+        var bgImage = Texture("/MenuBackground.png")
         
-        var houseImage = Texture("./res/House.png")
-        var windmillImage = Texture("./res/Windmill.png")
-        var towerImage = Texture("./res/Tower.png")
-        var woodCampImage = Texture("./res/WoodCamp.png")
-        var quarryImage = Texture("./res/Quarry.png")
-        var barracksImage = Texture("./res/Barracks.png")
-        var barricadeImage = Texture("./res/Barricade.png")
+        var houseImage = Texture("/House.png")
+        var windmillImage = Texture("/Windmill.png")
+        var towerImage = Texture("/Tower.png")
+        var woodCampImage = Texture("/WoodCamp.png")
+        var quarryImage = Texture("/Quarry.png")
+        var barracksImage = Texture("/Barracks.png")
+        var barricadeImage = Texture("/Barricade.png")
         
         var gameBarImages = arrayListOf(
             houseImage,
@@ -29,7 +29,7 @@ class G {
         )
         
         
-        var crossImage = Texture("./res/Cross.png")
+        var crossImage = Texture("/Cross.png")
     }
 
 }

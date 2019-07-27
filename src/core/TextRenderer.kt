@@ -3,7 +3,6 @@ package core
 import math.vec2
 import math.vec3
 import math.vec4
-import org.lwjgl.opengl.GL30
 import org.lwjgl.opengl.GL45.*
 
 object TextRenderer {
@@ -23,7 +22,7 @@ object TextRenderer {
 	var depth = 0.0f
 	
 	fun init(){
-		fontTexture = Texture("./res/Font.png")
+		fontTexture = Texture("/Font.png")
 		
 		
 		val vertex = Shader("/shaders/text.vs.glsl", Shader.Type.VERTEX)

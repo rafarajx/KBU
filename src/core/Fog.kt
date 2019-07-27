@@ -2,7 +2,6 @@ package core
 
 import entity.building.Building
 import gametype.Game
-import math.vec2
 import org.lwjgl.opengl.*
 import org.lwjgl.opengl.GL45.*
 
@@ -118,7 +117,7 @@ object Fog{
 		
 		AlphaInverter.render(tex)
 		
-		//ImageRenderer.draw(tex, vec2(0), Window.size)
+		//ImageRenderer.draw(tex, vec2(0), core.Window.size)
 	}
 	
 }

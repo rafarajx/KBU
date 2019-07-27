@@ -72,7 +72,7 @@ object AlphaInverter {
 		
 		program.use()
 		
-		//GL20.glUniform2fv(resolutionUL, Window.size.array)
+		//GL20.glUniform2fv(resolutionUL, core.Window.size.array)
 		
 		glBindTexture(GL_TEXTURE_2D, textureId)
 		glActiveTexture(GL_TEXTURE0)
