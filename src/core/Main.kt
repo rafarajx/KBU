@@ -49,13 +49,13 @@ fun main(){
 		)
 	}
 
-	glfwSetWindowSizeCallback(Window.id, { id: Long, w: Int, h: Int -> Canvas.windowSizeCallback(w, h)})
-	glfwSetKeyCallback(Window.id, {window: Long, key: Int, scancode: Int, action: Int, mods: Int -> Canvas.keyCallback(key, scancode, action, mods)})
-	glfwSetMouseButtonCallback(Window.id, {window: Long, button: Int, action: Int, mods: Int -> Canvas.mouseButtonCallback(button, action, mods)})
-	glfwSetWindowPosCallback(Window.id, {window: Long, xpos: Int, ypos: Int -> Canvas.windowPosCallback(xpos, ypos)})
-	glfwSetCursorPosCallback(Window.id, {window: Long, xpos: Double, ypos: Double -> Canvas.cursorPosCallback(xpos.toFloat(), ypos.toFloat())})
-
-
+	glfwSetWindowSizeCallback(Window.id) { _: Long, w: Int, h: Int -> Canvas.windowSizeCallback(w, h)}
+	glfwSetKeyCallback(Window.id) { _: Long, key: Int, scancode: Int, action: Int, mods: Int -> Canvas.keyCallback(key, scancode, action, mods)}
+	glfwSetMouseButtonCallback(Window.id) { _: Long, button: Int, action: Int, mods: Int -> Canvas.mouseButtonCallback(button, action, mods)}
+	glfwSetWindowPosCallback(Window.id) { _: Long, xpos: Int, ypos: Int -> Canvas.windowPosCallback(xpos, ypos)}
+	glfwSetCursorPosCallback(Window.id) { _: Long, xpos: Double, ypos: Double -> Canvas.cursorPosCallback(xpos.toFloat(), ypos.toFloat())}
+	
+	
 	glfwMakeContextCurrent(Window.id)
 
 	glfwSwapInterval(1)

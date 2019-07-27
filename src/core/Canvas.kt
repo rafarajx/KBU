@@ -11,7 +11,6 @@ import kotlin.math.abs
 
 object Canvas {
 	
-	
 	const val SECOND: Long = 1_000_000_000
 	
 	var UPS: Long = 60
@@ -81,9 +80,6 @@ object Canvas {
 		Fog.init()
 		
 
-		
-
-		
 		G.batch = SpriteBatch(tileset)
 
 		/*
@@ -143,14 +139,10 @@ object Canvas {
 		StateManager.renderGL()
 		
 
-
 		G.batch.closePosition()
 		G.batch.closeTexCoords()
 
 		G.batch.render()
-		
-		
-		
 
 	}
 	

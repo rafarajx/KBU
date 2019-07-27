@@ -10,11 +10,8 @@ class Button(private val x: Int, private val y: Int, private val w: Int, private
 		return false
 	}
 	
-	fun setContent(content: BufferedImage) {
+	fun setText(content: BufferedImage) {
 		this.content = content
 	}
 	
-	fun render(g2d: Graphics2D) {
-		g2d.drawImage(content, x, y, w, h, null)
-	}
 }
