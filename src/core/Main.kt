@@ -66,7 +66,8 @@ fun main(){
 
 	Canvas.init()
 
-	Thread { Canvas.loopGL() }.start()
+	val clt = Thread { Canvas.loop() }
+	clt.start()
 
 	while (!glfwWindowShouldClose(Window.id)) {
 		glfwPollEvents()
@@ -84,6 +85,9 @@ fun main(){
 		glfwSwapBuffers(Window.id)
 
 	}
+	
+	Canvas.threadrunning = false
+	
 }
 
 

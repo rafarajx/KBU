@@ -371,9 +371,9 @@ open class Game: GameState(){
 			g2d.drawLine(0, MINIMAP_SIZE - 1, 0, 0)
 			
 			val cx1 = ((-camera.x + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).toInt()
-			val cx2 = ((-camera.x + MAP_SIZE / 2 + Canvas.width) / MAP_SIZE * MINIMAP_SIZE).toInt()
+			val cx2 = ((-camera.x + MAP_SIZE / 2 + Window.width) / MAP_SIZE * MINIMAP_SIZE).toInt()
 			val cy1 = ((-camera.y + MAP_SIZE / 2) / MAP_SIZE * MINIMAP_SIZE).toInt()
-			val cy2 = ((-camera.y + MAP_SIZE / 2 + Canvas.height) / MAP_SIZE * MINIMAP_SIZE).toInt()
+			val cy2 = ((-camera.y + MAP_SIZE / 2 + Window.height) / MAP_SIZE * MINIMAP_SIZE).toInt()
 			
 			g2d.drawLine(cx1, cy1, cx2, cy1)
 			g2d.drawLine(cx2, cy1, cx2, cy2)

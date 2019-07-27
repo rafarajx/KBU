@@ -9,7 +9,7 @@ import java.awt.Graphics2D
 import javax.imageio.ImageIO
 import kotlin.math.abs
 
-object Canvas : java.awt.Canvas() {
+object Canvas {
 	
 	
 	const val SECOND: Long = 1_000_000_000
@@ -23,6 +23,7 @@ object Canvas : java.awt.Canvas() {
 	var TUPS: Int = 0
 	var TFPS: Int = 0
 	
+	var threadrunning = true
 	
 	var TUPSA = ArrayList<Int>()
 	var TFPSA = ArrayList<Int>()
@@ -31,20 +32,6 @@ object Canvas : java.awt.Canvas() {
 	lateinit var bra: Texture
 	lateinit var tileset: Texture
 	
-	init {
-		
-		setSize(Window.width, Window.height)
-		isFocusable = true
-		addMouseListener(Input)
-		addMouseMotionListener(Input)
-		addKeyListener(Input)
-		
-		Screen.init(
-			ImageIO.read(Window::class.java.getResourceAsStream("/Tileset.png")),
-			ImageIO.read(Window::class.java.getResourceAsStream("/Font.png"))
-		)
-	}
-
 	fun windowSizeCallback(width: Int, height: Int){
 		println("$width $height")
 		Window.width = width
@@ -117,9 +104,9 @@ object Canvas : java.awt.Canvas() {
 	}
 	
 
-	fun loopGL() {
+	fun loop() {
 
-		while (true) {
+		while (threadrunning) {
 			val t1 = System.nanoTime()
 
 			StateManager.update()

@@ -2,6 +2,7 @@ package fraction
 
 import core.Canvas
 import core.Resources
+import core.Window
 import entity.building.*
 import gametype.Game
 import math.AABB
@@ -17,8 +18,8 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 		this.color = c
 		this.resources = resources
 		this.teamNumber = teamNumber
-		Game.camera.x = -start.x + Canvas.width / 2
-		Game.camera.y = -start.y + Canvas.height / 2
+		Game.camera.x = -start.x + Window.width / 2
+		Game.camera.y = -start.y + Window.height / 2
 		Tower(start, this, teamNumber).add()
 	}
 	

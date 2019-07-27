@@ -88,43 +88,6 @@ object GameOptions : GameState() {
 		}
 	}
 	
-	override fun render(g2d: Graphics2D) {
-		g2d.drawImage(Menu.BG, 0, 0, Canvas.width, Canvas.height, null)
-		g2d.color = Color(180, 180, 180, 180)
-		g2d.fill3DRect(50, 50, 780, 660, true)
-		Screen.drawString(g2d, "Game Options", 225, 100, 4.0)
-		Screen.drawString(g2d, "Game Mode:", 130, 200, 3.0)
-
-		if (optionNum == 0 && tick % 30 / 15 == 0)
-			Screen.drawString(g2d, "<" + GAME_MODES[gameMode] + ">", 520 - GAME_MODES[gameMode].length * 8, 200, 3.0)
-		else
-			Screen.drawString(g2d, "<" + GAME_MODES[gameMode] + ">", 520 - GAME_MODES[gameMode].length * 8, 202, 3.0)
-
-		when (gameMode) {
-			0 -> Screen.drawString(g2d, "Number of opponents:", 130, 250, 3.0)
-			1 -> Screen.drawString(g2d, "Number of allies:", 130, 250, 3.0)
-			else -> Screen.drawString(g2d, "Number of opponents:", 130, 250, 3.0)
-		}
-
-		if (optionNum == 1 && tick % 30 / 15 == 0)
-			Screen.drawString(g2d, "<$numberOfEnemies>", 620, 250, 3.0)
-		else
-			Screen.drawString(g2d, "<$numberOfEnemies>", 620, 252, 3.0)
-
-		Screen.drawString(g2d, "Difficulty:", 130, 300, 3.0)
-		if (optionNum == 2 && tick % 30 / 15 == 0)
-			Screen.drawString(g2d, "<" + DIFFICULTIES[difficulty] + ">", 500 - DIFFICULTIES[difficulty].length * 8, 300, 3.0)
-		else
-			Screen.drawString(g2d, "<" + DIFFICULTIES[difficulty] + ">", 500 - DIFFICULTIES[difficulty].length * 8, 302, 3.0)
-
-		for (i in 0 until S1.length) {
-			if (tick % (S1.length * 7) / 7 == i)
-				Screen.drawString(g2d, S1.substring(i, i + 1), 240 + i * 16, 664, 2.0)
-			else
-				Screen.drawString(g2d, S1.substring(i, i + 1), 240 + i * 16, 666, 2.0)
-		}
-	}
-
 	override fun renderGL() {
 		ImageRenderer.draw(G.bgImage, vec2(0), vec2(Window.width, Window.height))
 
