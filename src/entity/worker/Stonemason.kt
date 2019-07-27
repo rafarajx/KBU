@@ -34,17 +34,18 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 	}
 	
 	var stonemason = Sprite()
+	val stone = Sprite()
 	
 	override fun renderGL() {
 		stonemason.updatePosition(p - edgelength / 2, vec2(edgelength))
 
 		if (target == null) {
-			//Screen.drawTile(g2d, 1, 8, p - edgelength / 2, edgelength, edgelength)
 			stonemason.updateTexCoords(vec2(1 * 16, 8 * 16), vec2(16))
 		} else {
 			if (hasStone) {
 				drawAnimatedEntityGL(stonemason, 1, 9)
 				//Screen.drawTile(g2d, 8, 0, p.x.toInt() - 8, p.y.toInt() - 14, 16, 16)
+				stone.updatePosition(p - vec2(8, 2), vec2(16))
 			} else {
 				drawAnimatedEntityGL(stonemason, 1, 8)
 			}
@@ -107,11 +108,14 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 
 	override fun add() {
 		G.batch.add(stonemason)
+		G.batch.add(stone)
+		stone.updateTexCoords(vec2(8 * 16, 0), vec2(16))
 		owner.entityList.add(this)
 	}
 	
 	@Synchronized override fun remove(){
 		G.batch.remove(stonemason)
+		G.batch.remove(stone)
 		owner.entityList.remove(this)
 	}
 }

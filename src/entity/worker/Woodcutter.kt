@@ -15,6 +15,8 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 
 	companion object{
 		private const val FULL_HEALTH = 50f
+		const val EDGE_LENGTH = 16
+		const val HALF_EDGE = 16
 	}
 	
 	init {
@@ -22,27 +24,26 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 		super.owner = owner
 		super.teamNumber = teamIndex
 		field = AABB(p, edgelength / 2)
-		edgelength = 16
+		edgelength = EDGE_LENGTH
+		halfedge = HALF_EDGE
 		health = FULL_HEALTH
 		damage = 10
 		speed = 0.75f
 		owner.population++
 	}
 	
-	var woodcutter = Sprite()
+	val woodcutter = Sprite()
+	val wood = Sprite()
 
 	override fun renderGL() {
 		woodcutter.updatePosition(p - edgelength / 2, vec2(edgelength))
 		if (target == null) {
-			//Screen.drawTile(g2d, 1, 8, p - edgelength / 2, edgelength, edgelength)
-
 			woodcutter.updateTexCoords(vec2(1 * 16, 8 * 16), vec2(16))
-
 		} else {
 			if (hasWood) {
 				drawAnimatedEntityGL(woodcutter, 1, 9)
-				//drawAnimatedEntity(g2d, 1, 9)
 				//Screen.drawTile(g2d, 7, 0, p.x.toInt() - 8, p.y.toInt() - 14, edgelength, edgelength)
+				wood.updatePosition(p - vec2(8, 2), vec2(edgelength))
 			} else {
 				drawAnimatedEntityGL(woodcutter, 1, 8)
 			}
@@ -100,12 +101,15 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 
 	override fun add() {
 		G.batch.add(woodcutter)
+		G.batch.add(wood)
+		wood.updateTexCoords(vec2(7 * 16, 0), vec2(16))
 		owner.entityList.add(this)
 	}
 
 	@Synchronized
 	override fun remove(){
 		G.batch.remove(woodcutter)
+		G.batch.remove(wood)
 		owner.entityList.remove(this)
 	}
 }

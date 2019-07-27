@@ -1,5 +1,6 @@
 package core
 
+import gametype.Game
 import math.vec2
 import math.vec3
 import math.vec4
@@ -17,12 +18,16 @@ object RectRenderer {
 	object filldata{
 		var resolutionUL = 0
 		var depthUL = 0
+		var cameraUL = 0
+		
 		var positionAL = 0
 		var colorAL = 0
 	}
 	object drawdata{
 		var resolutionUL = 0
 		var depthUL = 0
+		var cameraUL = 0
+		
 		var positionAL = 0
 		var colorAL = 0
 	}
@@ -41,6 +46,7 @@ object RectRenderer {
 		
 		filldata.resolutionUL = glGetUniformLocation(program.id, "resolution")
 		filldata.depthUL = glGetUniformLocation(program.id, "depth")
+		filldata.cameraUL = glGetUniformLocation(program.id, "camera")
 		glProgramUniform2f(program.id, filldata.resolutionUL, Window.width.toFloat(), Window.height.toFloat())
 		
 		
@@ -57,6 +63,7 @@ object RectRenderer {
 		
 		drawdata.resolutionUL = glGetUniformLocation(drawprogram.id, "resolution")
 		drawdata.depthUL = glGetUniformLocation(drawprogram.id, "depth")
+		drawdata.cameraUL = glGetUniformLocation(drawprogram.id, "camera")
 		glProgramUniform2f(drawprogram.id, drawdata.resolutionUL, Window.width.toFloat(), Window.height.toFloat())
 	}
 	
@@ -173,12 +180,19 @@ object RectRenderer {
 		glDeleteVertexArrays(vao)
 		glBindVertexArray(0)
 		
-		
 		glDeleteBuffers(vbo)
 		glDeleteBuffers(cbo)
-		
 	}
 	
+	fun enableCamera(){
+		glProgramUniform2fv(program.id, filldata.cameraUL, Game.camera.array)
+		glProgramUniform2fv(drawprogram.id, drawdata.cameraUL, Game.camera.array)
+	}
+	
+	fun disableCamera(){
+		glProgramUniform2fv(program.id, filldata.cameraUL, floatArrayOf(0f, 0f))
+		glProgramUniform2fv(drawprogram.id, drawdata.cameraUL, floatArrayOf(0f, 0f))
+	}
 	
 	fun setColor(color: vec4) {
 		this.color = color

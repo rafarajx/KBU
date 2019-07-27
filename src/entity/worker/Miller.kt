@@ -35,19 +35,19 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 		owner.population++
 	}
 	
-	var miller = Sprite()
+	val miller = Sprite()
+	val wheat = Sprite()
 	
 	override fun renderGL() {
 		miller.updatePosition(p - edgelength / 2, vec2(edgelength))
 		if (target == null) {
-			//Screen.drawTile(g2d, 1, 8, p - edgelength / 2, edgelength, edgelength)
 			miller.updateTexCoords(vec2(1 * 16, 8 * 16), vec2(16))
 		} else {
 			if (wheatNum == 0) {
 				drawAnimatedEntityGL(miller, 1, 8)
 			} else {
 				drawAnimatedEntityGL(miller, 1, 9)
-				//Screen.drawTile(g2d, 9, 0, p.x.toInt() - edgelength / 2, p.y.toInt() - edgelength / 2 - 6, edgelength, edgelength)
+				wheat.updatePosition(p - vec2(8, 2), vec2(edgelength))
 			}
 		}
 		if (Game.showHealth) {
@@ -125,12 +125,15 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 
 	override fun add() {
 		G.batch.add(miller)
+		G.batch.add(wheat)
+		wheat.updateTexCoords(vec2(9 * 16, 0), vec2(16))
 		owner.entityList.add(this)
 	}
 
 	@Synchronized
 	override fun remove() {
 		G.batch.remove(miller)
+		G.batch.remove(wheat)
 		owner.entityList.remove(this)
 	}
 }

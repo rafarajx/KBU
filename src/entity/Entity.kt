@@ -33,10 +33,17 @@ open class Entity (var owner: Fraction){
 		var random = Random()
 		
 		fun drawBarGL(pos: vec2, current: Float, max: Float, color: vec3) {
+			RectRenderer.enableCamera()
+			
+			RectRenderer.depth = -0.01f
 			RectRenderer.setColor(color)
 			RectRenderer.fill(pos - vec2(6, 0), vec2(current / max * 13f, 3f))
-			//g2d.color = Color.BLACK
-			//g2d.drawRect(x - 6, y, (current.toFloat() / max * 13).toInt(), 3)
+			
+			RectRenderer.depth = -0.02f
+			RectRenderer.setColor(0.0f)
+			RectRenderer.draw(pos - vec2(6, 0), vec2(current / max * 13f, 3f))
+			
+			RectRenderer.disableCamera()
 		}
 	}
 

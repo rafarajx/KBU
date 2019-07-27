@@ -47,8 +47,8 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 
 
 		drawBarGL(p - vec2(0f, 10f), health, 200f, Constants.RED)
-		//if (owner.population < owner.maxPopulation && owner.resources.food > 4)
-		//	Building.drawBar(g2d, p, tick % 1000, 1000, Color.ORANGE)
+		if (owner.population < owner.maxPopulation && owner.resources.food > 4)
+			drawBarGL(p, (tick % 1000).toFloat(), 1000f, Constants.ORANGE)
 	}
 	
 	override fun update() {

@@ -64,6 +64,7 @@ open class Game: GameState(){
 	}
 
 	override fun keyCallback(key: Int, scancode: Int, action: Int, mods: Int) {
+		println("keyCallback: $action")
 		when(key) {
 			GLFW.GLFW_KEY_LEFT -> if(action == 1)
 				if (selectedBuilding > 0) selectedBuilding--
@@ -77,7 +78,12 @@ open class Game: GameState(){
 				Canvas.UPS -= 60
 				Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
 			}
-			GLFW.GLFW_KEY_SPACE -> showHealth = true
+			GLFW.GLFW_KEY_SPACE ->
+				if (action == 1) {
+					showHealth = true
+				} else if (action == 0) {
+					showHealth = false
+				}
 			GLFW.GLFW_KEY_F -> {
 				if(action == 1)
 					fogEnabled = !fogEnabled
