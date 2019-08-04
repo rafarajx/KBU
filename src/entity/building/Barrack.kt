@@ -19,6 +19,8 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		const val MAX_HEALTH = 400f
 	}
 	
+	var barracks = Sprite()
+	
 	init {
 		super.p = p
 		super.owner = owner
@@ -28,9 +30,8 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
 		health = MAX_HEALTH
+		sprites = arrayOf(barracks)
 	}
-	
-	var barracks = Sprite()
 	
 	override fun renderGL() {
 
@@ -56,17 +57,17 @@ class Barrack(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	}
 	
 	override fun add(){
-		G.batch.add(barracks)
 		barracks.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
 		barracks.updateTexCoords(vec2(0, 80), vec2(16))
 		owner.buildingList.add(this)
 		owner.barrackList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(barracks)
 		owner.buildingList.remove(this)
 		owner.barrackList.remove(this)
+		World.remove(this)
 	}
 	
 	override fun hurt(dmg: Int) {

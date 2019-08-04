@@ -17,6 +17,8 @@ class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		private const val RANGE = 200
 	}
 	
+	var barricade = Sprite()
+	
 	init {
 		super.p = p
 		super.owner = owner
@@ -26,9 +28,9 @@ class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
 		health = 500f
+		sprites = arrayOf(barricade)
 	}
 	
-	var barricade = Sprite()
 	
 	override fun renderGL() {
 		
@@ -48,17 +50,17 @@ class Barricade(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	}
 	
 	override fun add(){
-		G.batch.add(barricade)
 		barricade.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
 		barricade.updateTexCoords(vec2(0, 96), vec2(16))
 		owner.buildingList.add(this)
 		owner.barricadeList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(barricade)
 		owner.buildingList.remove(this)
 		owner.barricadeList.remove(this)
+		World.remove(this)
 	}
 	
 	override fun hurt(dmg: Int) {

@@ -5,13 +5,14 @@ import org.lwjgl.Version
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryStack.stackPush
+import state.StateManager
 
 
 open class Window {
 	
 	companion object {
 		const val GAME_TITLE = "Kung-fu Barbarian Unit v1.2"
-		const val BILLION = 1000000000
+		const val BILLION = 1_000_000_000
 
 		var id: Long = 0
 		var width = 1000
@@ -24,7 +25,20 @@ open class Window {
 
 }
 
-var TUPSA = ArrayList<Int>()
+var updatethreadrunning = true
+
+var UPS: Long = 60
+var UPDATE_TIME = 1.0 / UPS
+var TUPS: Int = 0
+var TUPSA = ArrayList<Double>()
+
+
+var FPS: Int = 60
+var FPScounter = 0
+var FRAME_TIME = 1.0 / FPS
+var TFPS: Int = 0
+var TFPSA = ArrayList<Double>()
+
 
 fun main(){
 	
@@ -88,29 +102,62 @@ fun main(){
 	
 	Canvas.init()
 
-	val clt = Thread { Canvas.loop() }
-	clt.start()
+	//val clt = Thread { loop() }
+	//clt.start()
 
+	Timer.addEvery(1.0f) {
+		FPS = FPScounter
+		FPScounter = 0
+	}
+	
 	while (!glfwWindowShouldClose(Window.id)) {
 		glfwPollEvents()
 
-		val t1 = System.nanoTime()
+		val t1 = glfwGetTime()
 		
 		Canvas.renderGL()
 		
-		val t2 = System.nanoTime()
+		StateManager.update()
+		Timer.update()
+		
+		val t2 = glfwGetTime()
 		val d = t2 - t1
-		TUPSA.add((Canvas.SECOND / d).toInt())
-		if(TUPSA.size > 60) TUPSA.removeAt(0)
-		Canvas.TFPS = TUPSA.average().toInt()
+		
+		FPScounter++
+		
+		TFPSA.add(1.0 / d)
+		if(TFPSA.size > 60) TFPSA.removeAt(0)
+		TFPS = TFPSA.average().toInt()
 		
 		glfwSwapBuffers(Window.id)
-
 	}
 	
-	Canvas.threadrunning = false
+	updatethreadrunning = false
 	
 }
 
-
+/*
+fun loop() {
+	
+	while (updatethreadrunning) {
+		val t1 = glfwGetTime()
+		
+		StateManager.update()
+		Timer.update()
+		
+		val t2 = glfwGetTime()
+		val deltatime = t2 - t1 //time taken to complete update
+		var st = 1.0 / UPS - deltatime
+		if(st < 0) st = 0.0
+		TUPSA.add(deltatime)
+		if(TUPSA.size > UPS) TUPSA.removeAt(0)
+		TUPS = (1.0 / TUPSA.average()).toInt()
+		
+		val millis = st * 1000.0
+		val nanos = (millis - floor(millis)) * 1_000_000.0
+		
+		Thread.sleep(millis.toLong(), nanos.toInt())
+	}
+}
+*/
 

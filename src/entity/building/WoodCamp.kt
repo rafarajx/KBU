@@ -3,12 +3,9 @@ package entity.building
 import core.*
 import entity.nature.Cloud
 import fraction.Fraction
-import gametype.Game
 import math.AABB
 import math.Circle
 import math.vec2
-import java.awt.Color
-import java.awt.Graphics2D
 
 class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 
@@ -19,7 +16,9 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		val COST = Resources(20, 5, 0, 0)
 		private const val MAX_HEALTH = 200f
 	}
-
+	
+	var woodcamp = Sprite()
+	
 	init {
 		super.p = p
 		this.owner = owner
@@ -29,9 +28,9 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
 		health = MAX_HEALTH
+		sprites = arrayOf(woodcamp)
 	}
 	
-	var woodcamp = Sprite()
 
 	override fun renderGL() {
 		//g2d.drawImage(Screen.woodCamp, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH, null)
@@ -42,9 +41,7 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 
 	override fun update() {
 		if (health <= 0) die()
-
-		if (tick % 100 == 0 || tick % 173 == 0)
-			Cloud(Game.nature, p - vec2(3.0f, 5.0f)).add()
+		
 		tick++
 	}
 
@@ -53,18 +50,26 @@ class WoodCamp(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 	}
 	
 	override fun add(){
-		G.batch.add(woodcamp)
+		Timer.addEvery(1.6f) {
+			Cloud(owner, p - vec2(3.0f, 5.0f)).add()
+		}
+		
+		Timer.addEvery(2.9f) {
+			Cloud(owner, p - vec2(3.0f, 5.0f)).add()
+		}
+		
 		woodcamp.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
 		woodcamp.updateTexCoords(vec2(0, 48), vec2(16))
 		owner.buildingList.add(this)
 		owner.woodCampList.add(this)
+		World.add(this)
 		//owner!!.woodCampTree.add(this)
 	}
 	
 	@Synchronized override fun remove() {
-		G.batch.remove(woodcamp)
 		owner.buildingList.remove(this)
 		owner.woodCampList.remove(this)
+		World.remove(this)
 		//qt!!.remove()
 	}
 

@@ -1,18 +1,12 @@
 package entity.worker
 
-import core.Constants
-import core.G
-import core.Screen
-import core.Sprite
+import core.*
 import entity.Entity
 import entity.building.Windmill
 import fraction.Fraction
 import gametype.Game
 import math.AABB
 import math.vec2
-import sound.SimpleSound
-import java.awt.Color
-import java.awt.Graphics2D
 import kotlin.math.sqrt
 
 class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
@@ -22,6 +16,9 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	companion object{
 		private const val FULL_HEALTH = 50f
 	}
+	
+	val miller = Sprite()
+	val wheat = Sprite()
 	
 	init {
 		super.p = p
@@ -33,10 +30,10 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 		speed = 0.75f
 		field = AABB(p, edgelength / 2)
 		owner.population++
+		sprites = arrayOf(miller, wheat)
+		static = false
 	}
 	
-	val miller = Sprite()
-	val wheat = Sprite()
 	
 	override fun renderGL() {
 		miller.updatePosition(p - edgelength / 2, vec2(edgelength))
@@ -71,15 +68,6 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 				}
 			}
 		} else {
-			if (wheatNum == 0) {
-				if (tick % 15 == 0) {
-					target = getNearestEntity(Game.wheatList)
-				}
-				if (tick % 400 == 0) gatherWheat()
-			} else {
-				if (tick % 15 == 0) target = windmill
-				if (tick % 100 == 0) leaveWheat()
-			}
 			if (target != null) {
 				val delta = (target!!.p - p)
 				val d = sqrt(delta.square().sum())
@@ -87,9 +75,7 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 				p += move * speed
 			}
 		}
-		if (tick % 1500 == 0) {
-			if (tick % 1500 == 0) owner.resources.food--
-		}
+		
 		tick++
 	}
 	
@@ -102,7 +88,7 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	}
 	
 	private fun gatherWheat() {
-		for (wheat in Game.wheatList) {
+		for (wheat in World.wheatList) {
 			if (wheat.field!!.intersects(field!!)) {
 				wheatNum = wheat.gather()
 				return
@@ -111,7 +97,6 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	}
 	
 	override fun die() {
-		SimpleSound.die.play()
 		owner.population--
 		if(windmill != null) {
 			if (windmill!!.miller[0] != null) {
@@ -124,16 +109,40 @@ class Miller(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	}
 
 	override fun add() {
-		G.batch.add(miller)
-		G.batch.add(wheat)
-		wheat.updateTexCoords(vec2(9 * 16, 0), vec2(16))
+		Timer.addEvery(25.0f) {
+			owner.resources.food--
+		}
+		
+		Timer.addEvery(0.25f){
+			if (windmill != null && wheatNum == 0) {
+				target = getNearestEntity(World.wheatList)
+			}
+		}
+		Timer.addEvery(6f){
+			if (windmill != null && wheatNum == 0){
+				gatherWheat()
+				wheat.updateTexCoords(vec2(9 * 16, 0), vec2(16))
+			}
+		}
+		Timer.addEvery(0.25f){
+			if (windmill != null && wheatNum != 0){
+				target = windmill
+			}
+		}
+		Timer.addEvery(1f){
+			if (windmill != null && wheatNum != 0){
+				leaveWheat()
+				wheat.updateTexCoords(vec2(0, 0), vec2(0))
+			}
+		}
+		
 		owner.entityList.add(this)
+		World.add(this)
 	}
 
 	@Synchronized
 	override fun remove() {
-		G.batch.remove(miller)
-		G.batch.remove(wheat)
 		owner.entityList.remove(this)
+		World.remove(this)
 	}
 }

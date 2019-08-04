@@ -1,6 +1,5 @@
 package entity
 
-import core.G
 import core.Screen
 import core.Sprite
 import fraction.Fraction
@@ -47,12 +46,10 @@ class Zombie(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	}
 
 	override fun add() {
-		G.batch.add(zombie)
 		owner.entityList.add(this)
 	}
 	
 	override fun remove() {
-		G.batch.remove(zombie)
 		owner.entityList.remove(this)
 	}
 	

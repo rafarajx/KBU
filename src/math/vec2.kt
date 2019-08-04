@@ -13,8 +13,18 @@ data class vec2(var x: Float, var y: Float) {
 	
 	constructor(x: Int, y: Int) : this(x.toFloat(), y.toFloat())
 	
-	override operator fun equals(v: Any?): Boolean {
-		return v is vec2 && x == v.x && y == v.y
+	operator fun compareTo(other: vec2): Int{
+		if(x < other.x && y < other.y) return -1
+		if(x > other.x && y > other.y) return 1
+		return 0
+	}
+	
+	override operator fun equals(other: Any?): Boolean {
+		return other is vec2 && x == other.x && y == other.y
+	}
+	
+	operator fun unaryMinus(): vec2 {
+		return vec2(-x, -y)
 	}
 	
 	operator fun plus(v: vec2): vec2 {

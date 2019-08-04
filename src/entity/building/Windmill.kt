@@ -25,7 +25,9 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		private const val RANGE = 200
 		private const val MAX_HEALTH = 200f
 	}
-
+	
+	var windmill = Sprite()
+	
 	init {
 		super.p = p
 		super.owner = owner
@@ -35,9 +37,9 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
 		health = MAX_HEALTH
+		sprites = arrayOf(windmill)
 	}
 	
-	var windmill = Sprite()
 
 	override fun renderGL() {
 
@@ -61,12 +63,12 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 			val x1 = Building.random.nextInt(120) - 60 + p.x
 			val y1 = Building.random.nextInt(120) - 60 + p.y
 			val r = AABB(vec2(x1, y1), 0.5f)
-			for (fraction in Game.fractionList)
+			for (fraction in World.fractionList)
 				for (building in fraction.buildingList)
 					if (building.field!!.intersects(r)) return
-			for (nature in Game.natureList)
+			for (nature in World.natureList)
 				if (nature.field!!.intersects(r)) return
-			Wheat(Game.nature, vec2(x1, y1)).add()
+			Wheat(World.nature, vec2(x1, y1)).add()
 		}
 		if (tick % 15L == 1L) {
 			theta += 0.15
@@ -81,17 +83,17 @@ class Windmill(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 	}
 	
 	override fun add(){
-		G.batch.add(windmill)
-		windmill.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
+		windmill.updatePosition(p - HALF_EDGE, vec2(edgelength))
 		windmill.updateTexCoords(vec2(0, 16), vec2(16))
 		owner.buildingList.add(this)
 		owner.millList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove() {
-		G.batch.remove(windmill)
 		owner.buildingList.remove(this)
 		owner.millList.remove(this)
+		World.remove(this)
 	}
 
 	override fun hurt(dmg: Int) {

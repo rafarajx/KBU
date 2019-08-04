@@ -2,6 +2,7 @@ package fraction
 
 import core.Resources
 import core.Window
+import core.World
 import entity.building.*
 import gametype.Game
 import math.AABB
@@ -27,16 +28,7 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
 
 	override fun update() {
 		if (buildingList.size == 0) isDefeated = true
-        
-        for (i in entityList.indices) {
-            if(entityList.indices.contains(i))
-                entityList[i].update()
-        }
-        for (i in buildingList.indices) {
-            if(buildingList.indices.contains(i))
-                buildingList[i].update()
-        }
-        
+  
 		if (isDefeated) return
 		if (tick % 1000 == 0) {
 			val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
@@ -49,7 +41,7 @@ class Uprising(start: vec2, color: Color, baseAIRange: Int, teamNumber: Int) : F
 	override fun placeBuilding(id: Int, p: vec2) {
 		
 		val r = AABB(p, 16)
-		if (isColliding(r)) {
+		if (World.isColliding(r)) {
 			this.AIRange += 100
 			return
 		}

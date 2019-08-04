@@ -70,13 +70,13 @@ open class Game: GameState(){
 				if (selectedBuilding > 0) selectedBuilding--
 			GLFW.GLFW_KEY_RIGHT -> if(action == 1)
 				if(selectedBuilding < MENU_BAR.size - 1) selectedBuilding++
-			GLFW.GLFW_KEY_KP_ADD -> if(action == 1) if (Canvas.UPS + 60 <= 600) {
-				Canvas.UPS += 60
-				Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
+			GLFW.GLFW_KEY_KP_ADD -> if(action == 1) if (UPS + 60 <= 600) {
+				UPS += 60
+				UPDATE_TIME = 1.0 / UPS
 			}
-			GLFW.GLFW_KEY_KP_SUBTRACT -> if(action == 1) if(Canvas.UPS - 60 >= 60) {
-				Canvas.UPS -= 60
-				Canvas.UPDATE_TIME = Canvas.SECOND / Canvas.UPS
+			GLFW.GLFW_KEY_KP_SUBTRACT -> if(action == 1) if(UPS - 60 >= 60) {
+				UPS -= 60
+				UPDATE_TIME = 1.0 / UPS
 			}
 			GLFW.GLFW_KEY_SPACE ->
 				if (action == 1) {
@@ -88,6 +88,10 @@ open class Game: GameState(){
 				if(action == 1)
 					fogEnabled = !fogEnabled
 			}
+			GLFW.GLFW_KEY_F1 -> {
+				if(action == 1)
+					drawchunks = !drawchunks
+			}
 		}
 	}
 
@@ -98,6 +102,9 @@ open class Game: GameState(){
 		var mousePos0 = vec2(0, 0)
 		var mousePos1 = vec2(0, 0)
 
+		var drawchunks = false
+		
+		var speed = 1.0f
 
 		var fogEnabled = false
 		var x1 = 0.0f
@@ -112,26 +119,10 @@ open class Game: GameState(){
 		var mouseX = 0
 		var mouseY = 0
 		var mousePos: vec2 = vec2(0, 0)
-		var fractionList = ArrayList<Fraction>()
+		
 		lateinit var player: Player
-		var nature: Fraction = Fraction()
-		
-		var natureList = ArrayList<Nature>()
-		var cloudList = ArrayList<Cloud>()
-		var flowersList = ArrayList<Flowers>()
-		var grassList = ArrayList<Grass>()
-		var rockList = ArrayList<Rock>()
-		var treeList = ArrayList<Tree>()
-		var wheatList = ArrayList<Wheat>()
-		
-		//var rockTree = QuadTree<Rock>(vec2(-2000, -2000), vec2(2000, 2000))
-		var treeTree = QuadTree<Tree>(null, vec2(-3000, -3000), vec2(3000, 3000))
-		var rockTree = QuadTree<Rock>(null, vec2(-3000, -3000), vec2(3000, 3000))
 		
 		
-		var knightList = ArrayList<Knight>()
-		
-		var knightTree = QuadTree<Knight>(null, vec2(-3000, -3000), vec2(3000, 3000))
 		
 		private val MENU_BAR = arrayOf(
 			IntArray(2),
@@ -157,56 +148,9 @@ open class Game: GameState(){
 		
 		}
 
-		fun setupNature(fractions: Int) {
-			
-			for(i in 0..30){
-				Tree(nature, vec2(i * 5, i * 5)).add()
-			}
-			
-			for (i in 0..5000) {
-				val x = random.nextFloat() * 6000.0f - 3000.0f
-				val y = random.nextFloat() * 6000.0f - 3000.0f
-				Tree(nature, vec2(x, y)).add()
-			}
-			for (i in 0..100) {
-				val x = random.nextFloat() * 6000.0f - 3000.0f
-				val y = random.nextFloat() * 6000.0f - 3000.0f
-				if (!isColliding(AABB(vec2(x, y), 8.0f))) Flowers(nature, vec2(x, y)).add()
-			}
-			for (i in 0..100) {
-				val x = random.nextFloat() * 6000.0f - 3000.0f
-				val y = random.nextFloat() * 6000.0f - 3000.0f
-				if (!isColliding(AABB(vec2(x, y), 8.0f))) Grass(nature, vec2(x, y)).add()
-			}
-			for (i1 in 0 until 4 * fractions) {
-				val x1 = random.nextFloat() * 4000.0f - 2000.0f
-				val y1 = random.nextFloat() * 4000.0f - 2000.0f
-				for (i2 in 0..9) {
-					val x2 = random.nextFloat() * 200.0f
-					val y2 = random.nextFloat() * 200.0f
-					if (!isColliding(AABB(vec2(x1 + x2, y1 + y2), 8.0f))) Rock(nature, vec2(x1 + x2, y1 + y2)).add()
-				}
-			}
-		}
 		
-		private fun isColliding(r: AABB): Boolean {
-			for (f in fractionList.indices) {
-				val fraction = fractionList[f]
-				for (j in fraction.buildingList.indices) {
-					val building = fraction.buildingList[j]
-					if (building.field!!.intersects(r)) return true
-				}
-				for (j in fraction.entityList.indices) {
-					val entity = fraction.entityList[j]
-					if (entity.field!!.intersects(r)) return true
-				}
-			}
-			for (i in natureList.indices) {
-				val nature = natureList[i]
-				if (nature.field!!.intersects(r)) return true
-			}
-			return false
-		}
+		
+		
 		
 		fun drawObjectsGL() {
 
@@ -225,6 +169,7 @@ open class Game: GameState(){
 			g2d.fillRect(qt.aabb.ul.x.toInt(), qt.aabb.ul.y.toInt(), (qt.aabb.dr.x - qt.aabb.ul.x).toInt(), (qt.aabb.dr.y - qt.aabb.ul.y).toInt())
 			*/
 
+			/*
 			for(i in fractionList.indices){
 				if(fractionList.indices.contains(i))
 					fractionList[i].renderBuildingsGL()
@@ -235,17 +180,18 @@ open class Game: GameState(){
 					fractionList[i].renderEntitiesGL()
 			}
 
-			for(i in natureList.indices){
-				if(natureList.indices.contains(i))
-					natureList[i].renderGL()
+			for(i in World.natureList.indices){
+				if(World.natureList.indices.contains(i))
+					World.natureList[i].renderGL()
 			}
 
 			for(i in fractionList.indices){
 				if(fractionList.indices.contains(i))
 					fractionList[i].drawStatusGL()
 			}
+			*/
 			
-			
+			World.renderGL()
 
 			/*
 			val t = treeTree.nearest(vec2(mouseX - camera.x, mouseY - camera.y))
@@ -261,16 +207,19 @@ open class Game: GameState(){
 			createMinimap()
 			//g2d.drawImage(minimap, Canvas.width - MINIMAP_SIZE - 5, Canvas.height - MINIMAP_SIZE - 5, null)
 			
+			RectRenderer.disableCamera()
 			RectRenderer.depth = -0.1f
 			RectRenderer.setColor(0.3f, 0.3f, 0.3f, 1.0f)
 			RectRenderer.fill(vec2(0, Window.height - 70), vec2(320, 70))
 			
 			TextRenderer.depth = -0.2f
 			TextRenderer.setColor(0.0f)
-			TextRenderer.draw("FPS: " + Canvas.FPS, vec2(5 + 1, Window.height - (15 + 1)))
-			TextRenderer.draw("UPS: " + Canvas.UPS, vec2(5 + 1, Window.height - (30 + 1)))
-			TextRenderer.draw("TUPS: " + Canvas.TUPS, vec2(5 + 1, Window.height - (45 + 1)))
-			TextRenderer.draw("TFPS: " + Canvas.TFPS, vec2(5 + 1, Window.height - (60 + 1)))
+			TextRenderer.draw("FPS: " + FPS, vec2(5 + 1, Window.height - (15 + 1)))
+			TextRenderer.draw("UPS: " + UPS, vec2(5 + 1, Window.height - (30 + 1)))
+			TextRenderer.draw("TUPS: " + TUPS, vec2(5 + 1, Window.height - (45 + 1)))
+			TextRenderer.draw("TFPS: " + TFPS, vec2(5 + 1, Window.height - (60 + 1)))
+			TextRenderer.draw("NOS: " + batch.numberOfSprites, vec2(5 + 1, Window.height - (75 + 1)))
+			TextRenderer.draw("RC: " + batch.renderablechunks, vec2(5 + 1, Window.height - (90 + 1)))
 			TextRenderer.setColor(0.0f)
 			TextRenderer.draw("Wood: " + player.resources.wood, vec2(115 + 1, Window.height - (15 + 1)))
 			TextRenderer.draw("Stone: " + player.resources.stone, vec2(115 + 1, Window.height - (30 + 1)))
@@ -284,10 +233,12 @@ open class Game: GameState(){
 			
 			TextRenderer.depth = -0.3f
 			TextRenderer.setColor(1.0f)
-			TextRenderer.draw("FPS: " + Canvas.FPS, vec2(5, Window.height - 15))
-			TextRenderer.draw("UPS: " + Canvas.UPS, vec2(5, Window.height - 30))
-			TextRenderer.draw("TUPS: " + Canvas.TUPS, vec2(5, Window.height - 45))
-			TextRenderer.draw("TFPS: " + Canvas.TFPS, vec2(5, Window.height - 60))
+			TextRenderer.draw("FPS: $FPS", vec2(5, Window.height - 15))
+			TextRenderer.draw("UPS: $UPS", vec2(5, Window.height - 30))
+			TextRenderer.draw("TUPS: $TUPS", vec2(5, Window.height - 45))
+			TextRenderer.draw("TFPS: $TFPS", vec2(5, Window.height - 60))
+			TextRenderer.draw("NOS: " + batch.numberOfSprites, vec2(5, Window.height - 75))
+			TextRenderer.draw("RC: " + batch.renderablechunks, vec2(5, Window.height - 90))
 			TextRenderer.setColor(0.4f, 0.8f, 0.08f)
 			TextRenderer.draw("Wood: " + player.resources.wood, vec2(115, Window.height - 15))
 			TextRenderer.draw("Stone: " + player.resources.stone, vec2(115, Window.height - 30))
@@ -313,16 +264,16 @@ open class Game: GameState(){
 			
 			for (i in MENU_BAR.indices) {
 				ImageRenderer.depth = -0.3f
-				ImageRenderer.draw(G.gameBarImages[i], vec2(48 * i + 10, 10), vec2(48, 48))
+				ImageRenderer.draw(gameBarImages[i], vec2(48 * i + 10, 10), vec2(48, 48))
 				if (player.isDefeated || !player.resources.enough(COSTS[i])) {
 					ImageRenderer.depth = -0.4f
-					ImageRenderer.draw(G.crossImage, vec2(48 * i + 10, 10), vec2(48, 48))
+					ImageRenderer.draw(crossImage, vec2(48 * i + 10, 10), vec2(48, 48))
 				}
 			}
 			
 			TextRenderer.setColor(0.0f)
 
-			if (fractionList.size < 2 && !player.isDefeated) {
+			if (World.fractionList.size < 2 && !player.isDefeated) {
 				val bla: Float = (tick / 20.0f % Constants.pi) * 2.0f
 				val youWonScale: Float = 4.0f + sin(bla)
 				val youWonX = Window.width / 2 - Screen.LETTER_WIDTH * youWon.length / 2 * youWonScale
@@ -342,9 +293,9 @@ open class Game: GameState(){
 			val g2d = minimap.graphics as Graphics2D
 			g2d.color = Color.BLACK
 			g2d.fillRect(0, 0, MINIMAP_SIZE, MINIMAP_SIZE)
-			for (i in fractionList.indices) {
-				if(!fractionList.indices.contains(i)) return
-				val fraction = fractionList[i]
+			for (i in World.fractionList.indices) {
+				if(!World.fractionList.indices.contains(i)) return
+				val fraction = World.fractionList[i]
 				g2d.color = fraction.color
 				for (i in fraction.buildingList.indices) {
 					if(fraction.buildingList.indices.contains(i)) {
@@ -378,19 +329,6 @@ open class Game: GameState(){
 			g2d.drawLine(cx2, cy1, cx2, cy2)
 			g2d.drawLine(cx2, cy2, cx1, cy2)
 			g2d.drawLine(cx1, cy2, cx1, cy1)
-		}
-		
-		fun updateObjects() {
-
-			for (i in fractionList.indices) {
-				if (fractionList.indices.contains(i))
-					fractionList[i].update()
-			}
-			
-			for (i in natureList.indices) {
-				if (natureList.indices.contains(i))
-					natureList[i].update()
-			}
 		}
 		
 		fun <T: Building> inRange(arrayList: ArrayList<T>, r: AABB): Boolean {

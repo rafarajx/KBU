@@ -11,6 +11,7 @@ import sound.SimpleSound
 import java.awt.Color
 import java.awt.Graphics2D
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 open class Entity (var owner: Fraction){
@@ -26,10 +27,14 @@ open class Entity (var owner: Fraction){
 	var edgelength: Int = 0
 	var halfedge: Int = 0
 	var tick = 1
+	var renderable = false
+	var sprites: Array<Sprite> = arrayOf()
+	var static = true
 	
 	var qt: QuadTree<Entity>? = null
 	
 	companion object {
+		
 		var random = Random()
 		
 		fun drawBarGL(pos: vec2, current: Float, max: Float, color: vec3) {
@@ -82,7 +87,7 @@ open class Entity (var owner: Fraction){
 	fun getNearestEnemy(teamNumber: Int): Entity? {
 		var max = Float.MAX_VALUE
 		var target : Entity? = null
-		for (fraction in Game.fractionList) {
+		for (fraction in World.fractionList) {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
 				val d = (entity.p - p).square().sum()
@@ -118,7 +123,7 @@ open class Entity (var owner: Fraction){
 	}
 	
 	fun fight(damage: Int, teamNumber: Int, field: AABB) {
-		for (fraction in Game.fractionList) {
+		for (fraction in World.fractionList) {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
 				if (entity.field!!.intersects(field)) {

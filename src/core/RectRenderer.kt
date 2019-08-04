@@ -1,6 +1,7 @@
 package core
 
 import gametype.Game
+import math.AABB
 import math.vec2
 import math.vec3
 import math.vec4
@@ -65,6 +66,10 @@ object RectRenderer {
 		drawdata.depthUL = glGetUniformLocation(drawprogram.id, "depth")
 		drawdata.cameraUL = glGetUniformLocation(drawprogram.id, "camera")
 		glProgramUniform2f(drawprogram.id, drawdata.resolutionUL, Window.width.toFloat(), Window.height.toFloat())
+	}
+	
+	fun draw(aabb: AABB, linewidth: Float = 1.0f){
+		draw(aabb.downleft, aabb.size, linewidth)
 	}
 	
 	fun draw(pos: vec2, size: vec2, linewidth: Float = 1.0f){

@@ -4,6 +4,7 @@ import java.awt.Color
 import java.awt.Graphics2D
 
 import core.Resources
+import core.World
 import fraction.Player
 import fraction.StandardAI
 import fraction.Uprising
@@ -17,14 +18,14 @@ object SuppressUprising : Game() {
 	override fun onSet() {
         difficulty = 6 - difficulty
 		setupMenuBar()
-		natureList.clear()
-		fractionList.clear()
-		setupNature(friendsNumber + 1)
+		World.natureList.clear()
+		World.fractionList.clear()
+		World.setupNature(friendsNumber + 1)
 		
 		var start = vec2(random.nextInt(2000), random.nextInt(2000))
 		
 		player = Player(start, Color.BLUE, Resources(100, 60, 8, 30), 0)
-		fractionList.add(player)
+		World.fractionList.add(player)
 		
 		for (i in 0 until friendsNumber) {
 			val red = random.nextInt(255)
@@ -32,7 +33,7 @@ object SuppressUprising : Game() {
 			val blue = random.nextInt(255)
 			val c = Color(red, green, blue)
 			start = vec2(random.nextInt(2000), random.nextInt(2000))
-			fractionList.add(
+			World.fractionList.add(
 				StandardAI(
 					start, c,
 					Resources(50 * difficulty, 30 * difficulty, 5 * difficulty, 50 * difficulty),
@@ -41,12 +42,12 @@ object SuppressUprising : Game() {
 			)
 		}
 		start = vec2(1000.0f, 1000.0f)
-		fractionList.add(Uprising(start, Color.RED, 100, 1))
+		World.fractionList.add(Uprising(start, Color.RED, 100, 1))
 		
 	}
 
 	override fun update() {
-		updateObjects()
+		World.update()
 		tick++
 	}
 }

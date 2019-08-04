@@ -1,5 +1,6 @@
 package fraction
 
+import core.World
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.geom.Rectangle2D
@@ -30,14 +31,7 @@ class ZombieAI(StartX: Int, StartY: Int, c: Color, TeamIndex: Int) : Fraction() 
 			return
 		}
 		if (tick > Game.toTicks(intArrayOf(12)) && buildingList.size == 0) return
-		for (i in entityList.indices) {
-			val e = entityList[i]
-			e.update()
-		}
-		for (i in buildingList.indices) {
-			val b = buildingList[i]
-			b.update()
-		}
+		
 		if (tick % 60 == 0) {
 			val x = random.nextInt(AIRange) - AIRange / 2 + center.x.toInt()
 			val y = random.nextInt(AIRange) - AIRange / 2 + center.y.toInt()
@@ -49,7 +43,7 @@ class ZombieAI(StartX: Int, StartY: Int, c: Color, TeamIndex: Int) : Fraction() 
 	override fun placeBuilding(id: Int, p: vec2) {
 		val camera = Game.camera
 		val r = AABB(p - vec2(camera.x - 16.0f, camera.y - 16.0f), vec2(32.0f, 32.0f))
-		if (isColliding(r)) return
+		if (World.isColliding(r)) return
 		
 		when (id) {
 			0 -> this.buildingList.add(Grave(p, this, teamNumber))

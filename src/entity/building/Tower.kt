@@ -2,13 +2,9 @@ package entity.building
 
 import core.*
 import fraction.Fraction
-import gametype.Game
 import math.AABB
 import math.Circle
 import math.vec2
-import java.awt.Color
-import java.awt.Graphics2D
-import java.awt.geom.Line2D
 
 class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 
@@ -19,6 +15,8 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		val COST = Resources(20, 30, 5, 0)
 		const val MAX_HEALTH = 400f
 	}
+	
+	var tower = Sprite()
 	
 	init {
 		super.p = p
@@ -31,9 +29,10 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		range = Circle(p, RANGE)
 		health = MAX_HEALTH
 		damage = 10
+		
+		sprites = arrayOf(tower)
 	}
 	
-	var tower = Sprite()
 	
 	override fun renderGL() {
 
@@ -44,17 +43,19 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		//if (target != null)
 		//	g2d.draw(Line2D.Float(p.x, p.y, target!!.p.x, target!!.p.y))
 		if(health != MAX_HEALTH) drawBarGL(p, health, MAX_HEALTH, Constants.RED)
+		if(target != null){
+			
+		}
 	}
 	
 	override fun update() {
 		if (health <= 0) die()
-		if (tick % 2 == 0) getNearestEnemy()
-		if (tick % 30 == 0) shot()
+		
 		tick++
 	}
 	
 	private fun shot() {
-		for (fraction in Game.fractionList) {
+		for (fraction in World.fractionList) {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
 				if (range!!.contains(entity.p)) {
@@ -68,7 +69,7 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	}
 	
 	private fun getNearestEnemy() {
-		for (fraction in Game.fractionList) {
+		for (fraction in World.fractionList) {
 			if (fraction.teamNumber == teamNumber) continue
 			for (entity in fraction.entityList) {
 				if (range!!.contains(entity.p)) {
@@ -85,17 +86,25 @@ class Tower(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	}
 	
 	override fun add(){
-		G.batch.add(tower)
+		Timer.addEvery(0.5f) {
+			shot()
+		}
+		
+		Timer.addEvery(0.03f){
+			getNearestEnemy()
+		}
+		
 		tower.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
 		tower.updateTexCoords(vec2(0, 32), vec2(16))
 		owner.buildingList.add(this)
 		owner.towerList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(tower)
 		owner.buildingList.remove(this)
 		owner.towerList.remove(this)
+		World.remove(this)
 	}
 	
 	override fun hurt(dmg: Int) {

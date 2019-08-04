@@ -2,6 +2,7 @@ package fraction
 
 import core.Resources
 import core.Window
+import core.World
 import entity.building.*
 import gametype.Game
 import math.AABB
@@ -23,15 +24,7 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 	
 	override fun update() {
 		if (tick % 100 == 0 && buildingList.size == 0 && entityList.size == 0) isDefeated = true
-		for (i in entityList.indices) {
-			if(entityList.indices.contains(i))
-				entityList[i].update()
-		}
-		if (isDefeated) return
-		for (i in buildingList.indices) {
-			if(buildingList.indices.contains(i))
-				buildingList[i].update()
-		}
+		
 		tick++
 	}
 	
@@ -40,7 +33,7 @@ class Player(start: vec2, c: Color, resources: Resources, teamNumber: Int) : Fra
 		val area = if (id == 6) AABB(p, 8) else AABB(p, 16)
 		
 		//if (!inRange(buildingList, area)) return
-		if (isConstructionColliding(area)) return
+		if (World.isConstructionColliding(area)) return
 		when (id) {
 			0 -> if (resources.enough(House.COST)) {
 				resources.pay(House.COST)

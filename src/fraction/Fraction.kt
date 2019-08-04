@@ -1,9 +1,6 @@
 package fraction
 
-import core.Canvas
-import core.Resources
-import core.Screen
-import core.TextRenderer
+import core.*
 import entity.Entity
 import entity.Knight
 import entity.building.*
@@ -49,6 +46,10 @@ open class Fraction {
 	var statusText = arrayOf("", "")
 	var tick = 1
 	
+	open fun update(){
+	
+	}
+	
 	fun renderBuildingsGL() {
 		for (i in buildingList.indices) {
 			if(buildingList.indices.contains(i)) {
@@ -93,8 +94,6 @@ open class Fraction {
 			TextRenderer.draw(statusText[1], p, 2.0f)
 	}
 	
-	open fun update() {}
-	
 	fun updateCenter() {
 		var center = vec2(0.0f, 0.0f)
 		for (i in buildingList.indices) {
@@ -118,44 +117,6 @@ open class Fraction {
 	}
 	
 	open fun placeBuilding(id: Int, p: vec2) {}
-	
-	fun isConstructionColliding(r: AABB): Boolean {
-		for (i in Game.fractionList.indices) {
-			val fraction = Game.fractionList[i]
-			for (j in fraction.buildingList.indices) {
-				val building = fraction.buildingList[j]
-				if (building.field!!.intersects(r)) return true
-			}
-			for (j in fraction.entityList.indices) {
-				val entity = fraction.entityList[j]
-				if (entity.field!!.intersects(r)) return true
-			}
-		}
-		return false
-	}
-	
-	fun isColliding(r: AABB): Boolean {
-		for (i in Game.fractionList.indices) {
-			val fraction = Game.fractionList[i]
-			for (j in fraction.buildingList.indices) {
-				val building = fraction.buildingList[j]
-				if (building.field!!.intersects(r)) return true
-			}
-			for (j in fraction.entityList.indices) {
-				val entity = fraction.entityList[j]
-				if (entity.field!!.intersects(r)) return true
-			}
-		}
-		for (i in Game.natureList.indices) {
-			if(Game.natureList.indices.contains(i)){
-				if(Game.natureList[i] == null) continue
-				val nature = Game.natureList[i]
-				if(nature.field == null) continue
-				if (nature.field!!.intersects(r)) return true
-			}
-		}
-		return false
-	}
 	
 	fun <T: Building> inRange(arrayList: ArrayList<T>, r: AABB): Boolean {
 		for (i in arrayList.indices) {

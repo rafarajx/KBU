@@ -46,8 +46,7 @@ object Help : GameState() {
 	val w = w()
 
 	override fun renderGL() {
-		ImageRenderer.draw(G.bgImage, vec2(0, 0), vec2(Window.width, Window.height))
-		TextRenderer.draw("FPS: " + Canvas.FPS, vec2(20), 1.0f)
+		ImageRenderer.draw(bgImage, vec2(0, 0), vec2(Window.width, Window.height))
 		//g2d.fill3DRect(60, 200 - 40, Canvas.width - 120, HELP_TEXT.size * 50 + 50, true)
 		val h = HELP_TEXT.size * 50 + 50
 		val margin = 80

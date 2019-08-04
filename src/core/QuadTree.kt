@@ -47,18 +47,18 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 		
 		if (aabb.center.y >= obj.p.y) {
 			if (aabb.center.x >= obj.p.x) {
-				if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
+				//if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
 				a!!.add(obj)
 			} else {
-				if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
+				//if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
 				b!!.add(obj)
 			}
 		} else {
 			if (aabb.center.x >= obj.p.x) {
-				if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
+				//if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
 				c!!.add(obj)
 			} else {
-				if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
+				//if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
 				d!!.add(obj)
 			}
 		}
@@ -68,10 +68,10 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 	}
 	
 	fun split(){
-		if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
-		if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
-		if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
-		if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
+		//if(a == null) a = QuadTree(this, aabb.ul, aabb.center)
+		//if(b == null) b = QuadTree(this, vec2(aabb.center.x, aabb.ul.y), vec2(aabb.dr.x, aabb.center.y))
+		//if(c == null) c = QuadTree(this, vec2(aabb.ul.x, aabb.center.y), vec2(aabb.center.x, aabb.dr.y))
+		//if(d == null) d = QuadTree(this, aabb.center, aabb.dr)
 		isSubdivided = true
 	}
 	
@@ -85,7 +85,7 @@ class QuadTree<T: Entity>(var parent: QuadTree<T>?, var aabb: AABB) {
 		
 		g2d.color = Color.BLACK
 		
-		g2d.drawRect(aabb.ul.x.toInt(), aabb.ul.y.toInt(), (aabb.dr.x - aabb.ul.x).toInt(), (aabb.dr.y - aabb.ul.y).toInt())
+		//g2d.drawRect(aabb.ul.x.toInt(), aabb.ul.y.toInt(), (aabb.dr.x - aabb.ul.x).toInt(), (aabb.dr.y - aabb.ul.y).toInt())
 		
 		if (a != null) a!!.draw(g2d)
 		if (b != null) b!!.draw(g2d)

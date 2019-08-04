@@ -9,8 +9,6 @@ import fraction.Fraction
 import math.AABB
 import math.Circle
 import math.vec2
-import java.awt.Color
-import java.awt.Graphics2D
 
 class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	
@@ -22,6 +20,8 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		const val MAX_HEALTH = 200f
 	}
 
+	var house = Sprite()
+	
 	init {
 		super.p = p
 		super.owner = owner
@@ -32,15 +32,18 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 		range = Circle(p, RANGE)
 		health = 200f
 		owner.maxPopulation += 4
-
+		sprites = arrayOf(house)
 	}
 	
-	var house = Sprite()
 
 	private fun freeMill(): Windmill? {
 		for (m in owner.millList)
 			if (m.miller[0] == null || m.miller[1] == null) return m
 		return null
+	}
+	
+	val addcloud = {
+		Cloud(owner, p - vec2(3.0f, 5.0f)).add()
 	}
 	
 	override fun renderGL() {
@@ -54,9 +57,7 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	
 	override fun update() {
 		if (health <= 0) die()
-		if (tick % 100 == 0 || tick % 173 == 0) {
-			Cloud(owner, p - vec2(3.0f, 5.0f)).add()
-		}
+		
 		if (tick % 1000 == 0 && owner.population < owner.maxPopulation && owner.resources.food > 4) {
 			val windmill = freeMill()
 			if (windmill != null) {
@@ -93,17 +94,22 @@ class House(p: vec2, owner: Fraction, teamNumber: Int) : Building(owner) {
 	}
 	
 	override fun add() {
-		G.batch.add(house)
+		
+		Timer.addEvery(1.6f, addcloud)
+		Timer.addEvery(2.9f, addcloud)
+		
 		house.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
 		house.updateTexCoords(vec2(0), vec2(16))
 		owner.buildingList.add(this)
 		owner.houseList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(house)
 		owner.buildingList.remove(this)
 		owner.houseList.remove(this)
+		World.remove(this)
+		Timer.removeEvery(addcloud)
 	}
 	
 	override fun hurt(dmg: Int) {

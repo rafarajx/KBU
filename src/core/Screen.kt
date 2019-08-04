@@ -83,30 +83,4 @@ object Screen {
 	fun drawTile(g2d: Graphics2D, TileX: Int, TileY: Int, p: vec2, width: Int, height: Int) {
 		g2d.drawImage(TilesetArray[TileX + TILESET_WIDTH * TileY], p.x.toInt(), p.y.toInt(), width, height, null)
 	}
-	/*
-	fun showInfo(g2d: Graphics2D, PositionX: Float, PositionY: Float, Title: String, Text: Array<String>, Numbers: IntArray) {
-		g2d.color = Color(80, 80, 80, 180)
-		g2d.fillRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
-		g2d.drawRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
-		g2d.color = Color(255, 255, 200, 180)
-		g2d.drawString(Title, 10 + PositionX.toInt(), 15 + PositionY.toInt())
-		g2d.color = Color(255, 255, 255, 180)
-		for (i in Text.indices) {
-			g2d.drawString(Text[i] + ": " + Numbers[i], 10 + PositionX.toInt(), i * 15 + 35 + PositionY.toInt())
-		}
-	}
-	
-	fun showInfo(g2d: Graphics2D, PositionX: Float, PositionY: Float, Title: String, Text: Array<String>, resources: Resources) {
-		g2d.color = Color(80, 80, 80, 180)
-		g2d.fillRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
-		g2d.drawRect(PositionX.toInt(), PositionY.toInt(), Math.max(Title.length * 7 + 20, 80), Text.size * 15 + 30)
-		g2d.color = Color(255, 255, 200, 180)
-		g2d.drawString(Title, 10 + PositionX.toInt(), 15 + PositionY.toInt())
-		g2d.color = Color(255, 255, 255, 180)
-		g2d.drawString(Text[0] + ": " + resources.wood, 10 + PositionX.toInt(), 0 * 15 + 35 + PositionY.toInt())
-		g2d.drawString(Text[1] + ": " + resources.stone, 10 + PositionX.toInt(), 1 * 15 + 35 + PositionY.toInt())
-		g2d.drawString(Text[2] + ": " + resources.iron, 10 + PositionX.toInt(), 2 * 15 + 35 + PositionY.toInt())
-		g2d.drawString(Text[3] + ": " + resources.food, 10 + PositionX.toInt(), 3 * 15 + 35 + PositionY.toInt())
-	}
-	*/
 }

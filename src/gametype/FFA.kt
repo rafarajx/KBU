@@ -2,6 +2,7 @@ package gametype
 
 import core.Fog
 import core.Resources
+import core.World
 import fraction.Player
 import fraction.StandardAI
 import math.vec2
@@ -18,27 +19,27 @@ object FFA : Game() {
 	override fun onSet() {
 		setupMenuBar()
 		
-		natureList.clear()
-		rockList.clear()
-		treeList.clear()
-		grassList.clear()
-		wheatList.clear()
-		cloudList.clear()
-		flowersList.clear()
+		World.natureList.clear()
+		World.rockList.clear()
+		World.treeList.clear()
+		World.grassList.clear()
+		World.wheatList.clear()
+		World.cloudList.clear()
+		World.flowersList.clear()
 		
-		fractionList.clear()
+		World.fractionList.clear()
 		
-		setupNature(opponentsNumber + 1)
+		World.setupNature(opponentsNumber + 1)
 		
 		player = Player(vec2(0.0f, -900.0f), Color.BLUE, Resources(100, 60, 10, 200), 0)
-		fractionList.add(player)
+		World.fractionList.add(player)
 		
 		for (i in 0 until opponentsNumber) {
 			val color = Color.getHSBColor(1.0f / opponentsNumber * i, 1.0f, 1.0f)
 			val start = vec2(
 				(-sin(Math.PI * 2 / (opponentsNumber + 1) * (i + 1)) * 900).toInt(),
 				(-cos(Math.PI * 2 / (opponentsNumber + 1) * (i + 1)) * 900).toInt())
-			fractionList.add(
+			World.fractionList.add(
 				StandardAI(
 					start, color,
 					Resources(50 * (difficulty + 1), 30 * (difficulty + 1), 5 * (difficulty + 1), 100 * (difficulty + 1)),
@@ -72,7 +73,7 @@ object FFA : Game() {
 	}
 	
 	override fun update() {
-		updateObjects()
+		World.update()
 		tick++
 	}
 }

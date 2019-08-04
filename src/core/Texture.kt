@@ -29,28 +29,35 @@ class Texture{
 	var image: ByteBuffer? = null
 	
 	constructor (filename: String) {
-
+		
+		println("Loading texture: $filename ...")
+		
+		val stream = Window::class.java.getResourceAsStream(filename)
+		
+		val bytes = ByteArray(stream.available())
+		stream.read(bytes)
+		
+		val buffer = BufferUtils.createByteBuffer(bytes.size)
+		buffer.put(bytes)
+		buffer.flip()
+		
 		MemoryStack.stackPush().use { stack->
 			val w = stack.mallocInt(1)
 			val h = stack.mallocInt(1)
 			val comp = stack.mallocInt(1)
-			
-			val stream = Window::class.java.getResourceAsStream(filename)
-			val bytes = stream.readAllBytes()
-			
-			val buffer = BufferUtils.createByteBuffer(bytes.size)
-			buffer.put(bytes)
-			buffer.flip()
 			
 			stbi_set_flip_vertically_on_load(true)
 			image = stbi_load_from_memory(buffer, w, h, comp, 4)
 			
 			//stbi_set_flip_vertically_on_load(true)
 			//image = stbi_load(filename, w, h, comp, 4)
+			
+			
 			if (image == null)
 				throw RuntimeException(
 					"Failed to load a texture file!\n" + stbi_failure_reason() + "\n" + filename
 				)
+			println("Texture loaded")
 
 			width = w.get()
 			height = h.get()

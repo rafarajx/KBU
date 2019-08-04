@@ -1,9 +1,6 @@
 package entity.worker
 
-import core.Constants
-import core.G
-import core.Screen
-import core.Sprite
+import core.*
 import entity.Entity
 import fraction.Fraction
 import gametype.Game
@@ -20,6 +17,10 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 		private const val FULL_HEALTH = 50f
 	}
 	
+	var stonemason = Sprite()
+	val stone = Sprite()
+	
+	
 	init {
 		super.p = p
 		this.owner = owner
@@ -31,10 +32,9 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 		speed = 0.75f
 		owner.population++
 		update()
+		sprites = arrayOf(stonemason, stone)
+		static = false
 	}
-	
-	var stonemason = Sprite()
-	val stone = Sprite()
 	
 	override fun renderGL() {
 		stonemason.updatePosition(p - edgelength / 2, vec2(edgelength))
@@ -62,10 +62,16 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 			if (tick % 15 == 0){
 				target = getNearestEntity(owner.quarryList)
 			}
-			if (tick % 100 == 0) leaveStone()
+			if (tick % 100 == 0){
+				leaveStone()
+				stone.updateTexCoords(vec2(0), vec2(0))
+			}
 		} else {
-			if (tick % 15 == 0) target = getNearestEntity(Game.rockList)
-			if (tick % 100 == 0) gatherStone()
+			if (tick % 15 == 0) target = getNearestEntity(World.rockList)
+			if (tick % 100 == 0){
+				gatherStone()
+				stone.updateTexCoords(vec2(8 * 16, 0), vec2(16))
+			}
 		}
 		if (target != null) {
 			val delta = (target!!.p - p)
@@ -79,7 +85,7 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 	}
 	
 	private fun gatherStone() {
-		for (rock in Game.rockList) {
+		for (rock in World.rockList) {
 			if (rock.field!!.intersects(field!!)) {
 				rock.gatherResources(1)
 				hasStone = true
@@ -101,21 +107,17 @@ class Stonemason(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 	}
 	
 	override fun die() {
-		SimpleSound.die.play()
 		owner.population--
 		remove()
 	}
 
 	override fun add() {
-		G.batch.add(stonemason)
-		G.batch.add(stone)
-		stone.updateTexCoords(vec2(8 * 16, 0), vec2(16))
 		owner.entityList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(stonemason)
-		G.batch.remove(stone)
 		owner.entityList.remove(this)
+		World.remove(this)
 	}
 }

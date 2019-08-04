@@ -1,8 +1,8 @@
 package entity.nature
 
-import core.G
 import core.Screen
 import core.Sprite
+import core.World
 import fraction.Fraction
 import gametype.Game
 import math.AABB
@@ -17,15 +17,16 @@ class Grass(owner: Fraction, p: vec2) : Nature(owner) {
 		const val EDGE_LENGTH = 32
 		const val HALF_EDGE = EDGE_LENGTH / 2
 	}
+	var grass = Sprite()
 	
 	init {
 		super.p = p
 		edgelength = EDGE_LENGTH
 		halfedge = HALF_EDGE
 		field = AABB(p, 0.5f)
+		sprites = arrayOf(grass)
 	}
 	
-	var grass = Sprite()
 	
 	override fun renderGL() {
 		//Screen.drawTile(g2d, 8, 3, p.x.toInt() - fieldSize / 2, p.y.toInt() - fieldSize / 2 + 2, fieldSize, fieldSize)
@@ -41,15 +42,11 @@ class Grass(owner: Fraction, p: vec2) : Nature(owner) {
 	override fun gatherResources(amount: Int) {}
 	
 	override fun add(){
-		G.batch.add(grass)
 		grass.updatePosition(p - fieldSize / 2 + vec2(0, 2), vec2(halfedge))
-		Game.natureList.add(this)
-		Game.grassList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(grass)
-		Game.natureList.remove(this)
-		Game.grassList.remove(this)
+		World.remove(this)
 	}
 }

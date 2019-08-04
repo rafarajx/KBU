@@ -1,6 +1,7 @@
 package fraction
 
 import core.Resources
+import core.World
 import entity.building.*
 import gametype.Game
 import math.AABB
@@ -27,15 +28,6 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 	override fun update() {
 		
 		if (buildingList.size == 0) isDefeated = true
-		
-		for (i in entityList.indices) {
-			if (entityList.indices.contains(i))
-				entityList[i].update()
-		}
-		for (i in buildingList.indices) {
-			if (buildingList.indices.contains(i))
-				buildingList[i].update()
-		}
 		
 		if (isDefeated) return
 		if (tick % 60 == 0) updateCenter()
@@ -82,7 +74,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
 				val r = AABB(vec2(x, y), 16)
-				if (isConstructionColliding(r)) {
+				if (World.isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
@@ -93,7 +85,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
 				val r = AABB(vec2(x, y), 16)
-				if (isConstructionColliding(r)) {
+				if (World.isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
@@ -104,7 +96,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
 				val r = AABB(vec2(x, y), 16)
-				if (isConstructionColliding(r)) {
+				if (World.isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
@@ -112,13 +104,13 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				Tower(vec2(x, y), this, teamNumber).add()
 			}
 			Building.WOODCAMP -> if (resources.enough(WoodCamp.COST)) {
-				val p = (getNearestEntity(center, Game.treeList) ?: return).p.copy()
+				val p = (getNearestEntity(center, World.treeList) ?: return).p.copy()
 				
 				p.x += (random.nextInt(100) - 50).toFloat()
 				p.y += (random.nextInt(100) - 50).toFloat()
 				
 				val r = AABB(p, 16)
-				if (isConstructionColliding(r)) {
+				if (World.isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
@@ -126,13 +118,13 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				WoodCamp(p, this, teamNumber).add()
 			}
 			Building.QUARRY -> if (resources.enough(Quarry.COST)) {
-				val p = (getNearestEntity(center, Game.rockList) ?: return).p.copy()
+				val p = (getNearestEntity(center, World.rockList) ?: return).p.copy()
 				
 				p.x += (random.nextInt(100) - 50).toFloat()
 				p.y += (random.nextInt(100) - 50).toFloat()
 				
 				val r = AABB(p, 16)
-				if (isConstructionColliding(r)) {
+				if (World.isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}
@@ -144,7 +136,7 @@ class StandardAI(start: vec2, color: Color, resources: Resources, baseAIRange: I
 				val x = random.nextInt(AIRange) - AIRange / 2 + center.x
 				val y = random.nextInt(AIRange) - AIRange / 2 + center.y
 				val r = AABB(vec2(x, y), 16)
-				if (isConstructionColliding(r)) {
+				if (World.isConstructionColliding(r)) {
 					this.AIRange += 50
 					return
 				}

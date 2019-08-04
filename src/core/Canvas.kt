@@ -1,28 +1,12 @@
 package core
 
+import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.opengl.*
 import org.lwjgl.opengl.GL45.*
 import state.StateManager
+import kotlin.math.floor
 
 object Canvas {
-	
-	const val SECOND: Long = 1_000_000_000
-	
-	var UPS: Long = 60
-	var UPDATE_TIME = SECOND / UPS
-	
-	var FPS: Int = 60
-	var FRAME_TIME = SECOND / FPS
-	
-	var TUPS: Int = 0
-	var TFPS: Int = 0
-	
-	var threadrunning = true
-	
-	var TUPSA = ArrayList<Int>()
-	var TFPSA = ArrayList<Int>()
-	
-	
 	lateinit var bra: Texture
 	lateinit var tileset: Texture
 	
@@ -73,7 +57,7 @@ object Canvas {
 		Fog.init()
 		
 
-		G.batch = SpriteBatch(tileset)
+		batch = SpriteBatch(tileset)
 
 		/*
 		for (i in 0..100) {
@@ -90,23 +74,7 @@ object Canvas {
 		*/
 	}
 
-	fun loop() {
-
-		while (threadrunning) {
-			val t1 = System.nanoTime()
-
-			StateManager.update()
-
-			val t2 = System.nanoTime()
-			val d = t2 - t1
-			var st = UPDATE_TIME - d
-			if(st < 0) st = 1
-			TUPSA.add((SECOND / d).toInt())
-			if(TUPSA.size > UPS) TUPSA.removeAt(0)
-			TUPS = TUPSA.average().toInt()
-			Thread.sleep(st / 1000000, st.rem(1000000).toInt())
-		}
-	}
+	
 
 	fun renderGL() {
 		
@@ -114,8 +82,6 @@ object Canvas {
 		//glEnable(GL11.GL_DEPTH_TEST)
 		glClearColor(0.0f, 0.63f, 0.24f, 1.0f)
 
-		G.batch.openPosition()
-		G.batch.openTexCoords()
 		/*
 		for (i in 0..100) {
 			val x = i % 10
@@ -127,9 +93,7 @@ object Canvas {
 		*/
 		StateManager.renderGL()
 		
-		G.batch.closePosition()
-		G.batch.closeTexCoords()
 
-		G.batch.render()
+		batch.render()
 	}
 }

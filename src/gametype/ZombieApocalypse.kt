@@ -5,6 +5,7 @@ import java.awt.Graphics2D
 
 import core.Resources
 import core.Screen
+import core.World
 import fraction.Player
 import fraction.StandardAI
 import fraction.ZombieAI
@@ -18,11 +19,11 @@ object ZombieApocalypse : Game() {
 	fun init(FriendsNumber: Int, difficulty: Int) {
 		var difficulty = difficulty
 		setupMenuBar()
-		natureList.clear()
-		fractionList.clear()
-		setupNature(FriendsNumber + 1)
+		World.natureList.clear()
+		World.fractionList.clear()
+		World.setupNature(FriendsNumber + 1)
 		var start = vec2(1000.0f, 1000.0f)
-		fractionList.add(Player(start, Color.BLUE, Resources(100, 60, 8, 30), 0))
+		World.fractionList.add(Player(start, Color.BLUE, Resources(100, 60, 8, 30), 0))
 		difficulty++
 		for (i in 0 until FriendsNumber) {
 			val red = random.nextInt(255)
@@ -30,7 +31,7 @@ object ZombieApocalypse : Game() {
 			val blue = random.nextInt(255)
 			val c = Color(red, green, blue)
 			start = vec2(random.nextInt(2000), random.nextInt(2000))
-			fractionList.add(
+			World.fractionList.add(
 				StandardAI(
 					start, c,
 					Resources(200 / difficulty, 120 / difficulty, 20 / difficulty, 60 / difficulty),
@@ -38,11 +39,11 @@ object ZombieApocalypse : Game() {
 				)
 			)
 		}
-		fractionList.add(ZombieAI(1000, 1000, Color.RED, 1))
+		World.fractionList.add(ZombieAI(1000, 1000, Color.RED, 1))
 	}
 
 	override fun update() {
-		updateObjects()
+		World.update()
 		tick++
 	}
 }

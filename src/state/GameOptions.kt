@@ -88,7 +88,7 @@ object GameOptions : GameState() {
 	}
 	
 	override fun renderGL() {
-		ImageRenderer.draw(G.bgImage, vec2(0), vec2(Window.width, Window.height))
+		ImageRenderer.draw(bgImage, vec2(0), Window.size)
 
 		val bgw = 800
 		val bgh = 600

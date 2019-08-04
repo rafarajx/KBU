@@ -1,7 +1,8 @@
 package entity.nature
 
-import core.G
 import core.Screen
+import core.Sprite
+import core.World
 import fraction.Fraction
 import gametype.Game
 import math.AABB
@@ -26,9 +27,12 @@ class Flowers(owner: Fraction, p: vec2) : Nature(owner) {
 		field = AABB(p, 0.5f)
 	}
 	
+	val flower = Sprite()
+	
 	override fun renderGL() {
 		//Screen.drawTile(g2d, 7 + appearance, 4, p - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH)
-		G.batch.updatePosition(flowersid, p - HALF_EDGE, vec2(edgelength))
+		flower.updatePosition(p - HALF_EDGE, vec2(edgelength))
+		sprites = arrayOf(flower)
 	}
 	
 	override fun update() {
@@ -38,15 +42,11 @@ class Flowers(owner: Fraction, p: vec2) : Nature(owner) {
 	override fun gatherResources(amount: Int) {}
 	
 	override fun add(){
-		flowersid = G.batch.getId()
-		G.batch.updateTexCoords(flowersid, vec2((7 + appearance) * 16, 4 * 16), vec2(EDGE_LENGTH))
-		Game.natureList.add(this)
-		Game.flowersList.add(this)
+		flower.updateTexCoords(vec2((7 + appearance) * 16, 4 * 16), vec2(EDGE_LENGTH))
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.removeSprite(flowersid)
-		Game.natureList.remove(this)
-		Game.flowersList.remove(this)
+		World.remove(this)
 	}
 }

@@ -1,12 +1,11 @@
 package entity.nature
 
-import core.G
-import core.Screen
+import core.Sprite
+import core.Timer
+import core.World
 import fraction.Fraction
-import gametype.Game
 import math.AABB
 import math.vec2
-import java.awt.Graphics2D
 
 class Wheat(owner: Fraction, p: vec2) : Nature(owner) {
 	var num = 1
@@ -16,22 +15,23 @@ class Wheat(owner: Fraction, p: vec2) : Nature(owner) {
 		const val HALF_EDGE = EDGE_LENGTH / 2
 	}
 	
+	var wheat = Sprite()
+	var shadow = Sprite()
+	
 	init {
 		super.p = p
 		edgelength = EDGE_LENGTH
 		halfedge = HALF_EDGE
 		field = AABB(p, 0.5f)
+		sprites = arrayOf(wheat, shadow)
 	}
-	
-	var wheatid = 0
-	var shadowid = 0
 	
 	override fun renderGL() {
 		//Screen.drawTile(g2d, 8, 3, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE + 2, EDGE_LENGTH, EDGE_LENGTH)
 		//Screen.drawTile(g2d, 7 + num, 6, p.x.toInt() - HALF_EDGE, p.y.toInt() - HALF_EDGE, EDGE_LENGTH, EDGE_LENGTH)
 
 
-		G.batch.updateTexCoords(wheatid, vec2((7 + num) * 16, 6 * 16), vec2(16))
+		wheat.updateTexCoords(vec2((7 + num) * 16, 6 * 16), vec2(16))
 
 	}
 	
@@ -52,22 +52,20 @@ class Wheat(owner: Fraction, p: vec2) : Nature(owner) {
 	}
 	
 	override fun add(){
-		wheatid = G.batch.getId()
-		G.batch.updatePosition(wheatid, p - HALF_EDGE, vec2(16))
+		Timer.addEvery(20f) {
+			if(num < 7) num++
+		}
 		
-		shadowid = G.batch.getId()
-		G.batch.updatePosition(shadowid, p - HALF_EDGE, vec2(16))
-		G.batch.updateTexCoords(shadowid, vec2(8 * 16, 3 * 16), vec2(16))
-		G.batch.updateDepth(shadowid, 2.0f)
+		wheat.updatePosition(p - HALF_EDGE, vec2(16))
 		
-		Game.natureList.add(this)
-		Game.wheatList.add(this)
+		shadow.updatePosition(p - HALF_EDGE, vec2(16))
+		shadow.updateTexCoords(vec2(8 * 16, 3 * 16), vec2(16))
+		shadow.updateDepth(2.0f)
+		
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.removeSprite(wheatid)
-		G.batch.removeSprite(shadowid)
-		Game.natureList.remove(this)
-		Game.wheatList.remove(this)
+		World.remove(this)
 	}
 }

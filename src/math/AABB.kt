@@ -2,28 +2,31 @@ package math
 
 import kotlin.math.abs
 
-class AABB(var ul: vec2, var dr: vec2) {
+data class AABB(var downleft: vec2, var upright: vec2) {
 	
-	constructor(middle: vec2, halfEdge: Int): this(middle - halfEdge, middle + halfEdge)
+	constructor (pos: vec2, size: Float): this(pos - size, pos + size)
+	constructor (pos: vec2, size: Int): this(pos, size.toFloat())
 	
-	constructor(middle: vec2, halfEdge: Float): this(middle - halfEdge, middle + halfEdge)
+	companion object {
+		fun rect(xy: vec2, wh: vec2): AABB {
+			return AABB(xy, wh + xy)
+		}
+	}
+	var xmin = downleft.x
+	var xmax = upright.x
 	
-	var x = ul.x
-	var y = ul.y
+	var ymin = downleft.y
+	var ymax = upright.y
 	
-	var xmin = ul.x
-	var xmax = dr.x
+	var width = xmax - xmin
+	var height = ymax - ymin
 	
-	var ymin = ul.y
-	var ymax = dr.y
+	var center = (downleft + upright) * 0.5f
 	
-	var width = dr.x - ul.x
-	var height = dr.y - ul.y
+	var size = vec2(width, height)
 	
-	var center = (ul + dr) * 0.5f
-	
-	var ur = vec2(xmax, ymin)
-	var dl = vec2(xmin, ymax)
+	var x = xmin
+	var y = ymin
 	
 	/*
 	fun intersects(other: AABB): Boolean {
@@ -31,13 +34,33 @@ class AABB(var ul: vec2, var dr: vec2) {
 	}
 	*/
 	
+	/*
 	fun intersects(other: AABB): Boolean {
 		return (abs(xmin - other.xmin) * 2 < (width + other.width)) &&
 				(abs(ymin - other.ymin) * 2 < (height + other.height))
 	}
 	
+	*/
+	
+	
+	fun intersects(other: AABB): Boolean {
+		// If one rectangle is on left side of other
+		if (xmin > other.xmax || other.xmin > xmax)
+			return false
+		
+		// If one rectangle is above other
+		if (ymax < other.ymin || other.ymax < ymin)
+			return false
+		
+		return true
+	}
+	
 	fun contains(p: vec2): Boolean {
-		return p.x > xmin && p.x < xmax && p.y > ymin && p.y < ymax
+		//println("${c.field}    ${e.p}    ${c.field.contains(e.p)}")
+		val b = p.x > xmin && p.x < xmax && p.y > ymin && p.y < ymax
+		
+		//println("$xmin   $xmax   $ymin   $ymax  ${p.x}  ${p.y}   $ul $dr    $b")
+		return b
 	}
 	
 }

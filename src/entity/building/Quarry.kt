@@ -29,6 +29,7 @@ class Quarry(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 		field = AABB(p, HALF_EDGE)
 		range = Circle(p, RANGE)
 		health = MAX_HEALTH
+		sprites = arrayOf(quarry)
 	}
 	
 	override fun renderGL() {
@@ -48,17 +49,17 @@ class Quarry(p: vec2, owner: Fraction, teamIndex: Int) : Building(owner) {
 	}
 	
 	override fun add() {
-		G.batch.add(quarry)
 		quarry.updatePosition(vec2(p.x.toInt(), p.y.toInt()) - HALF_EDGE, vec2(edgelength))
 		quarry.updateTexCoords(vec2(0, 64), vec2(16))
 		owner.buildingList.add(this)
 		owner.quarryList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized override fun remove(){
-		G.batch.remove(quarry)
 		owner.buildingList.remove(this)
 		owner.quarryList.remove(this)
+		World.remove(this)
 	}
 	
 	override fun hurt(dmg: Int) {

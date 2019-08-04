@@ -1,9 +1,6 @@
 package entity
 
-import core.Constants
-import core.G
-import core.Screen
-import core.Sprite
+import core.*
 import fraction.Fraction
 import gametype.Game
 import math.AABB
@@ -14,11 +11,11 @@ import java.awt.Graphics2D
 
 class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	
-	var knight = Sprite()
-	
 	companion object{
 		const val MAX_HEALTH = 100f
 	}
+	
+	var knight = Sprite()
 	
 	init {
 		super.p = p
@@ -30,6 +27,8 @@ class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 		speed = 0.6f
 		field = AABB(p, edgelength / 2)
 		owner.population++
+		sprites = arrayOf(knight)
+		static = false
 	}
 	
 	override fun renderGL() {
@@ -60,12 +59,12 @@ class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 		if (n != null) {
 			var delta = n.p - p
 			if (delta == vec2(0.0f))
-				delta += vec2(random.nextFloat() - 0.5f, random.nextFloat() - 0.5f)
+				delta += vec2(random.nextFloat(), random.nextFloat()) - 0.5f
 			val d = delta.length()
 			p += delta / d * speed
 		}
 		
-		val e = getNearestEntity(Game.knightList)
+		val e = getNearestEntity(World.knightList)
 		
 		if(e != null && e != this){
 			var delta = e.p - p
@@ -82,23 +81,20 @@ class Knight(p: vec2, owner: Fraction, teamNumber: Int) : Entity(owner) {
 	}
 	
 	override fun die() {
-		SimpleSound.die.play()
 		owner.population--
 		remove()
 	}
 	
 	override fun add() {
-		G.batch.add(knight)
 		owner.knightList.add(this)
 		owner.entityList.add(this)
-		Game.knightList.add(this)
+		World.add(this)
 	}
 	
 	@Synchronized
 	override fun remove() {
-		G.batch.remove(knight)
 		owner.knightList.remove(this)
 		owner.entityList.remove(this)
-		Game.knightList.remove(this)
+		World.remove(this)
 	}
 }

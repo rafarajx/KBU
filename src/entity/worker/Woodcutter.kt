@@ -19,6 +19,9 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 		const val HALF_EDGE = 16
 	}
 	
+	val woodcutter = Sprite()
+	val wood = Sprite()
+	
 	init {
 		super.p = p
 		super.owner = owner
@@ -30,11 +33,10 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 		damage = 10
 		speed = 0.75f
 		owner.population++
+		sprites = arrayOf(woodcutter, wood)
+		static = false
 	}
 	
-	val woodcutter = Sprite()
-	val wood = Sprite()
-
 	override fun renderGL() {
 		woodcutter.updatePosition(p - edgelength / 2, vec2(edgelength))
 		if (target == null) {
@@ -58,10 +60,16 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 		field = AABB(p, edgelength / 2)
 		if (hasWood) {
 			if (tick % 15 == 0) target = getNearestEntity(owner.woodCampList)
-			if (tick % 100 == 0) leaveWood()
+			if (tick % 100 == 0){
+				leaveWood()
+				wood.updateTexCoords(vec2(0), vec2(0))
+			}
 		} else {
-			if (tick % 15 == 0) target = getNearestEntity(Game.treeList)
-			if (tick % 100 == 0) chopTree()
+			if (tick % 15 == 0) target = getNearestEntity(World.treeList)
+			if (tick % 100 == 0){
+				chopTree()
+				wood.updateTexCoords(vec2(7 * 16, 0), vec2(16))
+			}
 		}
 		if (target != null) {
 			val delta = target!!.p - p
@@ -74,7 +82,7 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 	}
 
 	private fun chopTree() {
-		for (tree in Game.treeList) {
+		for (tree in World.treeList) {
 			if (tree.field!!.intersects(field!!)) {
 				tree.gatherResources(1)
 				hasWood = true
@@ -94,22 +102,18 @@ class Woodcutter(p: vec2, owner: Fraction, teamIndex: Int) : Entity(owner) {
 	}
 	
 	override fun die() {
-		SimpleSound.die.play()
 		owner.population--
 		remove()
 	}
 
 	override fun add() {
-		G.batch.add(woodcutter)
-		G.batch.add(wood)
-		wood.updateTexCoords(vec2(7 * 16, 0), vec2(16))
 		owner.entityList.add(this)
+		World.add(this)
 	}
 
 	@Synchronized
 	override fun remove(){
-		G.batch.remove(woodcutter)
-		G.batch.remove(wood)
 		owner.entityList.remove(this)
+		World.remove(this)
 	}
 }
