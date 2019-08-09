@@ -20,42 +20,6 @@ object GameOptions : GameState() {
 
 	private var tick = 1
 	
-	override fun onSet() {
-		Input.keyPressed = object : Input.KEvent {
-			override fun get(e: KeyEvent) {
-				when (e.keyCode) {
-					KeyEvent.VK_ENTER -> {
-						Input.keyPressed = null
-						when (gameMode) {
-							0 -> {
-								FFA.opponentsNumber = numberOfEnemies
-								FFA.difficulty = difficulty + 1
-								StateManager.state = FFA
-							}
-							1 -> {
-								SuppressUprising.friendsNumber = numberOfEnemies
-								SuppressUprising.difficulty = difficulty + 1
-								StateManager.state = SuppressUprising
-							}
-						}
-					}
-					KeyEvent.VK_LEFT -> {
-						if (optionNum == 0 && gameMode > 0) gameMode--
-						else if (optionNum == 1 && numberOfEnemies > 0) numberOfEnemies--
-						else if (optionNum == 2 && difficulty > 0) difficulty--
-					}
-					KeyEvent.VK_RIGHT -> {
-						if (optionNum == 0 && gameMode < GAME_MODES.size - 1) gameMode++
-						else if (optionNum == 1 && numberOfEnemies < 7) numberOfEnemies++
-						else if (optionNum == 2 && difficulty < DIFFICULTIES.size - 1) difficulty++
-					}
-					KeyEvent.VK_UP -> if (optionNum > 0) optionNum--
-					KeyEvent.VK_DOWN -> if (optionNum < 2) optionNum++
-				}
-			}
-		}
-	}
-
 	override fun keyCallback(key: Int, scancode: Int, action: Int, mods: Int){
 		if(action == 1) when (key) {
 			GLFW.GLFW_KEY_ENTER -> {

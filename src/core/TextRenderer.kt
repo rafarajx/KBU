@@ -53,8 +53,8 @@ object TextRenderer {
 		val tileWidth = 8 * scale
 		val tileHeight = 11 * scale
 		
-		val vertices = FloatArray(12 * text.length)
-		val texCoords = FloatArray(12 * text.length)
+		val vertices = FloatArray(8 * text.length)
+		val texCoords = FloatArray(8 * text.length)
 		
 		val sb = StringBuilder()
 		
@@ -77,21 +77,19 @@ object TextRenderer {
 			val c: Float = pos.x + i * tileWidth
 			val d: Float = pos.y
 			
-			val index = 12 * i
+			val index = 8 * i
 			
 			vertices[index + 0] = c
 			vertices[index + 1] = d
+			
 			vertices[index + 2] = c + tileWidth
 			vertices[index + 3] = d
+			
 			vertices[index + 4] = c + tileWidth
 			vertices[index + 5] = d + tileHeight
 			
 			vertices[index + 6] = c
-			vertices[index + 7] = d
-			vertices[index + 8] = c + tileWidth
-			vertices[index + 9] = d + tileHeight
-			vertices[index + 10] = c
-			vertices[index + 11] = d + tileHeight
+			vertices[index + 7] = d + tileHeight
 			
 			val id = getLetterId(text[i])
 			
@@ -100,17 +98,15 @@ object TextRenderer {
 			
 			texCoords[index + 0] = a
 			texCoords[index + 1] = 0f
+			
 			texCoords[index + 2] = b
 			texCoords[index + 3] = 0f
+			
 			texCoords[index + 4] = b
 			texCoords[index + 5] = 1f
 			
 			texCoords[index + 6] = a
-			texCoords[index + 7] = 0f
-			texCoords[index + 8] = b
-			texCoords[index + 9] = 1f
-			texCoords[index + 10] = a
-			texCoords[index + 11] = 1f
+			texCoords[index + 7] = 1f
 		}
 		
 		fontProgram.use()
@@ -140,7 +136,7 @@ object TextRenderer {
 		glUniform4fv(colorUL, color.array)
 		glUniform1f(depthUL, depth)
 		
-		glDrawArrays(GL_TRIANGLES, 0, vertices.size)
+		glDrawArrays(GL_QUADS, 0, vertices.size)
 		glBindVertexArray(0)
 		glDeleteVertexArrays(vao)
 		glDeleteBuffers(vbo)

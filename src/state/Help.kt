@@ -19,21 +19,6 @@ object Help : GameState() {
 		"Press escape to quit..."
 	)
 
-	private var keyPressed: Input.KEvent? = null
-
-	override fun onSet() {
-		keyPressed = object : Input.KEvent {
-			override fun get(e: KeyEvent) {
-				if (e.keyCode == 27) {
-					SimpleSound.pickup.play()
-					Input.keyPressed = null
-					StateManager.state = Menu
-				}
-			}
-		}
-		Input.keyPressed = keyPressed
-	}
-
 	override fun keyCallback(key: Int, scancode: Int, action: Int, mods: Int) {
 		if (action == 1) {
 			if (key == GLFW.GLFW_KEY_ESCAPE) {

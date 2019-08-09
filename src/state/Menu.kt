@@ -51,43 +51,6 @@ object Menu: GameState() {
 		}
 	}
 	
-	override fun render(g2d: Graphics2D) {
-		g2d.drawImage(BG, 0, 0, Window.width, Window.height, null)
-		Screen.drawString(g2d, Window.GAME_TITLE, Window.width / 2 - Window.GAME_TITLE.length / 2 * 32, 70, 4.0)
-		g2d.color = Color(180, 180, 180, 180)
-		g2d.fill3DRect(Window.width / 2 - 200, Window.height / 2 - 250, 400, 300, true)
-		for (i in OPTIONS.indices) {
-			if (cursor == i) {
-				if (tick % 30 / 15 == 0) {
-					Screen.drawString(
-						g2d,
-						OPTIONS[i] + "<",
-						Window.width / 2 - OPTIONS[i].length / 2 * 3 * 8,
-						Window.height / 2 - 200 + i * 45,
-						3.0
-					)
-				} else {
-					Screen.drawString(
-						g2d,
-						OPTIONS[i] + "<",
-						Window.width / 2 - OPTIONS[i].length / 2 * 3 * 8,
-						Window.height / 2 - 200 + i * 45 + 2,
-						3.0
-					)
-				}
-			} else {
-				Screen.drawString(
-					g2d,
-					OPTIONS[i],
-					Window.width / 2 - OPTIONS[i].length / 2 * 3 * 8,
-					Window.height / 2 - 200 + i * 45,
-					3.0
-				)
-			}
-		}
-	}
-	
-	
 	override fun renderGL() {
 		ImageRenderer.draw(bgImage, vec2(0), vec2(Window.width, Window.height))
 		

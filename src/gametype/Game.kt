@@ -49,8 +49,8 @@ open class Game: GameState(){
 		when(button) {
 			GLFW.GLFW_MOUSE_BUTTON_1 -> {
 				val pos = vec2(
-					mousePos.x - Game.camera.x,
-					mousePos.y - Game.camera.y
+					mousePos.x - camera.x,
+					mousePos.y - camera.y
 				)
 				player.placeBuilding(selectedBuilding, pos)
 			}
